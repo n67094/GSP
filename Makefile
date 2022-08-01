@@ -13,7 +13,7 @@ TARGET := release # can be release or debug
 LIBSEVEN	:= ./externals/libseven
 MINRT		:= ./externals/libseven/gba-minrt
 
-SOURCES		:= rt/crt0.s src/main.c
+SOURCES		:= rt/crt0.s $(shell find ./src -name '*.c') $(shell find ./src -name '*.s')
 INCLUDES	:=
 LIBDIRS		:= $(LIBSEVEN)
 LIBS		:= seven
