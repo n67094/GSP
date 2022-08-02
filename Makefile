@@ -10,13 +10,14 @@ PROJECT		:= GSP
 
 TARGET := release # can be release or debug
 
+ACSL	:= ./externals/libacsl
 LIBSEVEN	:= ./externals/libseven
 MINRT		:= ./externals/libseven/gba-minrt
 
 SOURCES		:= rt/crt0.s $(shell find ./src -name '*.c') $(shell find ./src -name '*.s')
-INCLUDES	:=
-LIBDIRS		:= $(LIBSEVEN)
-LIBS		:= seven
+INCLUDES	:= #
+LIBDIRS		:= $(LIBSEVEN) $(ACSL)
+LIBS		:= seven acsl
 
 BUILDDIR	:= build
 
