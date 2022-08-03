@@ -3,27 +3,24 @@
 
 #include <seven/base/attributes.h>
 
-typedef enum {
-	TitleSceneState,
-	DevlopperSceneState,
-} SceneStates;
+typedef struct scene {
+	void (*Open)(void);
+	void (*Update)(void);
+	void (*Draw)(void);
+	void (*VBlank)(void);
+	void (*Close)(void);
+} Scene;
 
-typedef struct SceneManager {
-	SceneStates state;
-} SceneManager;
+extern Scene title_scene, mission_scene;
 
-extern SceneManager sceneManager;
-
-void SceneManagerInit(void);
+void SceneManagerOpen(void);
 
 void SceneManagerUpdate(void);
 
 void SceneManagerDraw(void);
 
-void SceneManagerDestroy(void);
+void SceneManagerVBlank(void);
 
-void SceneManagerLoad(SceneStates state);
-
-void SceneManagerGoTo(SceneStates state);
+void SceneManagerGoTo(Scene scene);
 
 #endif

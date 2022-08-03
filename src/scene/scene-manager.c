@@ -1,69 +1,33 @@
 #include "scene-manager.h"
 
-#include "title.h"
-#include "devlopper.h"
+static void Empty() {}
 
-void* scene;
-
-void SceneManagerInit()
-{
-  // The first scene on screen
-  SceneManagerLoad(TitleSceneState);
-}
-
-void SceneManagerLoad(SceneStates state)
-{
-  switch (state) {
-  case TitleSceneState:
-    scene = TitleCreate();
-    break;
-  case DevlopperSceneState:
-    scene = DevlopperCreate();
-    break;
-  }
-}
+Scene scene = {
+  .Open = Empty,
+  .Update = Empty,
+  .Draw = Empty,
+  .VBlank = Empty,
+  .Close = Empty
+};
 
 void SceneManagerUpdate()
 {
-  switch (sceneManager.state) {
-  case TitleSceneState:
-    TitleUpdate(scene);
-    break;
-  case DevlopperSceneState:
-    DevlopperUpdate(scene);
-    break;
-  }
+  scene.Update();
 }
 
 void SceneManagerDraw()
 {
-  switch (sceneManager.state) {
-  case TitleSceneState:
-    TitleDraw(scene);
-    break;
-  case DevlopperSceneState:
-    DevlopperDraw(scene);
-    break;
-  }
+  scene.Draw();
 }
 
-void SceneManagerDestroy()
+void SceneManagerVBlank()
 {
-  switch (sceneManager.state) {
-  case TitleSceneState:
-    TitleDestroy(scene);
-    break;
-  case DevlopperSceneState:
-    DevlopperDestroy(scene);
-    break;
-  }
+  scene.VBlank();
 }
 
-void SceneManagerGoTo(SceneStates state)
+void SceneManagerGoTo(Scene nextScene)
 {
-  SceneManagerDestroy();
-
-  SceneManagerLoad(state);
-
-  sceneManager.state = state;
+  scene.Close();
+  scene = nextScene;
+  scene.Open();
 }

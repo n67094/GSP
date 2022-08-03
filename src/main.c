@@ -1,8 +1,7 @@
 #include <seven/hw/irq.h>
 #include <seven/svc/wait.h>
 #include <seven/hw/video.h>
-#include <acsl/stdlib.h>
-#include <stdbool.h>
+#include <seven/hw/input.h>
 
 #include "debug/log.h"
 #include "debug/assert.h"
@@ -11,30 +10,17 @@
 
 bool gba_can_draw = false;
 
-SceneManager sceneManager;
-
-void Init() {
-    LOG_INIT();
-
-    SceneManagerInit();
-}
-
 void Update() {
-    SceneManagerUpdate();
+   SceneManagerUpdate();
 }
 
 void Draw() {
-    SceneManagerDraw();
+  SceneManagerDraw();
 }
 
-void Destroy() {
-    SceneManagerDestroy();
-
-    LOG_CLOSE();
-}
-
-// VBlank callback, called only on vBlank
 void VBlank(u16 irqs) {
+  SceneManagerVBlank();
+
   if(gba_can_draw == true) {
     Draw();
     gba_can_draw = false;
@@ -43,17 +29,26 @@ void VBlank(u16 irqs) {
 
 int main(void)
 {
+    LOG_INIT();
+
     irqInitDefault();
     irqEnableFull(IRQ_VBLANK);
     irqCallbackSet(IRQ_VBLANK, VBlank, 0);
 
-    Init();
+    SceneManagerGoTo(title_scene);
+    // SceneManagerGoTo(mission_scene);
 
     while (true) {
+        inputPoll();
+
+        LOG_DEBUG("ok");
+
         Update();
+
         gba_can_draw = true;
+
         svcVBlankIntrWait();
     }
 
-    Destroy();
+    LOG_CLOSE();
 }
