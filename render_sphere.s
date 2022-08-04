@@ -42,7 +42,7 @@
 	@This is how the registers are utilized during the main loop. 
 	@r0: Texture Pointer
 	@r1: VRAM Pointer Right
-	@r2: VRAM entry Left temp
+	@r2: VRAM entry 1 Left
 	@r3: X coordinate reletive to center (X)
 	@r4: Y coordinate reletive to center (Y)
 	@r5: Scratch 1
@@ -56,8 +56,7 @@
 	@r13: VRAM entry 3 Right
 	@r14: VRAM entry 4 Right
 	@r15: program counter
-	@rfiq_10: VRAM Pointer Left
-	@rfiq_11: VRAM entry 1 Left
+	@rfiq_11: VRAM Pointer Left
 	@rfiq_12: VRAM entry 2 Left
 	@rfiq_13: VRAM entry 3 Left
 	@rfiq_14: VRAM entry 4 Left
@@ -80,100 +79,145 @@ sphere_render_r13:
 	@this is a temporary storage place for the stack pointer, as r13 will be used for other purposes by this function
 	.word 0x0
 	
-render_sphere:
-	@first comes some housekeeping to handle the function arguments
-	@store all the existing registers
-	push	{r4-r12, r14}
-	str		r13, sphere_render_r13
-	mov		r5, r2 @put the pitch into r5 temporarilly. This will be replaced by self-modifying code |*****|
-	
-	@add the spin to the gfx Ptr, while moving it into a range of 0-1023
-	@the shift amount will need to change depending on gfxSize|*****|
-	mov		r3, r3, lsl #22
-	add		r0, r3, lsr #22
-	add		r0, r0, #0x80000
-	@setup the lut pointers. Change these to adr instructions once the rest of the function is done |*****|
-	ldr		r9, =table_group_1
-	ldr		r10, =table_group_2
-	@set the starting Y position. It starts at radius-1 and will decrement towards 0
-	mov		r4, #63 @this number will change depending on scale|*****|
-map_row:
-	@load the starting X position. It starts at sqrt(1-Y^2) pixels to the right, and decrements towards 0
-	add		r6, r9, #1
+render_sphere:																		
+	push	{r4-r12, r14}			@first comes some housekeeping to handle the function arguments
+	str		r13, sphere_render_r13	@store all the existing registers								
+	movs	r2, r2					@Place the pitch as an immediate into the code
+	rsbmi	r2, r2, #0
+	strb	r2, sm1
+	movmi	r6, #0x56
+	movpl	r6, #0x96
+	strb	r6, sm1+2																			
+	mov		r3, r3, lsl #22			@add the spin to the gfx Ptr, while moving it into a range of 0-1023
+	mov		r3, r3, lsr #22
+	add		r3, r3, #512
+	add		r0, r0, r3	 			@the shift amount will need to change depending on gfxSize|*****|
+	add		r0, r0, #0x80000								
+	ldr		r9, =table_group_1		@setup the lut pointers.
+	ldr		r10, =table_group_2		@set the starting Y position. It starts at radius-1 and will decrement towards 0									
+	mov		r4, #63 				@this number will change depending on scale|*****|
+map_row:				
+	mov		r11, #0					
+	add		r6, r9, #1				@load the starting X position. It starts at sqrt(1-Y^2) pixels to the right, and decrements towards 0
 	ldrb	r3, [r6, r4, lsl #4]
 	mov		r3, r3, lsr #2
-	sub		r3, r3, #1
-	@calculate the correct VRAM pointer (in tile format) based on the X and Y coordinates
-	mov		r1, #0x6000000 @This number will change depending on VRAMPtr |*****|
-	@first get the correct row of tiles
-	rsb		r6, r4, #64
-	mov		r7, r6, lsr #3
-	add		r1, r1, r7, lsl #10 
-	@then get the correct column of tiles
-	add		r7, r3, #64
+	sub		r3, r3, #1				@calculate the correct VRAM pointer (in tile format) based on the X and Y coordinates									
+	mov		r1, #0x6000000			@This number will change depending on VRAMPtr |*****|
+sm4:									
+	rsb		r6, r4, #64				@This will change to an add for the bottom half
+	mov		r7, r6, lsr #3			@first get the correct row of tiles
+	add		r1, r1, r7, lsl #10 							
+	add		r7, r3, #64				@then get the correct column of tiles
 	mov		r8, r7, lsr #3
 	add		r1, r1, r8, lsl #6
-	@then get the correct row within a tile
-	and		r6, r6, #7
-	add		r1, r1, r6, lsl #3
-	@lastly get the correct 4 pixels within a tile row
-	and		r7, r7, #4
+	sub		r8, r8, #8
+	mov		r8, r8, lsl #1
+	add		r8, r8, #1
+	sub		r2, r1, r8, lsl #6
+	and		r6, r6, #7				@then get the correct row within a tile
+	add		r1, r1, r6, lsl #3		
+	add		r2, r2, r6, lsl #3
+	and		r7, r7, #4				@lastly get the correct 4 pixels within a tile row
 	add		r1, r1, r7
+	add		r2, r2, #4
+	sub		r2, r2, r7
 	add		r3, r3, #1
-map_pixel:
-	@This is where the X position, Y position, and Pitch (P) are plugged into the function to get the coordinates of the texture.
-	@The first part of the formula is this: E = sqrt(1 - X^2) * sin(P + arcsin(y / (sqrt(1 - X^2))))
-	@First step is to find the sqrt(1 - X^2) and its inverse.
-	ldr		r6, [r9, r3, lsl #4]
-	and		r7, r6, #0xff00
-	mov		r6, r6, lsr #16
-	@then multiply by Y and take the arcsin of that result
-	muls	r8, r6, r4
+	msr		cpsr_c, #0x11
+	mov		r11, r2
+	msr		cpsr_c, #0x1F
+	mov		r2, #0
+map_pixel:							@This is where the X position, Y position, and Pitch (P) are plugged into the function to get the coordinates of the texture.																											
+	ldr		r6, [r9, r3, lsl #4]	@The first part of the formula is this: E = sqrt(1 - X^2) * sin(P + arcsin(y / (sqrt(1 - X^2))))
+	and		r7, r6, #0xff00			@First step is to find the sqrt(1 - X^2) and its inverse.
+	mov		r6, r6, lsr #16			
+	muls	r8, r6, r4				@then multiply by Y and take the arcsin of that result
 	mov		r6, r8, lsr #6
-	ldrb	r6, [r9, r6, lsl #2]
-	@then add the pitch, and take the sin of that result. Hold onto the first result for later use
-	adds	r8, r6, r5 @This will need to be replaced by a self-modifying immediate for Pitch |*****|
-	cmp		r8, #0x100
-	rsbgt	r8, r8, #0x200
-	ldrb	r8, [r10, r8, lsl #2]
-	@multiply by sqrt(1 - X^2) which is still in register 7 from before
-	mul		r8, r7, r8
-	mov		r8, r8, asr #16
-	@The next step is to convert this intermediate value (E) into the X and Y coordinates on the texture
-	@The Y coordinate is arcsin(E), the X coordinate is arcsin(X / (sqrt(1 - E^2)))
-	ldr		r7, [r9, r8, lsl #2]
-	and 	r8, r7, #0xff
+	ldrb	r6, [r9, r6, lsl #2]	@then add the pitch, and take the sin of that result. Hold onto the first result for later use
+sm1:								@The immediate here is replaced with the Pitch.
+	adds	r6, r6, #0 				@|*****| This instruction is modified during runtime. Take care if changing it.
+	mov		r5, r6
+	rsbmi	r6, r6, #0
+	cmp		r6, #0x100
+	rsbgt	r6, r6, #0x200
+	ldrb	r6, [r10, r6, lsl #2]								
+	mul		r6, r7, r6				@multiply by sqrt(1 - X^2) which is still in register 7 from before
+	mov		r6, r6, asr #16
+	ldr		r7, [r9, r6, lsl #2]	@The next step is to convert this intermediate value (E) into the X and Y coordinates on the texture
+	and 	r6, r7, #0xff			@The Y coordinate is arcsin(E), the X coordinate is arcsin(X / (sqrt(1 - E^2)))
 	mov		r7, r7, asr #16
-	mul		r6, r7, r3
-	mov		r6, r6, asr #6
-	ldrb	r6, [r9, r6, lsl #2]
-	@now we grab the pixel at those X and Y coordinates, and store them in a register
-	sub		r7, r6, r8, lsl #11 @This will have to change depending on gfxSize |*****|
-	ldrb	r7, [r0, r7]
-	orr		r11, r11, r7
-	@If X is a multiple of 4, then we need to swap out the storage register for an empty one.
-	subs	r3, r3, #1
+	mul		r8, r7, r3
+	mov		r8, r8, asr #6
+	ldrb	r8, [r9, r8, lsl #2]
+	rsbgt	r8, r8, #512
+	movs	r5, r5
+	rsbmi	r6, r6, #0
+sm3:								@now we grab the pixel at those X and Y coordinates, and store them in a register
+	sub		r5, r8, r6, lsl #11 	@This will have to change depending on gfxSize |*****|
+	ldrb	r7, [r0, r5]
+	orr		r11, r7, r11, lsl #8	@|*****|This will have to change depending on bpp
+	sub		r6, r5, r8, lsl #1
+	ldrb	r6, [r0, r6]
+	orr		r2, r6, r2, ror #8		@|*****|This will have to change depending on bpp
+	subs	r3, r3, #1				@If X is a multiple of 4, then we need to swap out the storage register for an empty one.
 	tst		r3, #3
 	beq		storage_full
-	mov		r11, r11, lsl #8 @this will have to change depending on bpp |*****|
 next_pixel:
 	bne		map_pixel
 next_row:
 	subs	r4, r4, #1
 	bne		map_row
+sm2:								
+	b		half_done				@after taking this branch once, the instruction is modified to a nop
+	mov		r6, #0xea
+	strb	r6, sm2+3				@reenable the half_done branch
+	ldrb	r6, sm4+2				@undo all the second half modifications
+	eor		r6, #0xe0
+	strb	r6, sm4+2
+	ldrb	r6, sm1+2
+	eor		r6, r6, #0xc0			
+	strb	r6, sm1+2
+	ldrb	r6, sm3+2
+	eor		r6, r6, #0xc0			
+	strb	r6, sm3+2
+	mov		r6, #64
+	strb	r6, sm4
 	ldr		r13, sphere_render_r13
 	pop		{r4-r12, r14}
 	bx lr
 	
-	storage_full:
+storage_full:						@this is called when 4 pixels have been plotted per side
 	str		r11, [r1], #-4
-	mov		r11, #0
+	msr		cpsr_c, #0x11
+	mov		r2, r2, ror #8
+	str		r2, [r11], #4
+	msr		cpsr_c, #0x1f
+	mov		r2, #0
 	tst		r3, #7
 	bne		next_pixel
 	cmp		r3, #0
 	beq		next_row
 	sub		r1, r1, #56
+	msr		cpsr_c, #0x11
+	add		r11, r11, #56
+	msr		cpsr_c, #0x1f
 	b		next_pixel
+	
+half_done:							@this is called when one half of the sphere has finished drawing
+	ldrb	r6, sm1+2
+	eor		r6, r6, #0xc0			@switch the pitch calculation from an add to a sub, or vice-versa
+	strb	r6, sm1+2
+	mov		r4, #63					@set the Y position back to 63 This number will change depending on scale |*****|
+	mov		r6, #0x1a
+	strb	r6, sm2+3				@change the half_done branch to a bne, so it wont get taken next time
+	ldrb	r6, sm3+2
+	eor		r6, r6, #0xc0			@switch the Y mapper from a sub to an add
+	strb	r6, sm3+2
+	ldrb	r6, sm4+2				@switch the Vram mapper from a rsb to an add
+	eor		r6, #0xe0
+	strb	r6, sm4+2
+	mov		r6, #63					@make the constant 63 instead of 64
+	strb	r6, sm4
+	b		map_row
 	
 table_group_1:
 	@this group consists of the 1/(sqrt(1-X^2)) table, the sqrt(1-X^2) table, and the arcsin(X) table, in that order.
