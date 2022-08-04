@@ -14,7 +14,7 @@ LIBSEVEN	:= ./externals/libseven
 MINRT		:= ./externals/libseven/gba-minrt
 
 SOURCES		:= rt/crt0.s $(shell find ./src -name '*.c') $(shell find ./src -name '*.s')
-INCLUDES	:=
+INCLUDES	:= 
 LIBDIRS		:= $(LIBSEVEN)
 LIBS		:= seven
 
