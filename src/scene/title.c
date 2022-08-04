@@ -5,12 +5,14 @@
 
 #include "scene-manager.h"
 
+#include "../core/input.h"
+
 static void TitleOpen() {
   REG_DISPCNT = VIDEO_MODE_BITMAP | VIDEO_BG2_ENABLE;
 }
 
 static void TitleUpdate() {
-  if(~(REG_KEYINPUT) & KEY_A) {
+  if (~(REG_KEYINPUT)&KEY_A) {
     SceneManagerGoTo(mission_scene);
   }
 }
