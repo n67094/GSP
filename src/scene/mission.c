@@ -6,7 +6,7 @@
 #include "../core/sphere.h"
 #include "../core/utils.h"
 
-#include "../../assets/earth.h"
+// #include "../../data/bitmaps/earth.h"
 #include "seven/hw/input.h"
 #include "seven/hw/memory.h"
 #include "seven/hw/video.h"
@@ -18,8 +18,8 @@ static void MissionOpen() {
   REG_DISPCNT = VIDEO_MODE_AFFINE | VIDEO_BG2_ENABLE | VIDEO_OBJ_MAPPING_1D;
   REG_BG2CNT = BG_TILE_8BPP;
 
-  TransferPalette(earth_palette);
-  TransferTilemap();
+  // TransferPalette(earth_palette);
+  // TransferTilemap();
 }
 
 static void MissionUpdate() {
@@ -42,7 +42,7 @@ static void MissionUpdate() {
   }
 
   // Due to the time it take to compute it cannot be move in draw
-  SphereRender(earth_tiles, (u8 *)MEM_VRAM, pitch, spin, 7, 9);
+  //  SphereRender(earth_tiles, (u8 *)MEM_VRAM, pitch, spin, 7, 9);
 }
 
 static void MissionDraw() {

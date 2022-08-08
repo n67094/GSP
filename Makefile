@@ -1,24 +1,22 @@
-#
-# This Source Code Form is subject to the terms of the Mozilla Public
-# License, v. 2.0. If a copy of the MPL was not distributed with this
-# file, You can obtain one at https://mozilla.org/MPL/2.0/.
-#
-
 .SUFFIXES:
 
-PROJECT		:= GSP
+PROJECT := GSP
 
 TARGET := release # can be release or debug
 
-LIBSEVEN	:= ./externals/libseven
-MINRT		:= ./externals/libseven/gba-minrt
+LIBSEVEN := ./externals/libseven
+MINRT := ./externals/libseven/gba-minrt
 
-SOURCES		:= rt/crt0.s $(shell find ./src -name '*.c') $(shell find ./src -name '*.s') $(shell find ./assets -name '*.c')
-INCLUDES	:= 
-LIBDIRS		:= $(LIBSEVEN)
-LIBS		:= seven
+LIBDIRS := $(LIBSEVEN)
+LIBS := seven
 
-BUILDDIR	:= build
+BIN2S := ./externals/bin2s/bin2s #bin2s exec
+
+SOURCES := rt/crt0.s $(shell find ./src ./data -type f -name '*.c' -o -name '*.s' ! -path '*/.*')
+INCLUDES :=
+DATA := $(shell find ./data -type f -name '*.*' ! -name '*.c' ! -name '*.h' ! -name '*.s' ! -path '*/.*')
+
+BUILDDIR := build
 
 FLAGS := -O2 -std=c99 -ffunction-sections -fdata-sections
 
@@ -26,12 +24,8 @@ FLAGS := -O2 -std=c99 -ffunction-sections -fdata-sections
 FLAGS.release :=
 FLAGS.debug := -g3 -gdwarf-4 -DNDEBUG
 
-CFLAGS		:= $(FLAGS.$(TARGET)) $(FLAGS)
-LDFLAGS		:= -mthumb -nostartfiles -specs=nano.specs -specs=nosys.specs -Wl,-Trom.ld -L$(MINRT)/rt
-
-#
-# Internal
-#
+CFLAGS := $(FLAGS.$(TARGET)) $(FLAGS)
+LDFLAGS := -mthumb -nostartfiles -specs=nano.specs -specs=nosys.specs -Wl,-Trom.ld -L$(MINRT)/rt
 
 vpath rt/% $(MINRT)
 
@@ -46,6 +40,7 @@ LIBSEVEN_LIB = $(LIBSEVEN)/lib/libseven.a
 
 OBJECTS = $(SOURCES:%=$(BUILDDIR)/obj/%.o)
 DEPENDS = $(SOURCES:%=$(BUILDDIR)/dep/%.d)
+BINARIES = $(DATA:%=/data/%)
 OBJDIRS = $(dir $(BUILDDIR) $(OBJECTS) $(DEPENDS))
 
 CFLAGS += \
@@ -56,32 +51,43 @@ CFLAGS += \
 	  $(INCLUDES:%=-I%) \
 
 LDFLAGS += \
-	   -Wl,--gc-sections \
-	   -Wl,-Map,$(MAPFILE) \
-	   $(LIBDIRS:%=-L%/lib) \
-	   $(LIBS:%=-l%) \
+	  -Wl,--gc-sections \
+	  -Wl,-Map,$(MAPFILE) \
+	  $(LIBDIRS:%=-L%/lib) \
+	  $(LIBS:%=-l%) \
 
 $(ROMFILE): $(ELFFILE)
 $(ELFFILE): $(OBJECTS) $(LIBSEVEN_LIB)
-$(OBJECTS): | builddirs
+$(OBJECTS): $(BINARIES)
+$(BINARIES): | builddirs
 
 %.gba:
-	@echo "$@"
+	@echo "1. $@"
 	@$(OBJCOPY) -O binary $< $@
 
 %.elf:
-	@echo "$@"
+	@echo "2. $@"
 	@$(CC) -o $@ $^ $(LDFLAGS)
 
 $(BUILDDIR)/obj/%.o: %
-	@echo "$<"
+	@echo "3. $@"
 	@$(CC) -c -o $@ $(CFLAGS) -MMD -MP -MF $(BUILDDIR)/dep/$<.d $<
 
 $(LIBSEVEN_LIB):
+	@echo "4. $@"
 	@$(MAKE) -C $(LIBSEVEN)
 
 builddirs:
+	@echo "5. $@"
 	@mkdir -p $(OBJDIRS)
+
+/data/%: %
+	@echo "6. $@"
+	$(BIN2S) -a 4 -H $<.h $< > $<.s
+
+bin2o:
+	@echo "7. $@"
+	@$(foreach file, $(DATA), bin2s -a 4 -H $(file))
 
 clean:
 	@echo "clean"
