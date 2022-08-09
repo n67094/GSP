@@ -26,7 +26,7 @@ To convert binary file to asm we use bin2s from the DevKipPro tools.
 
 **Commande :**
 ```
-cd externals/bin2s
+cd tools/bin2s
 make
 ```
 

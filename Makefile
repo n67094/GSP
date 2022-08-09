@@ -2,25 +2,27 @@
 
 PROJECT := GSP
 
-TARGET := release # can be release or debug
-
 LIBSEVEN := ./externals/libseven
 MINRT := ./externals/libseven/gba-minrt
 
 LIBDIRS := $(LIBSEVEN)
 LIBS := seven
 
-BIN2S := ./externals/bin2s/bin2s #bin2s exec
-
-SOURCES := rt/crt0.s $(shell find ./src ./data -type f -name '*.c' -o -name '*.s' ! -path '*/.*')
-INCLUDES :=
-DATA := $(shell find ./data -type f -name '*.*' ! -name '*.c' ! -name '*.h' ! -name '*.s' ! -path '*/.*')
-
 BUILDDIR := build
 
-FLAGS := -O2 -std=c99 -ffunction-sections -fdata-sections
+# Data folder can containes sources which was note generate from bin2s
+SOURCES := rt/crt0.s $(shell find ./src ./data -type f -name '*.c' -o -name '*.s' ! -path '*/.*')
+INCLUDES :=
 
-# TARGET Specific
+# Used to convert bin files to .s and .h with bin2s
+BIN2S := ./tools/bin2s/bin2s
+DATA := $(shell find ./data -type f -name '*.*' ! -name '*.c' ! -name '*.h' ! -name '*.s' ! -path '*/.*')
+BINARIES = $(DATA:%=/data/%)
+
+# Target specific
+TARGET := release # can be release or debug
+
+FLAGS := -O2 -std=c99 -ffunction-sections -fdata-sections
 FLAGS.release :=
 FLAGS.debug := -g3 -gdwarf-4 -DNDEBUG
 
@@ -40,7 +42,6 @@ LIBSEVEN_LIB = $(LIBSEVEN)/lib/libseven.a
 
 OBJECTS = $(SOURCES:%=$(BUILDDIR)/obj/%.o)
 DEPENDS = $(SOURCES:%=$(BUILDDIR)/dep/%.d)
-BINARIES = $(DATA:%=/data/%)
 OBJDIRS = $(dir $(BUILDDIR) $(OBJECTS) $(DEPENDS))
 
 CFLAGS += \
@@ -58,35 +59,30 @@ LDFLAGS += \
 
 $(ROMFILE): $(ELFFILE)
 $(ELFFILE): $(OBJECTS) $(LIBSEVEN_LIB)
-$(OBJECTS): $(BINARIES)
-$(BINARIES): | builddirs
+$(OBJECTS): | builddirs $(BINARIES)
 
 %.gba:
-	@echo "1. $@"
+	@echo "$@"
 	@$(OBJCOPY) -O binary $< $@
 
 %.elf:
-	@echo "2. $@"
+	@echo "$@"
 	@$(CC) -o $@ $^ $(LDFLAGS)
 
 $(BUILDDIR)/obj/%.o: %
-	@echo "3. $@"
+	@echo "$<"
 	@$(CC) -c -o $@ $(CFLAGS) -MMD -MP -MF $(BUILDDIR)/dep/$<.d $<
 
 $(LIBSEVEN_LIB):
-	@echo "4. $@"
 	@$(MAKE) -C $(LIBSEVEN)
 
 builddirs:
-	@echo "5. $@"
 	@mkdir -p $(OBJDIRS)
 
 /data/%: %
-	@echo "6. $@"
 	$(BIN2S) -a 4 -H $<.h $< > $<.s
 
 bin2o:
-	@echo "7. $@"
 	@$(foreach file, $(DATA), bin2s -a 4 -H $(file))
 
 clean:
