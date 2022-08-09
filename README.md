@@ -45,3 +45,6 @@ make TARGET=release
 ```
 make TARGET=debug
 ```
+## Note
+
+Durgin the development we noticed that mGBA 0.9.2 had unexpected behavoir, we recommand you to use the version 0.9.3, or the hardware
