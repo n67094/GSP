@@ -13,8 +13,8 @@ TARGET := release # can be release or debug
 LIBSEVEN	:= ./externals/libseven
 MINRT		:= ./externals/libseven/gba-minrt
 
-SOURCES		:= rt/crt0.s $(shell find ./src -name '*.c') $(shell find ./src -name '*.s')
-INCLUDES	:=
+SOURCES		:= rt/crt0.s $(shell find ./src -name '*.c') $(shell find ./src -name '*.s') $(shell find ./assets -name '*.c')
+INCLUDES	:= 
 LIBDIRS		:= $(LIBSEVEN)
 LIBS		:= seven
 
@@ -24,7 +24,7 @@ FLAGS := -O2 -std=c99 -ffunction-sections -fdata-sections
 
 # TARGET Specific
 FLAGS.release :=
-Flags.debug := -g3 -gdwarf-4 -DNDEBUG
+FLAGS.debug := -g3 -gdwarf-4 -DNDEBUG
 
 CFLAGS		:= $(FLAGS.$(TARGET)) $(FLAGS)
 LDFLAGS		:= -mthumb -nostartfiles -specs=nano.specs -specs=nosys.specs -Wl,-Trom.ld -L$(MINRT)/rt
@@ -35,7 +35,7 @@ LDFLAGS		:= -mthumb -nostartfiles -specs=nano.specs -specs=nosys.specs -Wl,-Trom
 
 vpath rt/% $(MINRT)
 
-CC 	= arm-none-eabi-gcc
+CC = arm-none-eabi-gcc
 OBJCOPY = arm-none-eabi-objcopy
 
 ELFFILE = $(BUILDDIR)/$(PROJECT).elf
