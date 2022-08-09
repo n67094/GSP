@@ -3,7 +3,7 @@
 
 #include "scene-manager.h"
 
-#include "../core/sphere.h"
+#include "../renderer/sphere.h"
 #include "../core/utils.h"
 
 #include "../../data/bitmaps/earth.h"
