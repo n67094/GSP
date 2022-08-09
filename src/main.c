@@ -1,7 +1,8 @@
-#include <seven/hw/irq.h>
-#include <seven/svc/wait.h>
-#include <seven/hw/video.h>
+#include <seven/base/types.h>
 #include <seven/hw/input.h>
+#include <seven/hw/irq.h>
+#include <seven/hw/video.h>
+#include <seven/svc/wait.h>
 
 #include "debug/log.h"
 #include "debug/assert.h"
