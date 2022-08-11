@@ -3,7 +3,7 @@
 
 #include "../types.h"
 
-void AxesCreate(s32 roll, s32 pitch, s32 yaw);
+void AxesCreate(void);
 
 void AxesUpdate(s32 roll, s32 pitch, s32 yaw);
 
