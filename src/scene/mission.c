@@ -3,10 +3,12 @@
 
 #include "scene-manager.h"
 
+#include "../types.h"
 #include "../renderer/sphere.h"
 #include "../core/utils.h"
 
 #include "../../data/bitmaps/earth.h"
+
 #include "seven/hw/input.h"
 #include "seven/hw/memory.h"
 #include "seven/hw/video.h"
@@ -23,7 +25,6 @@ static void MissionOpen() {
 }
 
 static void MissionUpdate() {
-
   if (~(REG_KEYINPUT)&KEY_UP) {
     pitch++;
   }
@@ -31,7 +32,6 @@ static void MissionUpdate() {
   if (~(REG_KEYINPUT)&KEY_DOWN) {
     pitch--;
   }
-
 
   if (~(REG_KEYINPUT)&KEY_LEFT) {
     spin--;

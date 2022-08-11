@@ -3,8 +3,8 @@
 
 #include "types.h"
 
-IWRAM_DATA struct Object object_buffer[128];
-
 extern struct Object object_buffer[128];
+
+extern struct ShipData ship_data;
 
 #endif

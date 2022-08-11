@@ -5,5 +5,3 @@
 #include "types.h"
 
 Object object_buffer[128];
-
-InterfaceData interface_data;
