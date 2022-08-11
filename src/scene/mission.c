@@ -3,10 +3,10 @@
 
 #include "scene-manager.h"
 
-#include "../core/sphere.h"
+#include "../renderer/sphere.h"
 #include "../core/utils.h"
 
-#include "../../assets/earth.h"
+#include "../../data/bitmaps/earth.h"
 #include "seven/hw/input.h"
 #include "seven/hw/memory.h"
 #include "seven/hw/video.h"
