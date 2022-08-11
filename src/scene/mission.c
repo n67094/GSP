@@ -3,9 +3,9 @@
 
 #include "scene-manager.h"
 
-#include "../types.h"
-#include "../renderer/sphere.h"
 #include "../core/utils.h"
+#include "../renderer/sphere.h"
+#include "../types.h"
 
 #include "../../data/bitmaps/earth.h"
 
@@ -16,7 +16,8 @@
 static s32 pitch = 0;
 static s32 spin = 0;
 
-static void MissionOpen() {
+static void MissionOpen()
+{
   REG_DISPCNT = VIDEO_MODE_AFFINE | VIDEO_BG2_ENABLE | VIDEO_OBJ_MAPPING_1D;
   REG_BG2CNT = BG_TILE_8BPP;
 
@@ -24,7 +25,8 @@ static void MissionOpen() {
   TransferTilemap();
 }
 
-static void MissionUpdate() {
+static void MissionUpdate()
+{
   if (~(REG_KEYINPUT)&KEY_UP) {
     pitch++;
   }
@@ -45,22 +47,11 @@ static void MissionUpdate() {
   SphereRender(earth_tiles, (u8 *)MEM_VRAM, pitch, spin, 7, 9);
 }
 
-static void MissionDraw() {
-}
+static void MissionDraw() {}
 
-static void MissionVBlank() {
+static void MissionVBlank() {}
 
-}
-
-static void MissionClose() {
-
-}
+static void MissionClose() {}
 
 Scene mission_scene = {
-  .Open = MissionOpen,
-  .Update = MissionUpdate,
-  .Draw = MissionDraw,
-  .VBlank = MissionVBlank,
-  .Close = MissionClose
-};
-
+    .Open = MissionOpen, .Update = MissionUpdate, .Draw = MissionDraw, .VBlank = MissionVBlank, .Close = MissionClose};

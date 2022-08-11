@@ -2,28 +2,13 @@
 
 static void Empty() {}
 
-Scene scene = {
-  .Open = Empty,
-  .Update = Empty,
-  .Draw = Empty,
-  .VBlank = Empty,
-  .Close = Empty
-};
+Scene scene = {.Open = Empty, .Update = Empty, .Draw = Empty, .VBlank = Empty, .Close = Empty};
 
-void SceneManagerUpdate()
-{
-  scene.Update();
-}
+void SceneManagerUpdate() { scene.Update(); }
 
-void SceneManagerDraw()
-{
-  scene.Draw();
-}
+void SceneManagerDraw() { scene.Draw(); }
 
-void SceneManagerVBlank()
-{
-  scene.VBlank();
-}
+void SceneManagerVBlank() { scene.VBlank(); }
 
 void SceneManagerGoTo(Scene nextScene)
 {

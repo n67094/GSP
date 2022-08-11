@@ -1,5 +1,5 @@
-#include <seven/video/object.h>
 #include <seven/base/types.h>
+#include <seven/video/object.h>
 
 #include "global.h"
 #include "types.h"
