@@ -77,6 +77,6 @@ typedef struct ShipData{
 	s32 pitch; //the pitch of the ship, reletive to the camera, where 256 is pointing the front of the ship at the camera. Must be between -256 and 256.
 	s32 spin; //the spin of the ship, (or roll), reletive to the camera. 
 	u32 length; //The longest dimension of the ship in in-game units, used to make sure the entire ship can fit into the background layer.
-} Ship;
+} ShipData;
 
 #endif

@@ -23,11 +23,8 @@ static void EarthInitTileMap() {
 }
 
 void EarthInit() {
-  // TODO this will be fixed on libseven to repalce with BG_PALETTE
-  u16 *palette = (u16*)MEM_PALETTE ;
-  MemCpy16(palette, earth_palette, earth_palette_size);
+  MemCpy16(BG_PALETTE, earth_palette, earth_palette_size);
 
-  // Init tile map (screen entries)
   EarthInitTileMap();
 }
 

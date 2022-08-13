@@ -2,18 +2,17 @@
 #include <seven/hw/memory.h>
 #include <seven/hw/video.h>
 
+#include "../../data/sprites/axes.tiles.h"
+#include "../../data/sprites/ui.palette.h"
+
 #include "../global.h"
 #include "../types.h"
 #include "../core/utils.h"
-
-#include "../../data/sprites/ui.palette.h"
-
+#include "axes.h"
 #include "interface.h"
 
 void InterfaceInit(void) {
-  // TODO this will be fixed on libseven to repalce with OBJ_PALETTE
-  u16 *palette = (u16*)MEM_PALETTE + 256;
-  MemCpy8(palette, ui_palette, ui_palette_size);
+  MemCpy8(OBJ_PALETTE, ui_palette, ui_palette_size);
 }
 
 void InterfaceUpdate(s32 roll, s32 pitch, s32 yaw) {}

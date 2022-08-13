@@ -3,10 +3,8 @@
 
 #include "../types.h"
 
-void AxesCreate(void);
+void AxesInit();
 
 void AxesUpdate(s32 roll, s32 pitch, s32 yaw);
-
-void AxesDraw(void);
 
 #endif
