@@ -1,28 +1,35 @@
 #include <seven/base/addresses.h>
-#include <seven/base/types.h>
 #include <seven/hw/memory.h>
+
+#include "../types.h"
 
 #include "utils.h"
 
-void TransferPalette(const u16 *data)
-{
-  volatile u16 *palette_pointer = (volatile u16 *)MEM_PALETTE;
+void MemCpy8(void* dest, const void* src, size_t size) {
+	u8 *_src = (u8 *)src;
+	u8 *_dest = (u8 *)dest;
 
-  for (u32 i = 0; i < 256; ++i) {
-    palette_pointer[i] = data[i];
-  }
+	for (u32 i = 0; i < size; ++i) {
+    _dest[i] = _src[i];
+	}
 }
 
-// What this does ?
-void TransferTilemap()
-{
-  volatile u16 *tilemap_ptr = (volatile u16 *)MEM_VRAM;
+void MemCpy16(void* dest, const void* src, size_t size) {
+	u16 *_src = (u16 *)src;
+	u16 *_dest = (u16 *)dest;
+	size = size >> 1;
+	
+	for (u32 i = 0; i < size; ++i) {
+    _dest[i] = _src[i];
+	}
+}
 
-  for (u32 i = 0; i < 128; ++i) {
-    tilemap_ptr[i] = (((i << 1) + 1) << 8) + (i << 1);
-  }
-
-  for (u32 i = 0; i < 2; ++i) {
-    tilemap_ptr[i] = 0xFFFF;
-  }
+void MemCpy32(void* dest, const void* src, size_t size) {
+	u32 *_src = (u32 *)src;
+	u32 *_dest = (u32 *)dest;
+	size = size >> 2;
+	
+	for (u32 i = 0; i < size; ++i) {
+    _dest[i] = _src[i];
+	}
 }

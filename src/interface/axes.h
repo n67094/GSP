@@ -1,5 +1,5 @@
-#ifndef INTERFACE_AXES
-#define INTERFACE_AXES
+#ifndef INTERFACE_AXES_H
+#define INTERFACE_AXES_H
 
 #include "../types.h"
 

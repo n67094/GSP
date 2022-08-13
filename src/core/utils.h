@@ -1,11 +1,12 @@
 #ifndef CORE_UTILS_H
 #define CORE_UTILS_H
 
-#include <seven/base/types.h>
+#include "../types.h"
 
-// TODO this sould be replace with a memCpy16 asm routine (which is probably faster) ? c.f libtonc routine
-void TransferPalette(const u16 *data);
+void MemCpy8(void* dest, const void* src, size_t size);
 
-void TransferTilemap();
+void MemCpy16(void* dest, const void* src, size_t size);
+
+void MemCpy32(void* dest, const void* src, size_t size);
 
 #endif

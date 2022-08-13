@@ -1,5 +1,5 @@
-#ifndef TYPES
-#define TYPES
+#ifndef TYPES_H
+#define TYPES_H
 
 #include <seven/base/types.h>
 #include <seven/video/object.h>
@@ -26,9 +26,14 @@ typedef const s16 cs16;
 typedef const s32 cs32;
 typedef const s64 cs64;
 
+typedef struct SphereData {
+	s32 pitch;
+	s32 spin;
+} SphereData;
+
 //this is the data for one segment, a segment is a piece that uses a single texture. There are two main types of segments, walls, and bases.
 //Walls are the parts that go around cylinders/cones. Bases are the flat part at the end of a cylinder/cone.
-typedef struct SegmentData{ 
+typedef struct SegmentData{
 	cu8 type; //encodes various data about the segment so that the algorithm knows how to draw it.
 	//bit 0: 0 = wall, 1 = base.
 	//bit 1 if wall: 0 = cylinder, 1 = cone.
