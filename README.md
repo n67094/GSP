@@ -20,6 +20,17 @@ Before building the project, you will need to build libseven
 cd externals/libseven/
 make
 ```
+## bin2s
+
+To convert binary file to asm we use bin2s from the DevKipPro tools.
+
+**Commande :**
+```
+cd tools/bin2s
+make
+```
+
+Binary file can now be put in the /data folder with the extension you want ex: player.tiles, player.palette
 
 ## Release
 
@@ -34,3 +45,6 @@ make TARGET=release
 ```
 make TARGET=debug
 ```
+## Note
+
+Durgin the development we noticed that mGBA 0.9.2 had unexpected behavoir, we recommand you to use the version 0.9.3, or the hardware

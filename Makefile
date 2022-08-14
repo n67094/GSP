@@ -1,37 +1,33 @@
-#
-# This Source Code Form is subject to the terms of the Mozilla Public
-# License, v. 2.0. If a copy of the MPL was not distributed with this
-# file, You can obtain one at https://mozilla.org/MPL/2.0/.
-#
-
 .SUFFIXES:
 
-PROJECT		:= GSP
+PROJECT := GSP
 
+LIBSEVEN := ./externals/libseven
+MINRT := ./externals/libseven/gba-minrt
+
+LIBDIRS := $(LIBSEVEN)
+LIBS := seven
+
+BUILDDIR := build
+
+# Data folder can containes sources which was note generate from bin2s
+SOURCES := rt/crt0.s $(shell find ./src ./data -type f -name '*.c' -o -name '*.s' ! -path '*/.*')
+INCLUDES :=
+
+# Used to convert bin files to .s and .h with bin2s
+BIN2S := ./tools/bin2s/bin2s
+DATA := $(shell find ./data -type f -name '*.*' ! -name '*.c' ! -name '*.h' ! -name '*.s' ! -path '*/.*')
+BINARIES = $(DATA:%=/data/%)
+
+# Target specific
 TARGET := release # can be release or debug
 
-LIBSEVEN	:= ./externals/libseven
-MINRT		:= ./externals/libseven/gba-minrt
-
-SOURCES		:= rt/crt0.s $(shell find ./src -name '*.c') $(shell find ./src -name '*.s') $(shell find ./assets -name '*.c')
-INCLUDES	:= 
-LIBDIRS		:= $(LIBSEVEN)
-LIBS		:= seven
-
-BUILDDIR	:= build
-
 FLAGS := -O2 -std=c99 -ffunction-sections -fdata-sections
-
-# TARGET Specific
 FLAGS.release :=
 FLAGS.debug := -g3 -gdwarf-4 -DNDEBUG
 
-CFLAGS		:= $(FLAGS.$(TARGET)) $(FLAGS)
-LDFLAGS		:= -mthumb -nostartfiles -specs=nano.specs -specs=nosys.specs -Wl,-Trom.ld -L$(MINRT)/rt
-
-#
-# Internal
-#
+CFLAGS := $(FLAGS.$(TARGET)) $(FLAGS)
+LDFLAGS := -mthumb -nostartfiles -specs=nano.specs -specs=nosys.specs -Wl,-Trom.ld -L$(MINRT)/rt
 
 vpath rt/% $(MINRT)
 
@@ -56,14 +52,14 @@ CFLAGS += \
 	  $(INCLUDES:%=-I%) \
 
 LDFLAGS += \
-	   -Wl,--gc-sections \
-	   -Wl,-Map,$(MAPFILE) \
-	   $(LIBDIRS:%=-L%/lib) \
-	   $(LIBS:%=-l%) \
+	  -Wl,--gc-sections \
+	  -Wl,-Map,$(MAPFILE) \
+	  $(LIBDIRS:%=-L%/lib) \
+	  $(LIBS:%=-l%) \
 
 $(ROMFILE): $(ELFFILE)
 $(ELFFILE): $(OBJECTS) $(LIBSEVEN_LIB)
-$(OBJECTS): | builddirs
+$(OBJECTS): | builddirs $(BINARIES)
 
 %.gba:
 	@echo "$@"
@@ -82,6 +78,12 @@ $(LIBSEVEN_LIB):
 
 builddirs:
 	@mkdir -p $(OBJDIRS)
+
+/data/%: %
+	$(BIN2S) -a 4 -H $<.h $< > $<.s
+
+bin2o:
+	@$(foreach file, $(DATA), bin2s -a 4 -H $(file))
 
 clean:
 	@echo "clean"

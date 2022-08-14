@@ -1,8 +1,6 @@
 #ifndef SCENE_MANAGER_H
 #define SCENE_MANAGER_H
 
-#include <seven/base/attributes.h>
-
 typedef struct scene {
 	void (*Open)(void);
 	void (*Update)(void);
