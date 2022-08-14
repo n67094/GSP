@@ -1,6 +1,7 @@
 #include "../global.h"
 #include "../types.h"
 
+#include "interface-data.h"
 #include "axes.h"
 
 void AxesInit() {
