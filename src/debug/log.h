@@ -1,5 +1,5 @@
-#ifndef UTILS_LOG
-#define UTILS_LOG
+#ifndef UTILS_LOG_H
+#define UTILS_LOG_H
 
 #ifdef NDEBUG
 #  include <seven/base/types.h>

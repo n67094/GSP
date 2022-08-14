@@ -1,5 +1,5 @@
-#ifndef CORE_SHPERE_H
-#define CORE_SHPERE_H
+#ifndef RENDERER_SHPERE_H
+#define RENDERER_SHPERE_H
 
 #include <seven/base/types.h>
 

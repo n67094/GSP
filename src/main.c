@@ -4,25 +4,22 @@
 #include <seven/hw/video.h>
 #include <seven/svc/wait.h>
 
-#include "debug/log.h"
 #include "debug/assert.h"
+#include "debug/log.h"
 
 #include "scene/scene-manager.h"
 
 bool gba_can_draw = false;
 
-void Update() {
-   SceneManagerUpdate();
-}
+void Update() { SceneManagerUpdate(); }
 
-void Draw() {
-  SceneManagerDraw();
-}
+void Draw() { SceneManagerDraw(); }
 
-void VBlank(u16 irqs) {
+void VBlank(u16 irqs)
+{
   SceneManagerVBlank();
 
-  if(gba_can_draw == true) {
+  if (gba_can_draw == true) {
     Draw();
     gba_can_draw = false;
   }
@@ -30,26 +27,26 @@ void VBlank(u16 irqs) {
 
 int main(void)
 {
-    LOG_INIT();
+  LOG_INIT();
 
-    irqInitDefault();
-    irqEnableFull(IRQ_VBLANK);
-    irqCallbackSet(IRQ_VBLANK, VBlank, 0);
+  irqInitDefault();
+  irqEnableFull(IRQ_VBLANK);
+  irqCallbackSet(IRQ_VBLANK, VBlank, 0);
 
-    SceneManagerGoTo(title_scene);
-    // SceneManagerGoTo(mission_scene);
+  SceneManagerGoTo(title_scene);
+  // SceneManagerGoTo(mission_scene);
 
-    while (true) {
-        inputPoll();
+  while (true) {
+    inputPoll();
 
-        LOG_DEBUG("ok");
+    LOG_DEBUG("ok");
 
-        Update();
+    Update();
 
-        gba_can_draw = true;
+    gba_can_draw = true;
 
-        svcVBlankIntrWait();
-    }
+    svcVBlankIntrWait();
+  }
 
-    LOG_CLOSE();
+  LOG_CLOSE();
 }

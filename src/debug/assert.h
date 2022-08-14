@@ -1,5 +1,5 @@
-#ifndef UTILS_ASSERT
-#define UTILS_ASSERT
+#ifndef UTILS_ASSERT_H
+#define UTILS_ASSERT_H
 
 #ifdef NDEBUG
 #  include "log.h"
