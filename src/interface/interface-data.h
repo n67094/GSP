@@ -18,4 +18,9 @@
 #define TILE_AXES_PITCH_CURSOR 0
 #define TILE_AXES_YAW_CURSOR 0
 
+// SPRITE POS
+// ==========
+#define POS_AXES_LABEL_X 0
+#define POS_AXES_LABEL_Y 128
+
 #endif
