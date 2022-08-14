@@ -7,7 +7,7 @@
 
 #include "../global.h"
 #include "../types.h"
-#include "../core/utils.h"
+#include "../core/memory.h"
 #include "axes.h"
 #include "interface.h"
 

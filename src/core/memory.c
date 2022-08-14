@@ -3,7 +3,7 @@
 
 #include "../types.h"
 
-#include "utils.h"
+#include "memory.h"
 
 void MemCpy8(void* dest, const void* src, size_t size) {
 	u8 *_src = (u8 *)src;

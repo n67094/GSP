@@ -6,11 +6,10 @@
 
 #include "../interface/interface.h"
 #include "../entity/earth.h"
-#include "../core/utils.h"
 #include "../renderer/sphere.h"
 #include "../types.h"
 
-#include "scene-manager.h"
+#include "scene.h"
 
 SphereData earth;
 
