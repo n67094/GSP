@@ -1,10 +1,10 @@
-#include "seven/base/types.h"
-#include "TrigFunctions.h"
+#include "trig.h"
+#include "../types.h"
 
 //All angular inputs and outputs are in units of pi/512 radians.
 //All linear inputs and outputs are in units of 1/256.
 
-s32 GetSinValue(s32 theta){
+s32 TrigGetSin(s32 theta){
 	u32 negative;
 	s32 value;
 	theta = theta & 0x3ff; //shift any Theta into a range of 0-1023 (1 complete sin wave)
@@ -16,7 +16,7 @@ s32 GetSinValue(s32 theta){
 		theta = 200 - theta;
 	}
 	if(theta < 0x100){
-		value = table_group_2[theta] & 0xff;
+		value = trig_table_group_2[theta] & 0xff;
 	}
 	else{
 		value = 0x100;
@@ -27,13 +27,13 @@ s32 GetSinValue(s32 theta){
 	return value;
 }
 
-s32 GetCosValue(s32 theta){
+s32 TrigGetCos(s32 theta){
 	s32 value;
-	value = GetSinValue(theta + 0x100);
+	value = TrigGetSin(theta + 0x100);
 	return value;
 }
 
-s32 GetArcSinValue(s32 length){ //length must be between -256 (-1) and 256 (1)
+s32 TrigGetArcSin(s32 length){ //length must be between -256 (-1) and 256 (1)
 	s32 theta;
 	u32 negative;
 	if (length < 0){
@@ -41,7 +41,7 @@ s32 GetArcSinValue(s32 length){ //length must be between -256 (-1) and 256 (1)
 		length = -length;
 	}
 	if (length != 0x100){
-		theta = table_group_1[length] & 0xff;
+		theta = trig_table_group_1[length] & 0xff;
 	}
 	else {
 		theta = 0x100;
@@ -52,19 +52,19 @@ s32 GetArcSinValue(s32 length){ //length must be between -256 (-1) and 256 (1)
 	return theta;
 }
 
-s32 GetArcCosValue(s32 length){ //length must be between -0x100 (-1) and 0x100 (1)
+s32 TrigGetArcCos(s32 length){ //length must be between -0x100 (-1) and 0x100 (1)
 	s32 theta;
-	theta = 0x100 - GetArcSinValue(length);
+	theta = 0x100 - TrigGetArcSin(length);
 	return theta;
 }
 
-s32 GetPythSqrtValue(s32 length){ //length must be between -0x100 (-1) and 0x100 (1)
+s32 TrigGetPythSqrt(s32 length){ //length must be between -0x100 (-1) and 0x100 (1)
 	u32 value;
 	if (length < 0){
 		length = -length;
 	}
 	if (length != 0x100){
-		value = (table_group_1[length] & 0xff00) >> 8;
+		value = (trig_table_group_1[length] & 0xff00) >> 8;
 	}
 	else{
 		value = 0;
@@ -72,13 +72,13 @@ s32 GetPythSqrtValue(s32 length){ //length must be between -0x100 (-1) and 0x100
 	return value;
 }
 
-s32 GetInvPythSqrtValue(s32 length){ //length must be between -0xff and 0xff. 0x100 is infinity, but returns 0xffff
+s32 TrigGetInvPythSqrt(s32 length){ //length must be between -0xff and 0xff. 0x100 is infinity, but returns 0xffff
 	u32 value;
 	if (length < 0){
 		length = -length;
 	}
 	if (length != 0x100){
-		value = (table_group_1[length] & 0xffff0000) >> 16;
+		value = (trig_table_group_1[length] & 0xffff0000) >> 16;
 	}
 	else{
 		value = 0xffff;
@@ -86,7 +86,7 @@ s32 GetInvPythSqrtValue(s32 length){ //length must be between -0xff and 0xff. 0x
 	return value;
 }
 
-s32 GetCscValue(s32 theta){ //length should not be a multiple of pi (512). csc(pi) is undefined, but this function returns 0xffff
+s32 GetCsc(s32 theta){ //length should not be a multiple of pi (512). csc(pi) is undefined, but this function returns 0xffff
 	u32 negative;
 	s32 value;
 	theta = theta & 0x3ff; //shift any Theta into a range of 0-1023 (1 complete csc wave)
@@ -98,7 +98,7 @@ s32 GetCscValue(s32 theta){ //length should not be a multiple of pi (512). csc(p
 		theta = 200 - theta;
 	}
 	if(theta < 0x100){
-		value = (table_group_2[theta] & 0xffff0000) >> 16;
+		value = (trig_table_group_2[theta] & 0xffff0000) >> 16;
 	}
 	else{
 		value = 0x100;
@@ -109,20 +109,20 @@ s32 GetCscValue(s32 theta){ //length should not be a multiple of pi (512). csc(p
 	return value;
 }
 
-s32 GetSecValue(s32 theta){ //length should not be a multiple of pi (512) - pi/2. csc(pi/2) is undefined, but this function returns 0xffff
+s32 GetSec(s32 theta){ //length should not be a multiple of pi (512) - pi/2. csc(pi/2) is undefined, but this function returns 0xffff
 	s32 value;
-	value = GetCscValue(theta + 0x100);
+	value = GetCsc(theta + 0x100);
 	return value;
 }
 
 s32 GetTanValue(s32 theta){ //theta should not be a multiple of pi (256) - pi/2. Answer is undefined, but this function returns 0xffff
 	s32 value;
-	value = (GetSecValue(theta) * GetSinValue(theta)) >> 8;
+	value = (GetSec(theta) * TrigGetSin(theta)) >> 8;
 	return value;
 }
 
-s32 GetCotValue(s32 theta){ //theta should not be a multiple of pi (256). Answer is undefined, but this function returns 0xffff
+s32 GetCot(s32 theta){ //theta should not be a multiple of pi (256). Answer is undefined, but this function returns 0xffff
 	s32 value;
-	value = (GetCscValue(theta) * GetCosValue(theta)) >> 8;
+	value = (GetCsc(theta) * TrigGetCos(theta)) >> 8;
 	return value;
 }

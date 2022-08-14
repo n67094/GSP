@@ -1,9 +1,9 @@
 .section .iwram
     .align  2
-	.global table_group_1
-	.global table_group_2
+	.global trig_table_group_1
+	.global trig_table_group_2
 
-table_group_1:
+trig_table_group_1:
 	@this group consists of the 1/(sqrt(1-X^2)) table, the sqrt(1-X^2) table, and the arcsin(X) table, in that order.
 	.word 0x0100FF00, 0x0100FF00, 0x0100FF01, 0x0100FF01, 0x0100FF02, 0x0100FF03, 0x0100FF03, 0x0100FF04
 	.word 0x0100FF05, 0x0100FF05, 0x0100FF06, 0x0100FF07, 0x0100FF07, 0x0100FF08, 0x0100FF08, 0x0100FF09
@@ -38,7 +38,7 @@ table_group_1:
 	.word 0x02DF59C6, 0x02F756C7, 0x031053C9, 0x032D50CB, 0x034E4DCD, 0x03724AD0, 0x039C46D2, 0x03CE43D4
 	.word 0x04083FD7, 0x044E3BD9, 0x04A537DC, 0x051532DF, 0x05AD2DE3, 0x068D27E7, 0x08041FEB, 0x0B5316F1
 	
-table_group_2:
+trig_table_group_2:
 	@this group consists of the csc(X) table, the cos(X) table, and the sin(X) table, in that order.
 	.word 0xFFFFFF00, 0xA2F9FF01, 0x517DFF03, 0x3653FF04, 0x28BFFF06, 0x2099FF07, 0x1B2BFF09, 0x174AFF0A
 	.word 0x1461FF0C, 0x121EFF0E, 0x104EFF0F, 0x0ED3FF11, 0x0D97FF12, 0x0C8CFF14, 0x0BA7FF15, 0x0AE1FE17

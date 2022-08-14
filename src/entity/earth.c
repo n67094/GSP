@@ -1,7 +1,7 @@
 #include <seven/hw/video.h>
 
+#include "../core/memory.h"
 #include "../entity/earth.h"
-#include "../core/utils.h"
 #include "../renderer/sphere.h"
 #include "../types.h"
 
