@@ -5,9 +5,9 @@
 #include "../../data/sprites/axes.tiles.h"
 #include "../../data/sprites/ui.palette.h"
 
+#include "../core/memory.h"
 #include "../global.h"
 #include "../types.h"
-#include "../core/utils.h"
 #include "axes.h"
 #include "interface.h"
 
