@@ -18,7 +18,7 @@ static void MissionOpen()
   REG_DISPCNT = VIDEO_MODE_AFFINE | VIDEO_BG2_ENABLE | VIDEO_OBJ_ENABLE | VIDEO_OBJ_MAPPING_1D;
   REG_BG2CNT = BG_TILE_8BPP;
 
-  // EarthInit();
+  EarthInit();
 
   InterfaceInit();
 }
@@ -42,7 +42,7 @@ static void MissionUpdate()
   }
 
   // Due to the time it take to compute it cannot be move in draw
-  //  EarthDraw(&earth);
+  EarthDraw(&earth);
 
   InterfaceUpdate(0, 0, 0);
 }

@@ -10,21 +10,44 @@
 #include "seven/video/object.h"
 
 void AxesInit() {
-  MemCpy32(&TILE4_CHARBLOCKS[4][0], axes_tiles, axes_tiles_size);
-  //MemCpy32(&TILE4_MEM[4][0], axes_tiles, axes_tiles_size);
+  MemCpy32(&TILE4_CHARBLOCKS[4][TILE_AXES], axes_tiles, axes_tiles_size);
 
-  Object *label = &object_buffer[OAM_AXES_LABEL];
-  // Object *roll_cursor = &object_buffer[OAM_AXES_ROLL_CURSOR];
-  // Object *pitch_cursor = &object_buffer[OAM_AXES_PITCH_CURSOR];
-  // Object *yaw_curosr = &object_buffer[OAM_AXES_YAW_CURSOR];
+  Object *label = &object_buffer[OAM_AXES];
+  Object *roll_caret = &object_buffer[OAM_ROLL_CARET];
+  Object *pitch_caret = &object_buffer[OAM_PITCH_CARET];
+  Object *yaw_caret = &object_buffer[OAM_YAW_CARET];
 
   // LABEL
   ObjectSetAttr(label,
-      ATTR0_HORIZONTAL,
-      ATTR1_SIZE_64x32,
-      ATTR2_PALETTE_BANK(0) | ATTR2_TILE_ID(TILE_AXES_LABEL)
+      OBJ_HORIZONTAL,
+      OBJ_SIZE_64x32,
+      OBJ_PALETTE_ID(OBJ_PALETTE_0) | OBJ_TILE_ID(TILE_AXES)
   );
-  ObjectSetPos(label, POS_AXES_LABEL_X, POS_AXES_LABEL_Y);
+  ObjectSetPos(label, POS_AXES_X, POS_AXES_Y);
+
+  // ROLL CARET
+  ObjectSetAttr(roll_caret,
+      OBJ_SQUARE,
+      OBJ_SIZE_8x8,
+      OBJ_PALETTE_ID(OBJ_PALETTE_0) | OBJ_TILE_ID(TILE_CARET)
+  );
+  ObjectSetPos(roll_caret, POS_ROLL_CARET_X, POS_ROLL_CARET_Y);
+
+  // PITCH CARET
+  ObjectSetAttr(pitch_caret,
+      OBJ_SQUARE,
+      OBJ_SIZE_8x8,
+      OBJ_PALETTE_ID(OBJ_PALETTE_0) | OBJ_TILE_ID(TILE_CARET)
+  );
+  ObjectSetPos(pitch_caret, POS_PITCH_CARET_X, POS_PITCH_CARET_Y);
+
+  // YAW CARET
+  ObjectSetAttr(yaw_caret,
+      OBJ_SQUARE,
+      OBJ_SIZE_8x8,
+      OBJ_PALETTE_ID(OBJ_PALETTE_0) | OBJ_TILE_ID(TILE_CARET)
+  );
+  ObjectSetPos(yaw_caret, POS_YAW_CARET_X, POS_YAW_CARET_Y);
 }
 
 void AxesUpdate(s32 roll, s32 pitch, s32 yaw) {
