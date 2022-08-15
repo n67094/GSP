@@ -13,6 +13,7 @@
 #include "../core/tile.h"
 #include "axes.h"
 #include "interface-data.h"
+
 #include "interface.h"
 
 void InterfaceInit(void) {

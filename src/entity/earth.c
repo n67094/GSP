@@ -1,11 +1,11 @@
 #include <seven/hw/video.h>
 
-#include "../entity/earth.h"
+#include "../../data/bitmaps/earth.tiles.h"
+
 #include "../core/memory.h"
+#include "../entity/earth.h"
 #include "../renderer/sphere.h"
 #include "../types.h"
-
-#include "../../data/bitmaps/earth.tiles.h"
 
 #include "earth.h"
 

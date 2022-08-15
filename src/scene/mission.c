@@ -4,8 +4,8 @@
 #include <seven/hw/memory.h>
 #include <seven/hw/video.h>
 
-#include "../interface/interface.h"
 #include "../entity/earth.h"
+#include "../interface/interface.h"
 #include "../renderer/sphere.h"
 #include "../types.h"
 
