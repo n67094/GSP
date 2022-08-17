@@ -3,8 +3,8 @@
 
 #include "../types.h"
 
-void AxesInit();
+void MetricsInit();
 
-void AxesUpdate(s32 roll, s32 pitch, s32 yaw);
+void MetricsUpdate(s32 altitude, s32 speed, s32 throttle);
 
 #endif

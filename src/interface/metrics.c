@@ -21,17 +21,23 @@ void MetricsInit()
   Object *throttle_caret = &object_buffer[OAM_THROTTLE_CARET];
 
   ObjectSetAttr(metrics_1,
-      OBJ_HORIZONTAL,
-      OBJ_SIZE_64x32,
-      OBJ_PALETTE_ID(OBJ_PALETTE_0) | OBJ_TILE_ID(TILE_METRICS_1)
+    OBJ_SHAPE_WIDE,
+    OBJ_SIZE_64X32,
+    OBJ_PALETTE_NUMBER(OBJ_PALETTE_0) | OBJ_TILE_NUMBER(TILE_METRICS_1)
   );
-  ObjectSetPos(metrics_1, POS_AXES_X, POS_AXES_Y);
+  ObjectSetPos(metrics_1, POS_METRICS_1_X, POS_METRICS_2_Y);
 
-  ObjectSetAttr(metrics_2, OBJ_SQUARE, OBJ_SIZE_64x32, OBJ_PALETTE_ID(OBJ_PALETTE_0) | OBJ_TILE_ID(TILE_METRICS_2));
-  ObjectSetPos(metrics_2, POS_ROLL_CARET_X, POS_ROLL_CARET_Y);
+  ObjectSetAttr(metrics_2,
+    OBJ_SHAPE_WIDE,
+    OBJ_SIZE_64X32,
+    OBJ_PALETTE_NUMBER(OBJ_PALETTE_0) | OBJ_TILE_NUMBER(TILE_METRICS_2)
+  );
+  ObjectSetPos(metrics_2, POS_METRICS_2_X, POS_METRICS_2_Y);
 
-  ObjectSetAttr(
-      throttle_caret, OBJ_SQUARE, OBJ_SIZE_8x8, OBJ_PALETTE_ID(OBJ_PALETTE_0) | OBJ_TILE_ID(TILE_THROTTLE_CARET));
+  ObjectSetAttr(throttle_caret,
+                OBJ_SHAPE_SQUARE,
+                OBJ_SIZE_8X8,
+                OBJ_PALETTE_NUMBER(OBJ_PALETTE_0) | OBJ_TILE_NUMBER(TILE_THROTTLE_CARET));
   ObjectSetPos(throttle_caret, POS_THROTTLE_CARET_X, POS_THROTTLE_CARET_Y);
 }
 

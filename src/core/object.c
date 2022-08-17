@@ -7,8 +7,8 @@ void OamInit(Object *object, u32 count)
 
     while(nn--)
     {
-        *dst++= OBJ_MODE_HIDE;
-        *dst++= 0;
+      *dst++ = OBJ_MODE_HIDDEN;
+      *dst++ = 0;
     }
 
     oamWriteObjects(0, object, count);

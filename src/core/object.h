@@ -19,8 +19,8 @@ inline Object *ObjectSetAttr(Object *object, u16 attr0, u16 attr1, u16 attr2)
 
 inline void ObjectSetPos(Object *object, u32 x, u32 y)
 {
-  object->attr0 = BF_SET(object->attr0, OBJ_Y, y);
-  object->attr1 = BF_SET(object->attr1, OBJ_X, x);
+  object->attr0 = BF_SET(object->attr0, OBJ_Y_POS, y);
+  object->attr1 = BF_SET(object->attr1, OBJ_X_POS, x);
 }
 
 inline void ObjectHide(Object *object)
@@ -30,7 +30,7 @@ inline void ObjectHide(Object *object)
 
 inline void ObjectUnhide(Object *object, u16 mode)
 {
-  object->attr0 = BF_SET(object->attr0, OBJ_MODE, OBJ_MODE_HIDE);
+  object->attr0 = BF_SET(object->attr0, OBJ_MODE, OBJ_MODE_HIDDEN);
 }
 
 void OamInit(Object *object, u32 count);
