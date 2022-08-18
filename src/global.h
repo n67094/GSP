@@ -24,4 +24,8 @@ extern Object object_buffer[128];
 
 extern ShipData ship_data;
 
+extern u8 Spaceship_buffer[0x4000];
+extern u8 Pos_Table_1[128];
+extern u8 Pos_Table_2[128];
+
 #endif
