@@ -5,6 +5,6 @@
 #include "types.h"
 
 Object object_buffer[128];
-u8 Spaceship_buffer[0x4000];
-u8 Pos_Table_1[128];
-u8 Pos_Table_2[128];
+u8 spaceship_buffer[0x4000];
+u8 pos_table_1[128];
+u8 pos_table_2[128];

@@ -7,9 +7,11 @@
 #include "../entity/earth.h"
 #include "../interface/interface.h"
 #include "../renderer/sphere.h"
+#include "../renderer/spaceship.h"
 #include "../types.h"
 
 #include "scene-manager.h"
+#include "../global.h"
 
 SphereData earth;
 
@@ -42,10 +44,13 @@ static void MissionUpdate()
   }
 
   // Due to the time it take to compute it cannot be move in draw
-  EarthDraw(&earth);
+  //EarthDraw(&earth);
 }
 
-static void MissionDraw() {}
+static void MissionDraw() {
+	TransferBuffer(spaceship_buffer, (u16 *)0x6008000); //That VRAM address was just made up for testing purposes.
+	ClearBuffer(spaceship_buffer);
+}
 
 static void MissionVBlank() {}
 
