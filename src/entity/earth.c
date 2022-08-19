@@ -1,12 +1,11 @@
 #include <seven/hw/video.h>
 
+#include "../../data/bitmaps/earth.tiles.h"
+
 #include "../core/memory.h"
 #include "../entity/earth.h"
 #include "../renderer/sphere.h"
 #include "../types.h"
-
-#include "../../data/bitmaps/earth.palette.h"
-#include "../../data/bitmaps/earth.tiles.h"
 
 #include "earth.h"
 
@@ -23,7 +22,7 @@ static void EarthInitTileMap() {
 }
 
 void EarthInit() {
-  MemCpy16(BG_PALETTE, earth_palette, earth_palette_size);
+  MemCpy16(BG_PALETTE, earth_palette, 512);
 
   EarthInitTileMap();
 }

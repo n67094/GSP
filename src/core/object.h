@@ -2,28 +2,37 @@
 #define CORE_OBJECT_H
 
 #include <seven/base/bits.h>
+#include <seven/video/bg_regular.h>
+#include <seven/video/object.h>
 
 #include "../types.h"
+#include "seven/video/oam.h"
 
-#define BF_ATTR0_Y_LENGTH 8
-#define BF_ATTR0_Y_OFFSET 0
-
-#define BF_ATTR1_X_LENGTH 9
-#define BF_ATTR1_X_OFFSET 0
-
-#define OBJECT_ATTR0_SET(y, shape, bpp, mode, mos, bld, win)                                                           \
-  (((y)&255) | (((mode)&3) << 8) | (((bld)&1) << 10) | (((win)&1) << 11) | (((mos)&1) << 12) | (((bpp)&8) << 10) |     \
-   (((shape)&3) << 14))
-
-#define OBJECT_ATTR1_SET(x, size, hflip, vflip)                                                                        \
-  (((x)&511) | (((hflip)&1) << 12) | (((vflip)&1) << 13) | (((size)&3) << 14))
-
-#define OBJECT_ATTR2_SET(id, pbank, prio) (((id)&0x3FF) | (((pbank)&15) << 12) | (((prio)&3) << 10))
-
-inline void obj_set_pos(Object *object, u32 x, u32 y)
+inline Object *ObjectSetAttr(Object *object, u16 attr0, u16 attr1, u16 attr2)
 {
-  BF_SET(object->attr0, ATTR0_Y, y);
-  BF_SET(object->attr1, ATTR1_X, x);
+  object->attr0 = attr0;
+  object->attr1 = attr1;
+  object->attr2 = attr2;
+
+  return object;
 }
+
+inline void ObjectSetPos(Object *object, u32 x, u32 y)
+{
+  object->attr0 = BF_SET(object->attr0, OBJ_Y_POS, y);
+  object->attr1 = BF_SET(object->attr1, OBJ_X_POS, x);
+}
+
+inline void ObjectHide(Object *object)
+{
+  object->attr0 = BF_SET(object->attr0, OBJ_MODE, OBJ_MODE_REGULAR);
+}
+
+inline void ObjectUnhide(Object *object, u16 mode)
+{
+  object->attr0 = BF_SET(object->attr0, OBJ_MODE, OBJ_MODE_HIDDEN);
+}
+
+void OamInit(Object *object, u32 count);
 
 #endif

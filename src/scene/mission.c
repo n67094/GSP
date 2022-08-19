@@ -9,13 +9,13 @@
 #include "../renderer/sphere.h"
 #include "../types.h"
 
-#include "scene-manager.h"
+#include "scene.h"
 
 SphereData earth;
 
 static void MissionOpen()
 {
-  REG_DISPCNT = VIDEO_MODE_AFFINE | VIDEO_BG2_ENABLE | VIDEO_OBJ_MAPPING_1D;
+  REG_DISPCNT = VIDEO_MODE_AFFINE | VIDEO_BG2_ENABLE | VIDEO_OBJ_ENABLE | VIDEO_OBJ_MAPPING_1D;
   REG_BG2CNT = BG_TILE_8BPP;
 
   EarthInit();
@@ -43,9 +43,13 @@ static void MissionUpdate()
 
   // Due to the time it take to compute it cannot be move in draw
   EarthDraw(&earth);
+
+  InterfaceUpdate(0, 0, 0, 0, 0, 0);
 }
 
-static void MissionDraw() {}
+static void MissionDraw() {
+  InterfaceDraw();
+}
 
 static void MissionVBlank() {}
 
