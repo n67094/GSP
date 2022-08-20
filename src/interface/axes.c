@@ -40,7 +40,10 @@ void AxesInit() {
   ObjectSetPos(pitch_caret, POS_PITCH_CARET_X, POS_PITCH_CARET_Y);
 
   ObjectSetAttr(
-      yaw_caret, OBJ_SHAPE_SQUARE, OBJ_SIZE_8X8, OBJ_PALETTE_NUMBER(OBJ_PALETTE_0) | OBJ_TILE_NUMBER(TILE_CARET));
+      yaw_caret, 
+      OBJ_SHAPE_SQUARE, 
+      OBJ_SIZE_8X8, 
+      OBJ_PALETTE_NUMBER(OBJ_PALETTE_0) | OBJ_TILE_NUMBER(TILE_CARET));
   ObjectSetPos(yaw_caret, POS_YAW_CARET_X, POS_YAW_CARET_Y);
 }
 

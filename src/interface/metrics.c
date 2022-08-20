@@ -13,8 +13,8 @@
 
 void MetricsInit()
 {
-  MemCpy32(&TILE4_CHARBLOCKS[4][TILE_METRICS_1], metrics_1_tiles, metrics_1_tiles_size);
-  MemCpy32(&TILE4_CHARBLOCKS[4][TILE_METRICS_2], metrics_2_tiles, metrics_2_tiles_size);
+  MemCpy32(&OBJ4_CHARBLOCKS[0][TILE_METRICS_1], metrics_1_tiles, metrics_1_tiles_size);
+  MemCpy32(&OBJ4_CHARBLOCKS[0][TILE_METRICS_2], metrics_2_tiles, metrics_2_tiles_size);
 
   Object *metrics_1 = &object_buffer[OAM_METRICS_1];
   Object *metrics_2 = &object_buffer[OAM_METRICS_2];
