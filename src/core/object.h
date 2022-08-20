@@ -30,15 +30,15 @@ inline void ObjectHide(Object *object)
   object->attr0 = (object->attr0 & ~BF_MASK(OBJ_MODE)) | OBJ_MODE_HIDDEN;
 }
 
-inline void ObjectUnhide(Object *object)
+inline void ObjectUnhide(Object *object, u16 mode)
 {
-  object->attr0 = (object->attr0 & ~BF_MASK(OBJ_MODE)) | OBJ_MODE_REGULAR;
+  object->attr0 = (object->attr0 & ~BF_MASK(OBJ_MODE)) | mode;
 }
 
-inline void ObjectVisibility(Object *object, bool visible)
+inline void ObjectVisibility(Object *object, bool visible, u16 mode)
 {
   if(visible) {
-    ObjectUnhide(object);
+    ObjectUnhide(object, mode);
   } else {
     ObjectHide(object);
   }

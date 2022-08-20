@@ -17,6 +17,7 @@
 #include "scene.h"
 
 #include "../debug/log.h"
+#include "seven/video/object.h"
 
 #define TITLE_OBJ_PALETTE_0 0
 
@@ -85,8 +86,8 @@ static void TitleVBlank() {
 
     title_show_start = !title_show_start;
 
-    ObjectVisibility(start1, title_show_start);
-    ObjectVisibility(start2, title_show_start);
+    ObjectVisibility(start1, title_show_start, OBJ_MODE_REGULAR);
+    ObjectVisibility(start2, title_show_start, OBJ_MODE_REGULAR);
 
     title_frame_counter = 0;
   }else {
