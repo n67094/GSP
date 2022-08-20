@@ -22,7 +22,7 @@ void InterfaceInit(void) {
   OamInit(object_buffer, 128);
 
   MemCpy32(OBJ_PALETTE, interface_palette, interface_palette_size);
-  MemCpy32(&TILE4_CHARBLOCKS[4][TILE_CARET], caret_tiles, caret_tiles_size);
+  MemCpy32(&OBJ4_CHARBLOCKS[0][TILE_CARET], caret_tiles, caret_tiles_size);
 
   AxesInit();
   MetricsInit();

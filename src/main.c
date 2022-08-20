@@ -39,8 +39,6 @@ int main(void)
   while (true) {
     inputPoll();
 
-    LOG_DEBUG("ok");
-
     Update();
 
     gba_can_draw = true;
