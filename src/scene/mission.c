@@ -17,10 +17,12 @@ SphereData earth;
 
 static void MissionOpen()
 {
-  REG_DISPCNT = VIDEO_MODE_AFFINE | VIDEO_BG2_ENABLE | VIDEO_OBJ_MAPPING_1D;
-  REG_BG2CNT = BG_TILE_8BPP;
+  REG_DISPCNT = VIDEO_MODE_AFFINE | VIDEO_BG2_ENABLE | VIDEO_BG3_ENABLE | VIDEO_OBJ_MAPPING_1D;
+  REG_BG2CNT = BG_TILE_8BPP | BG_PRIORITY(1);
+  REG_BG3CNT = BG_TILE_8BPP | BG_PRIORITY(0) | BG_GFX_BASE(2) | BG_MAP_BASE(8);
 
   EarthInit();
+  SpaceshipInit();
 
   InterfaceInit();
 }
@@ -45,11 +47,15 @@ static void MissionUpdate()
 
   // Due to the time it take to compute it cannot be move in draw
   //EarthDraw(&earth);
+	ClearBuffer(spaceship_buffer);
+	SpaceshipDraw();
+  	TransferBuffer(spaceship_buffer, GFX_BASE_ADDR(2)); 
+	
+	
 }
 
 static void MissionDraw() {
-	TransferBuffer(spaceship_buffer, (u16 *)0x6008000); //That VRAM address was just made up for testing purposes.
-	ClearBuffer(spaceship_buffer);
+
 }
 
 static void MissionVBlank() {}
