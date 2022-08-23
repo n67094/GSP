@@ -11,6 +11,14 @@
 #include "interface-data.h"
 #include "metrics.h"
 
+static void MetricsMoveThrottleCaret(u16 offset_x) {
+  Object *caret = &object_buffer[OAM_THROTTLE_CARET];
+
+  if(offset_x < 48) {
+    ObjectSetPos(caret, POS_THROTTLE_CARET_X + offset_x, POS_THROTTLE_CARET_Y);
+  }
+}
+
 void MetricsInit()
 {
   MemCpy32(&OBJ4_CHARBLOCKS[0][TILE_METRICS_1], metrics_1_tiles, metrics_1_tiles_size);
@@ -41,4 +49,6 @@ void MetricsInit()
   ObjectSetPos(throttle_caret, POS_THROTTLE_CARET_X, POS_THROTTLE_CARET_Y);
 }
 
-void MetricsUpdate(s32 roll, s32 pitch, s32 yaw) {}
+void MetricsUpdate(u16 altitue, u16 speed, u16 throttle) {
+  MetricsMoveThrottleCaret(throttle);
+}

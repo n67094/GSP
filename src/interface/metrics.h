@@ -5,6 +5,6 @@
 
 void MetricsInit();
 
-void MetricsUpdate(s32 altitude, s32 speed, s32 throttle);
+void MetricsUpdate(u16 altitude, u16 speed, u16 throttle);
 
 #endif

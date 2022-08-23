@@ -79,8 +79,7 @@ static void TitleDraw()
 }
 
 static void TitleVBlank() {
-  if(title_frame_counter >= 30) {
-
+  if (title_frame_counter >= 30) {
     Object *start1 = &object_buffer[OAM_TITLE_START_1];
     Object *start2 = &object_buffer[OAM_TITLE_START_2];
 
@@ -90,7 +89,7 @@ static void TitleVBlank() {
     ObjectVisibility(start2, title_show_start, OBJ_MODE_REGULAR);
 
     title_frame_counter = 0;
-  }else {
+  } else {
     ++title_frame_counter;
   }
 }

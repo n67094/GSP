@@ -10,6 +10,12 @@
 #include "interface-data.h"
 #include "axes.h"
 
+static void AxesMoveCaret(Object *caret, u16 origin_x, u16 origin_y, s16 offset_x) {
+  if(offset_x > -7 && offset_x < 7) {
+    ObjectSetPos(caret, origin_x + offset_x, origin_y);
+  }
+}
+
 void AxesInit() {
   MemCpy32(&TILE4_CHARBLOCKS[4][TILE_AXES], axes_tiles, axes_tiles_size);
 
@@ -48,5 +54,11 @@ void AxesInit() {
 }
 
 void AxesUpdate(s32 roll, s32 pitch, s32 yaw) {
+  Object *roll_caret = &object_buffer[OAM_ROLL_CARET];
+  Object *pitch_caret = &object_buffer[OAM_PITCH_CARET];
+  Object *yaw_caret = &object_buffer[OAM_YAW_CARET];
 
+  AxesMoveCaret(roll_caret, POS_ROLL_CARET_X, POS_ROLL_CARET_Y, roll);
+  AxesMoveCaret(pitch_caret, POS_PITCH_CARET_X, POS_PITCH_CARET_Y, pitch);
+  AxesMoveCaret(yaw_caret, POS_YAW_CARET_X, POS_YAW_CARET_Y, yaw);
 }
