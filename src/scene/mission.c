@@ -10,7 +10,7 @@
 #include "../entity/spaceship.h"
 #include "../types.h"
 
-#include "scene-manager.h"
+//#include "scene-manager.h"
 #include "../global.h"
 #include "scene.h"
 

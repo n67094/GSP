@@ -5,7 +5,7 @@
 #include "../renderer/sphere.h"
 #include "../types.h"
 
-#include "../../data/bitmaps/earth.palette.h"
+//#include "../../data/bitmaps/earth.palette.h"
 #include "../../data/bitmaps/earth.tiles.h"
 
 #include "spaceship.h"
@@ -50,7 +50,7 @@ void SpaceshipDraw(s32 pitch2, s32 spin){
 	}
 
 	
-	SetupPosTableCylinder(pos_table_1, TrigGetCos(pitch), radius, xPos, yPos);
+	SetupPosTableCylinder(pos_table_1, TrigGetSin(pitch), radius, xPos, yPos);
 	
 	for (u32 i = 0; i < 128; i++){
 		spaceship_buffer[(i * 128) + (pos_table_1[i] & 0xff)] = 0xa0;

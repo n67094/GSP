@@ -73,7 +73,7 @@ setupPixel:
 @takes ~ 4,575 cycles
 
 R13Temp:
-	.word	
+	.word	0
 ClearBuffer:
 	push	{r4-r12, r14}
 	str		r13, R13Temp
