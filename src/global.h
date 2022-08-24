@@ -22,9 +22,7 @@
 
 extern Object object_buffer[128];
 
-extern ShipData ship_data;
-
-extern vu8 spaceship_buffer[0x4000];
+extern volatile u8 spaceship_buffer[0x4000];
 extern u32 pos_table_1[128];
 extern u32 pos_table_2[128];
 

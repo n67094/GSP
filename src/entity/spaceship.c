@@ -10,6 +10,7 @@
 
 #include "spaceship.h"
 #include "../global.h"
+#include "../core/trig.h"
 
 static void SpaceshipInitTileMap() {
   vu16 *tilemap_ptr = (u16 *)MAP_BASE_ADDR(8);
@@ -27,10 +28,31 @@ void SpaceshipInit(){
 	*(u16 *)0x05000142 = 0x1f; //Setting the color Red to palette entry 0xa1
 }
 
-void SpaceshipDraw(){
-	for (u32 i = 0; i < 128; i++){
-		for (u32 j = 0; j < 64; j++){
-			spaceship_buffer[j + (128 * i)] = TestWallTextureBitmap[j + (64 * i)];
+void SpaceshipDraw(s32 pitch2, s32 spin){
+	u32 radius = 32;
+	u32 xPos = 64;
+	u32 yPos = 64;
+	static s32 pitch = 0;
+	static u32 pitchneg = 0;
+	if(pitchneg){
+		pitch--;
+		if (pitch < -255){
+			pitchneg = 0;
+			pitch = -255;
 		}
+	}
+	else{
+		pitch++;
+		if (pitch > 255){
+			pitchneg = 1;
+			pitch = 255;
+		}
+	}
+
+	
+	SetupPosTableCylinder(pos_table_1, TrigGetCos(pitch), radius, xPos, yPos);
+	
+	for (u32 i = 0; i < 128; i++){
+		spaceship_buffer[(i * 128) + (pos_table_1[i] & 0xff)] = 0xa0;
 	}
 }

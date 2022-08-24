@@ -7,13 +7,14 @@
 #include "../entity/earth.h"
 #include "../interface/interface.h"
 #include "../renderer/sphere.h"
-#include "../renderer/spaceship.h"
+#include "../entity/spaceship.h"
 #include "../types.h"
 
 #include "scene-manager.h"
 #include "../global.h"
 
 SphereData earth;
+ShipData spaceship;
 
 static void MissionOpen()
 {
@@ -25,6 +26,9 @@ static void MissionOpen()
   SpaceshipInit();
 
   InterfaceInit();
+  spaceship.pitch = 0; 
+  spaceship.spin = 0;
+
 }
 
 static void MissionUpdate()
@@ -45,10 +49,13 @@ static void MissionUpdate()
     earth.spin++;
   }
 
+
+	
+
   // Due to the time it take to compute it cannot be move in draw
   //EarthDraw(&earth);
 	ClearBuffer(spaceship_buffer);
-	SpaceshipDraw();
+	SpaceshipDraw(spaceship.pitch, spaceship.spin);
   	TransferBuffer(spaceship_buffer, GFX_BASE_ADDR(2)); 
 	
 	
