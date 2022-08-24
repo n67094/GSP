@@ -12,6 +12,7 @@
 
 #include "scene-manager.h"
 #include "../global.h"
+#include "scene.h"
 
 SphereData earth;
 ShipData spaceship;
@@ -49,9 +50,6 @@ static void MissionUpdate()
     earth.spin++;
   }
 
-
-	
-
   // Due to the time it take to compute it cannot be move in draw
   //EarthDraw(&earth);
 	ClearBuffer(spaceship_buffer);
@@ -62,7 +60,7 @@ static void MissionUpdate()
 }
 
 static void MissionDraw() {
-
+  InterfaceDraw();
 }
 
 static void MissionVBlank() {}

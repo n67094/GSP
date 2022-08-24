@@ -7,17 +7,17 @@
 #include "debug/assert.h"
 #include "debug/log.h"
 
-#include "scene/scene-manager.h"
+#include "scene/scene.h"
 
 bool gba_can_draw = false;
 
-void Update() { SceneManagerUpdate(); }
+void Update() { SceneUpdate(); }
 
-void Draw() { SceneManagerDraw(); }
+void Draw() { SceneDraw(); }
 
 void VBlank(u16 irqs)
 {
-  SceneManagerVBlank();
+  SceneVBlank();
 
   if (gba_can_draw == true) {
     Draw();
@@ -33,13 +33,11 @@ int main(void)
   irqEnableFull(IRQ_VBLANK);
   irqCallbackSet(IRQ_VBLANK, VBlank, 0);
 
-  SceneManagerGoTo(title_scene);
+  SceneGoTo(title_scene);
   // SceneManagerGoTo(mission_scene);
 
   while (true) {
     inputPoll();
-
-    LOG_DEBUG("ok");
 
     Update();
 

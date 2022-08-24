@@ -1,0 +1,53 @@
+#ifndef INTERFACE_DATA
+#define INTERFACE_DATA
+
+// PALETTE ID
+#define OBJ_PALETTE_0 0
+
+// UI GENERICS
+// ===========
+// TILE ID
+#define TILE_CARET 0
+
+// AXES
+// ====
+// OAM ID
+#define OAM_AXES 0
+#define OAM_ROLL_CARET 1
+#define OAM_PITCH_CARET 2
+#define OAM_YAW_CARET 3
+
+// TILE ID
+#define TILE_AXES 1
+
+// SPRITES POS
+#define POS_AXES_X 0
+#define POS_AXES_Y 128
+#define POS_ROLL_CARET_X 47
+#define POS_ROLL_CARET_Y 134
+#define POS_PITCH_CARET_X 47
+#define POS_PITCH_CARET_Y 142
+#define POS_YAW_CARET_X 47
+#define POS_YAW_CARET_Y 150
+
+// METRICS
+// =======
+// OAM ID
+#define OAM_METRICS_1 4
+#define OAM_METRICS_2 5
+#define OAM_THROTTLE_CARET 6
+
+// TILE ID
+#define TILE_METRICS_1 33
+#define TILE_METRICS_2 65
+#define TILE_THROTTLE_CARET 0
+
+// SPRITES POS
+#define POS_METRICS_1_X 128
+#define POS_METRICS_1_Y 128
+#define POS_METRICS_2_X 176
+#define POS_METRICS_2_Y 128
+#define POS_THROTTLE_CARET_X 185
+#define POS_THROTTLE_CARET_Y 150
+
+#endif
