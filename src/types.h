@@ -1,30 +1,7 @@
 #ifndef TYPES_H
 #define TYPES_H
 
-#include <seven/base/types.h>
-#include <seven/video/object.h>
-
-typedef struct Object Object;
-
-typedef volatile u8  vu8;
-typedef volatile u16 vu16;
-typedef volatile u32 vu32;
-typedef volatile u64 vu64;
-
-typedef volatile s8  vs8;
-typedef volatile s16 vs16;
-typedef volatile s32 vs32;
-typedef volatile s64 vs64;
-
-typedef const u8  cu8;
-typedef const u16 cu16;
-typedef const u32 cu32;
-typedef const u64 cu64;
-
-typedef const s8  cs8;
-typedef const s16 cs16;
-typedef const s32 cs32;
-typedef const s64 cs64;
+#include "./core/types.h"
 
 typedef struct SphereData {
 	s32 pitch;

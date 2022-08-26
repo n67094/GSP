@@ -5,10 +5,9 @@
 #include <seven/video/bg_regular.h>
 #include <seven/video/object.h>
 
-#include "../types.h"
+#include "types.h"
 #include "seven/video/oam.h"
 
-#include "../debug/log.h"
 
 inline Object *ObjectSetAttr(Object *object, u16 attr0, u16 attr1, u16 attr2)
 {

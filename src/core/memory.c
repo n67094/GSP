@@ -1,8 +1,7 @@
 #include <seven/base/addresses.h>
 #include <seven/hw/memory.h>
 
-#include "../types.h"
-
+#include "types.h"
 #include "memory.h"
 
 void MemCpy8(void* dest, const void* src, size_t size) {
