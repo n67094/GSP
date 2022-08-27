@@ -7,7 +7,7 @@
  * Print glyph as object/sprites. Glyph are stored in OVRAM
  */
 
-void LabelInit(LabelFont *font);
+void LabelInit(const LabelFont *font);
 
 /*
  * @text is the text to draw

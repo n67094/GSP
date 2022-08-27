@@ -8,6 +8,7 @@
 #include "../core/memory.h"
 #include "../core/object.h"
 #include "../core/tile.h"
+#include "../core/label.h"
 #include "interface-data.h"
 #include "metrics.h"
 
@@ -51,4 +52,10 @@ void MetricsInit()
 
 void MetricsUpdate(u16 altitue, u16 speed, u16 throttle) {
   MetricsMoveThrottleCaret(throttle);
+}
+
+void MetricsDraw() {
+  LabelDraw("1234567890", 10, 10, 60, object_buffer, 1);
+  LabelDraw("This is a test", 10, 20, 71, object_buffer, 1);
+  LabelDraw("Test:.", 10, 30, 85, object_buffer, 1);
 }

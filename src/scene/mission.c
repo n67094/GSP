@@ -4,10 +4,12 @@
 #include <seven/hw/memory.h>
 #include <seven/hw/video.h>
 
+#include "../core/label.h"
 #include "../entity/earth.h"
 #include "../interface/interface.h"
 #include "../renderer/sphere.h"
 #include "../types.h"
+#include "../global.h"
 
 #include "scene.h"
 
@@ -49,6 +51,7 @@ static void MissionUpdate()
 
 static void MissionDraw() {
   InterfaceDraw();
+
 }
 
 static void MissionVBlank() {}
