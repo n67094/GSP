@@ -4,6 +4,7 @@
 #include "../entity/earth.h"
 #include "../renderer/sphere.h"
 #include "../types.h"
+#include <seven/hw/input.h>
 
 //#include "../../data/bitmaps/earth.palette.h"
 #include "../../data/bitmaps/earth.tiles.h"
@@ -28,31 +29,36 @@ void SpaceshipInit(){
 	*(u16 *)0x05000142 = 0x1f; //Setting the color Red to palette entry 0xa1
 }
 
-void SpaceshipDraw(s32 pitch2, s32 spin){
-	u32 radius = 32;
-	u32 xPos = 64;
+void SpaceshipDraw(s32 pitch, s32 spin){
+	static u32 radius = 32;
+	static u32 height = 64;
+	u32 xPos = 64 - ((TrigGetCos(pitch)) / (512/height)); //This is a very inefficient calculation, but it is for demo purposes only
 	u32 yPos = 64;
-	static s32 pitch = 0;
-	static u32 pitchneg = 0;
-	if(pitchneg){
-		pitch--;
-		if (pitch < -255){
-			pitchneg = 0;
-			pitch = -255;
-		}
+	u32 scale = TrigGetSec(pitch);
+	
+	spin = spin & 0x3ff; //get the spin into a range of 0-2pi
+	spin += 0x100;
+	
+	
+	if (scale >= 0) {
+		scale = -scale;
 	}
-	else{
-		pitch++;
-		if (pitch > 255){
-			pitchneg = 1;
-			pitch = 255;
+	//normally, the radius will only be set by the part data, this key controlls is for testing only
+	if (~(REG_KEYINPUT)&KEY_L) {
+		radius++;
+		if (radius > 63){
+			radius = 63;
 		}
 	}
 
-	
-	SetupPosTableCylinder(pos_table_1, TrigGetSin(pitch), radius, xPos, yPos);
-	
-	for (u32 i = 0; i < 128; i++){
-		spaceship_buffer[(i * 128) + (pos_table_1[i] & 0xff)] = 0xa0;
+	if (~(REG_KEYINPUT)&KEY_R) {
+		radius--;
+		if (radius < 1){
+			radius = 1;
+		}
 	}
+
+	SetupPosTableCylinder(TrigGetSin(pitch), radius, xPos);
+	
+	DrawCylinderWall(TestWallTextureBitmap + ((spin/8) * 64), 6, scale, radius, spaceship_buffer + 8192, 7);
 }

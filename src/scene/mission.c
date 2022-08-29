@@ -10,7 +10,6 @@
 #include "../entity/spaceship.h"
 #include "../types.h"
 
-//#include "scene-manager.h"
 #include "../global.h"
 #include "scene.h"
 
@@ -27,7 +26,7 @@ static void MissionOpen()
   SpaceshipInit();
 
   InterfaceInit();
-  spaceship.pitch = 0; 
+  spaceship.pitch = 64; 
   spaceship.spin = 0;
 
 }
@@ -48,6 +47,27 @@ static void MissionUpdate()
 
   if (~(REG_KEYINPUT)&KEY_RIGHT) {
     earth.spin++;
+  }
+  
+    if (~(REG_KEYINPUT)&KEY_LEFT) {
+    spaceship.pitch--;
+	if (spaceship.pitch < -255){
+		spaceship.pitch = -255;
+	}
+  }
+
+  if (~(REG_KEYINPUT)&KEY_RIGHT) {
+    spaceship.pitch++;
+	if (spaceship.pitch > 255){
+		spaceship.pitch = 255;
+	}
+  }
+      if (~(REG_KEYINPUT)&KEY_DOWN) {
+    spaceship.spin-=4;
+  }
+
+  if (~(REG_KEYINPUT)&KEY_UP) {
+    spaceship.spin+=4;
   }
 
   // Due to the time it take to compute it cannot be move in draw

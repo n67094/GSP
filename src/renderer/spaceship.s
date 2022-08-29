@@ -4,7 +4,70 @@
 	.global DrawCylinderWall
 	.type DrawCylinderWall STT_FUNC
 	
+@register usage
+@r0: texture pointer center
+@r1: texture width (2^n pixels), 
+@r2: horizontal scale
+@r3: radius - vertical counter
+@r4: buffer address, middle point
+@r5: position table address
+@r6: buffer address
+@r7: texture height (2^n pixels), shift value
+@r8: texture pointer
+@r9: horizontal counter
+@r11: scratch
+@r12: scratch
+@r13: texture width (pixels)
+@r14: original radius
+
 DrawCylinderWall:
+	push	{r4-r12, r14}			@store the existing registers
+	ldr		r4, [r13, #40]			@load the fourth argument, the buffer address, from the stack
+	ldr		r7, [r13, #44]			@load the texture height
+	str		r13, R13Temp			@store the stack pointer
+	ldr		r5, =pos_table_1		@load the position table address
+	mov		r14, r3
+	mov		r10, #1
+	mov		r13, r10, lsl r1		@calculate the width of the texture in pixels
+	sub		r7, r7, #2				@divide the height of the texture in 4 
+	rsb		r7, r7, #8				@find the shift value needed to link the angle to texture vertical position.
+DrawOneLineUp:	
+	ldr		r11, [r5], #4			@load the value at the position table
+	mov		r12, r11, lsr #24		@isolate the angle value
+	mov		r12, r12, lsr r7
+	sub		r8, r0, r12, lsl r1		
+	sub		r6, r4, r3, lsl #7		@get the correct row of the buffer
+	and		r11, r11, #0xff
+	add		r6, r6, r11				@get the correct starting pixel of the buffer
+	mov		r9, r13, lsl #8
+DrawOnePixelUp:
+	ldrb	r11, [r8, r9, lsr #8]	@load the pixel from the texture bitmap
+	strb	r11, [r6], #1			@store the pixel in the buffer, post increment
+	subs	r9, r9, r2				@subtract the horizontal scale to reach the next pixel
+	bpl		DrawOnePixelUp			@continue until we run out of horizontal pixels in the texture
+	subs	r3, r3, #1				@decrement the vertical counter
+	bpl		DrawOneLineUp
+BottomHalf:							@now we repeat the process, this time for the bottom half of the cylinder
+	ldr		r5, =pos_table_1		@reset the position table address
+	mov		r3, r14
+DrawOneLineDown:	
+	ldr		r11, [r5], #4			@load the value at the position table
+	mov		r12, r11, lsr #24		@isolate the angle value
+	mov		r12, r12, lsr r7
+	add		r8, r0, r12, lsl r1		@this time add to get the texture pointer
+	add		r6, r4, r3, lsl #7		@and add to get the buffer address
+	and		r11, r11, #0xff
+	add		r6, r6, r11				@get the correct starting pixel of the buffer
+	mov		r9, r13, lsl #8
+DrawOnePixelDown:
+	ldrb	r11, [r8, r9, lsr #8]	@load the pixel from the texture bitmap
+	strb	r11, [r6], #1			@store the pixel in the buffer, post increment
+	subs	r9, r9, r2				@subtract the horizontal scale to reach the next pixel
+	bpl		DrawOnePixelDown		@continue until we run out of horizontal pixels in the texture
+	subs	r3, r3, #1				@decrement the vertical counter
+	bpl		DrawOneLineDown	
+	ldr		r13, R13Temp
+	pop		{r4-r12, r14}
 	bx		lr
 	
 .section .iwram,"ax", %progbits
@@ -15,50 +78,46 @@ DrawCylinderWall:
 	.type SetupPosTableCylinder STT_FUNC
 
 @Register Usage
-@r0: pointer to position table
-@r1: cos(pitch)
-@r2: radius
-@r3: center xPos
-@r4: current yPos
+
+@r0: cos(pitch)
+@r1: radius
+@r2: center xPos
+@r3: current yPos
+@r4: pointer to position table
 @r5: yPos Update Value
 @r6: trig table 1
-@r7: trig table 2
-@r8:
-@r9: pointer to position table from bottom
-@r10: scratch
+@r7: scratch
+@r8: scratch
+
+@angle is in top byte, xpos is in bottom byte
 
 SetupPosTableCylinder:
-	push	{r4-r12, r14}			@store the existing registers
-	ldr		r4, [r13, #40]			@load the fourth argument, the center y pos, from the stack
-	str		r13, R13Temp			@store the stack pointer
-	add		r0, r0, r4, lsl #2		@add the center y pos to the table pointer
-	add		r9, r0, r2, lsl #2		@add radius to center to get opposite starting y pointer
-	sub		r0, r0, r2, lsl #2		@subtract radius from center to get starting y pointer
-	mov		r4, #0x10000			@starting y pos is 1
-	mov		r5, r2, lsl #1
+	push	{r4-r9}					@store the existing registers
+	ldr		r4, =pos_table_1
+	mov		r3, #0x10000			@starting y pos is 1
+	mov		r5, r1, lsl #1
 	adr		r8, InverseTable
 	ldrh	r5, [r8, r5]			@load the inverse of radius into the y update value
 	ldr		r6, =trig_table_group_1
-	ldr		r7, =trig_table_group_2 
-	strb	r3, [r0], #4			@first pixel is always at same x value as center x
-	strb	r3, [r9], #-4
-	subs	r4, r4, r5				@add the update value to the ypos
+	orr		r8, r2, #0xff000000		@first pixel has texture value of pi/2			
+	str		r8, [r4], #4			@first pixel is always at same x value as center x	
+	subs	r3, r3, r5				@add the update value to the ypos
 setupPixel:
-	mov		r8, r4, lsr #8
-	ldr		r8, [r6, r8, lsl #2]	@load the sqrt(1-Y^2)
+	mov		r8, r3, lsr #8
+	ldr		r8, [r6, r8, lsl #2]	@load the sqrt(1-Y^2) and the arcsin(Y)
+	and		r9, r8, #0xff
 	and		r8, r8, #0xff00
-	mul		r10, r8, r2				@multiply by radius
-	mul		r8, r10, r1				@multiply by cos(pitch)
-	add		r8, r3, r8, asr #24
-	strb	r8, [r0], #4			@store the x value at the corrosponding y position in the table
-	strb	r8, [r9], #-4
-	subs	r4, r4, r5				@add the update value to the ypos
+	mul		r7, r8, r1				@multiply by radius
+	mul		r8, r7, r0				@multiply by cos(pitch)
+	add		r8, r2, r8, lsr #24		@store the x pos in the bottom byte
+	orr		r8, r8, r9, lsl #24		@store the angle at the upper byte
+	str		r8, [r4], #4			@store the x value at the corrosponding y position in the table
+	subs	r3, r3, r5				@add the update value to the ypos
 	bhi		setupPixel
-	mul		r8, r2, r1				@one special case for the center pixel
-	add		r8, r3, r8, asr #8
-	strb	r8, [r0]				
-	ldr		r13, R13Temp
-	pop		{r4-r12, r14}
+	mul		r8, r1, r0				@one special case for the center pixel
+	add		r8, r2, r8, asr #8
+	str		r8, [r4]				
+	pop		{r4-r9}
 	bx		lr
 	
 	
@@ -174,3 +233,10 @@ InverseTable:
 	.hword	0x1000, 0x0F0F, 0x0E38, 0x0D79, 0x0CCC, 0x0C30, 0x0BA2, 0x0B21, 0x0AAA, 0x0A3D, 0x09D8, 0x097B, 0x0924, 0x08D3, 0x0888, 0x0842
 	.hword	0x0800, 0x07C1, 0x0787, 0x0750, 0x071C, 0x06EB, 0x06BC, 0x0690, 0x0666, 0x063E, 0x0618, 0x05F4, 0x05D1, 0x05B0, 0x0590, 0x0572
 	.hword	0x0555, 0x0539, 0x051E, 0x0505, 0x04EC, 0x04D4, 0x04BD, 0x04A7, 0x0492, 0x047D, 0x0469, 0x0456, 0x0444, 0x0432, 0x0421, 0x0410, 0x0400
+	
+	.align  2
+pos_table_1:
+	.word 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 
+	
+pos_table_2:
+	.word 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0

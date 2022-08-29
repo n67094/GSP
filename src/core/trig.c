@@ -95,7 +95,7 @@ s32 TrigGetCsc(s32 theta){ //length should not be a multiple of pi (512). csc(pi
 		theta -= 0x200;
 	}
 	if(theta > 0x100){ //if theta is in the second or fourth quarter of the csc wave.
-		theta = 200 - theta;
+		theta = 0x200 - theta;
 	}
 	if(theta < 0x100){
 		value = (trig_table_group_2[theta] & 0xffff0000) >> 16;
@@ -111,7 +111,7 @@ s32 TrigGetCsc(s32 theta){ //length should not be a multiple of pi (512). csc(pi
 
 s32 TrigGetSec(s32 theta){ //length should not be a multiple of pi (512) - pi/2. csc(pi/2) is undefined, but this function returns 0xffff
 	s32 value;
-	value = TrigGetCsc(theta + 0x100);
+	value = TrigGetCsc(theta - 0x100);
 	return value;
 }
 
