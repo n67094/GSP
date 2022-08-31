@@ -3,12 +3,17 @@
 #include "../../data/sprites/metrics-1.tiles.h"
 #include "../../data/sprites/metrics-2.tiles.h"
 
-#include "../global.h"
-#include "../types.h"
 #include "../core/memory.h"
 #include "../core/object.h"
 #include "../core/tile.h"
 #include "../core/label.h"
+#include "../core/utils.h"
+
+#include "../debug/log.h"
+
+#include "../global.h"
+#include "../types.h"
+
 #include "interface-data.h"
 #include "metrics.h"
 
@@ -44,18 +49,27 @@ void MetricsInit()
   ObjectSetPos(metrics_2, POS_METRICS_2_X, POS_METRICS_2_Y);
 
   ObjectSetAttr(throttle_caret,
-                OBJ_SHAPE_SQUARE,
-                OBJ_SIZE_8X8,
-                OBJ_PALETTE_NUMBER(OBJ_PALETTE_0) | OBJ_TILE_NUMBER(TILE_THROTTLE_CARET));
+    OBJ_SHAPE_SQUARE,
+    OBJ_SIZE_8X8,
+    OBJ_PALETTE_NUMBER(OBJ_PALETTE_0) | OBJ_TILE_NUMBER(TILE_THROTTLE_CARET));
   ObjectSetPos(throttle_caret, POS_THROTTLE_CARET_X, POS_THROTTLE_CARET_Y);
 }
 
 void MetricsUpdate(u16 altitue, u16 speed, u16 throttle) {
   MetricsMoveThrottleCaret(throttle);
-}
 
-void MetricsDraw() {
-  LabelDraw("1234567890", 10, 10, 60, object_buffer, 1);
-  LabelDraw("This is a test", 10, 20, 71, object_buffer, 1);
-  LabelDraw("Test:.", 10, 30, 85, object_buffer, 1);
+  LOG_DEBUG("OKI");
+
+  //char speed_str[7];
+  //int speed_bcd = UtilsBCD(999);
+  //UtilsBCDtoA(speed_bcd, speed_str);
+
+  LOG_DEBUG("speed: %s", speed_str);
+
+  LabelPrint("Hamza", 10, 10, 60, object_buffer, 1);
+
+
+  // this is here cause it just update values in OAM is not a drawing which shoul happend in Draw function
+  // LabelPrint("This is a test", 10, 20, 71, object_buffer, 1);
+  // LabelPrint("Test:.", 10, 30, 85, object_buffer, 1);
 }

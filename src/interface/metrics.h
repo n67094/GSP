@@ -7,6 +7,4 @@ void MetricsInit(void);
 
 void MetricsUpdate(u16 altitude, u16 speed, u16 throttle);
 
-void MetricsDraw(void);
-
 #endif

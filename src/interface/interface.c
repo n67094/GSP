@@ -41,8 +41,6 @@ void InterfaceUpdate(s32 roll, s32 pitch, s32 yaw, s32 altitude, s32 speed, s32 
 
 void InterfaceDraw(void) 
 {
-  MetricsDraw();
-
   oamWriteObjects(0, object_buffer, 128);
 }
 

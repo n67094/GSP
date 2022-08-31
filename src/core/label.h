@@ -18,6 +18,6 @@ void LabelInit(const LabelFont *font);
  * return the number of object draw which is equals at the number of slot taken on the oam_buffer
  * or zero if no font was initialized
  */
-int LabelDraw(char *text, u32 pos_x, u32 pos_y, u32 oam_start_id, Object* oam_buffer, u32 palette_id);
+int LabelPrint(char *text, u32 pos_x, u32 pos_y, u32 oam_start_id, Object* oam_buffer, u32 palette_id);
 
 #endif
