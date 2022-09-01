@@ -58,20 +58,15 @@ void MetricsInit()
 void MetricsUpdate(u16 altitue, u16 speed, u16 throttle) {
   MetricsMoveThrottleCaret(throttle);
 
-  LOG_DEBUG("OKI");
+  char altitue_str[7];
+  int altitue_bcd = UtilsBCD(altitue);
+  UtilsBCDtoA(altitue_bcd, altitue_str);
+
+  LabelPrint(altitue_str, POS_ALTITUE_X, POS_ALTITUE_Y, OAM_ALTITUE, object_buffer, 1);
 
   char speed_str[7];
-  int speed_bcd = UtilsBCD(245);
-
-  LOG_DEBUG("OKI 1");
+  int speed_bcd = UtilsBCD(speed);
   UtilsBCDtoA(speed_bcd, speed_str);
-  LOG_DEBUG("OKI 2");
 
-  LOG_DEBUG("speed: %s", speed_str);
-
-  LabelPrint(speed_str, 10, 10, 60, object_buffer, 1);
-
-  // this is here cause it just update values in OAM is not a drawing which shoul happend in Draw function
-  // LabelPrint("This is a test", 10, 20, 71, object_buffer, 1);
-  // LabelPrint("Test:.", 10, 30, 85, object_buffer, 1);
+  LabelPrint(speed_str, POS_SPEED_X, POS_SPEED_Y, OAM_SPEED, object_buffer, 1);
 }

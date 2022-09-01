@@ -46,7 +46,7 @@ static void MissionUpdate()
   // Due to the time it take to compute it cannot be move in draw
   EarthDraw(&earth);
 
-  InterfaceUpdate(0, 0, 0, 0, 0, 0);
+  InterfaceUpdate(7, 8, 3, 1234, 2345, 5);
 }
 
 static void MissionDraw() {
