@@ -21,8 +21,10 @@ u32 UtilsBCD(u32 value) {
 
   u32 result = 0;
 
-  u32 i;
-  for(i = 20; i >= 0; --i) {
+  LOG_DEBUG("oki -1");
+
+  int i;
+  for(i = 20; i >= 0; --i) { // 20 is the number of bit occupied by 999999
     if((result & BCD_1ST) >= 5)
       result += 3;
     if(((result & BCD_2ND) >> 4) >= 5)
@@ -39,6 +41,8 @@ u32 UtilsBCD(u32 value) {
     result = (result << 1) | ((value >> i) & 1);
   }
 
+  LOG_DEBUG("oki -2");
+
   return result;
 }
 
@@ -48,8 +52,8 @@ u32 UtilsBCDDigit(u32 bcd, u32 index) {
 
 void UtilsBCDtoA(u32 bcd, char *str) {
   int i;
-  for(i = 0; i < 5; ++i) {
-    str[i] = UtilsBCDDigit(bcd, i) + 48; // 48 = ascii code of 0
+  for(i = 0; i < 6; ++i) {
+    str[5 - i] = UtilsBCDDigit(bcd, i) + 48; // 48 = ascii code of 0
   }
 
   str[i] = '\0';
