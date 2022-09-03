@@ -1,5 +1,5 @@
 #include "trig.h"
-#include "../types.h"
+#include "types.h"
 
 //All angular inputs and outputs are in units of pi/512 radians.
 //All linear inputs and outputs are in units of 1/256.

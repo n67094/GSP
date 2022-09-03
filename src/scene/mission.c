@@ -4,10 +4,12 @@
 #include <seven/hw/memory.h>
 #include <seven/hw/video.h>
 
+#include "../core/label.h"
 #include "../entity/earth.h"
 #include "../interface/interface.h"
 #include "../renderer/sphere.h"
 #include "../types.h"
+#include "../global.h"
 
 #include "scene.h"
 
@@ -44,11 +46,12 @@ static void MissionUpdate()
   // Due to the time it take to compute it cannot be move in draw
   EarthDraw(&earth);
 
-  InterfaceUpdate(0, 0, 0, 0, 0, 0);
+  InterfaceUpdate(7, 8, 3, 1234, 2345, 5);
 }
 
 static void MissionDraw() {
   InterfaceDraw();
+
 }
 
 static void MissionVBlank() {}
