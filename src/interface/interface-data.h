@@ -16,10 +16,8 @@
 #define OAM_ROLL_CARET 1
 #define OAM_PITCH_CARET 2
 #define OAM_YAW_CARET 3
-
 // TILE ID
 #define TILE_AXES 1
-
 // SPRITES POS
 #define POS_AXES_X 0
 #define POS_AXES_Y 128
@@ -53,5 +51,26 @@
 #define POS_METRICS_2_Y 128
 #define POS_THROTTLE_CARET_X 185
 #define POS_THROTTLE_CARET_Y 150
+
+// STAGES
+// ======
+// OAM ID
+#define OAM_STAGE 0
+// TILE ID
+#define TILE_DECOUPLER_V 0
+#define TILE_DECOUPLER_H 0
+#define TILE_PARACHUTE 0
+#define TILE_ENGINE 0
+#define TILE_SEPARATOR 0
+#define TILE_GAUGE 0
+// SPRITES POS
+#define POS_STAGE_X 3
+#define POS_STAGE_Y 16
+#define POS_SEPARATOR_MARGIN_X 1
+#define POS_SEPARATOR_MARGIN_Y 0
+#define POS_ICON_MARGIN_X 1
+#define POS_ICON_MARGIN_Y 2
+#define POS_GAUGE_MARGIN_X 16
+#define POS_GAUGE_MARGIN_Y 8
 
 #endif
