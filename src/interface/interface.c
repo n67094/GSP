@@ -15,6 +15,7 @@
 #include "../core/tile.h"
 #include "axes.h"
 #include "metrics.h"
+#include "stage.h"
 #include "interface-data.h"
 
 #include "interface.h"
@@ -31,12 +32,14 @@ void InterfaceInit(void)
 
   AxesInit();
   MetricsInit();
+  StageInit();
 }
 
 void InterfaceUpdate(s32 roll, s32 pitch, s32 yaw, s32 altitude, s32 speed, s32 throttle) 
 {
   AxesUpdate(roll, pitch, yaw);
   MetricsUpdate(altitude, speed, throttle);
+  StageUpdate();
 }
 
 void InterfaceDraw(void) 

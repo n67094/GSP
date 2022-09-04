@@ -5,7 +5,13 @@
 
 #define STAGES_SIZE 5
 
+extern u32 stage_previous;
 extern u32 stage_current;
+
+// on screen stages index
+extern u32 stage_visible_start;
+extern u32 stage_visible_end;
+extern bool stage_visible_consumable;
 
 static const Stage *stages = (Stage[]){
 	{
@@ -16,12 +22,13 @@ static const Stage *stages = (Stage[]){
 			}
 		},
 		.height = 0,
-		.in_queue = true
 	},
 };
 
 void StageInit();
 
 void StageUpdate();
+
+void StageNext();
 
 #endif
