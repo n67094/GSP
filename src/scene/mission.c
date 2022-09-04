@@ -26,7 +26,7 @@ static void MissionOpen()
   SpaceshipInit();
 
   InterfaceInit();
-  spaceship.pitch = 64; 
+  spaceship.pitch = 0; 
   spaceship.spin = 0;
 
 }

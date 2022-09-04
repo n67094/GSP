@@ -5,67 +5,68 @@
 	.type DrawCylinderWall STT_FUNC
 	
 @register usage
-@r0: texture pointer center
-@r1: texture width (2^n pixels), 
-@r2: horizontal scale
-@r3: radius - vertical counter
-@r4: buffer address, middle point
-@r5: position table address
-@r6: buffer address
-@r7: texture height (2^n pixels), shift value
-@r8: texture pointer
-@r9: horizontal counter
-@r11: scratch
-@r12: scratch
-@r13: texture width (pixels)
-@r14: original radius
+@r0: texture pointer top start
+@r1: texture width (2^n pixels) 
+@r2: texture height (2^n pixels)
+@r3: buffer address, top
+@r4: texture pointer bottom start
+@r5: buffer address, bottom
+@r6: position table
+@r7: horizontal counter
+@r8: horizontal scale 
+@r9: texture width (in pixels)
+@r11: texture pointer partial
+@r12: 
+@r13: scratch
+@r14: scratch
 
 DrawCylinderWall:
 	push	{r4-r12, r14}			@store the existing registers
-	ldr		r4, [r13, #40]			@load the fourth argument, the buffer address, from the stack
-	ldr		r7, [r13, #44]			@load the texture height
+	ldr		r12, [r13, #40]			@load the fourth argument, the horizontal length (in pixels) from the stack
+	ldr		r14, [r13, #44]			@load the radius
 	str		r13, R13Temp			@store the stack pointer
-	ldr		r5, =pos_table_1		@load the position table address
-	mov		r14, r3
-	mov		r10, #1
-	mov		r13, r10, lsl r1		@calculate the width of the texture in pixels
-	sub		r7, r7, #2				@divide the height of the texture in 4 
-	rsb		r7, r7, #8				@find the shift value needed to link the angle to texture vertical position.
-DrawOneLineUp:	
-	ldr		r11, [r5], #4			@load the value at the position table
-	mov		r12, r11, lsr #24		@isolate the angle value
-	mov		r12, r12, lsr r7
-	sub		r8, r0, r12, lsl r1		
-	sub		r6, r4, r3, lsl #7		@get the correct row of the buffer
-	and		r11, r11, #0xff
-	add		r6, r6, r11				@get the correct starting pixel of the buffer
-	mov		r9, r13, lsl #8
-DrawOnePixelUp:
-	ldrb	r11, [r8, r9, lsr #8]	@load the pixel from the texture bitmap
-	strb	r11, [r6], #1			@store the pixel in the buffer, post increment
-	subs	r9, r9, r2				@subtract the horizontal scale to reach the next pixel
-	bpl		DrawOnePixelUp			@continue until we run out of horizontal pixels in the texture
-	subs	r3, r3, #1				@decrement the vertical counter
-	bpl		DrawOneLineUp
-BottomHalf:							@now we repeat the process, this time for the bottom half of the cylinder
-	ldr		r5, =pos_table_1		@reset the position table address
-	mov		r3, r14
-DrawOneLineDown:	
-	ldr		r11, [r5], #4			@load the value at the position table
-	mov		r12, r11, lsr #24		@isolate the angle value
-	mov		r12, r12, lsr r7
-	add		r8, r0, r12, lsl r1		@this time add to get the texture pointer
-	add		r6, r4, r3, lsl #7		@and add to get the buffer address
-	and		r11, r11, #0xff
-	add		r6, r6, r11				@get the correct starting pixel of the buffer
-	mov		r9, r13, lsl #8
-DrawOnePixelDown:
-	ldrb	r11, [r8, r9, lsr #8]	@load the pixel from the texture bitmap
-	strb	r11, [r6], #1			@store the pixel in the buffer, post increment
-	subs	r9, r9, r2				@subtract the horizontal scale to reach the next pixel
-	bpl		DrawOnePixelDown		@continue until we run out of horizontal pixels in the texture
-	subs	r3, r3, #1				@decrement the vertical counter
-	bpl		DrawOneLineDown	
+	ldr		r6, =pos_table_1		@load the position table address
+	add		r5, r3, r14, lsl #8		@add double the radius to get the buffer pointer for the bottom
+	mov		r14, #1					@\calculate the texture width in pixels
+	mov		r9, r14, lsl r1			@/
+	adr		r11, InverseTable		@\
+	movs	r12, r12, lsl #1		@|
+	rsbmi	r12, r12, #0			@|calculate the horizontal scale
+	ldrh	r12, [r11, r12]			@|
+	mov		r8, r12, lsl r1			@/
+	add		r13, r1, r2				@\
+	sub		r13, #1					@|calculate the starting texture pointer for the lower portion of the cylinder
+	add		r4, r0, r14, lsl r13	@/
+	mov		r11, #0
+DrawOneLine:	
+	ldr		r13, [r6], #4			@load the value at the position table
+	mov		r14, r13, lsr #24		@isolate the angle value
+	add		r11, r11, r14			@add the angle to the partial angle counter
+	mov		r7, r9, lsl #16			@set the maximum horizontal counter
+	and		r13, r13, #0xff			@isolate the xpos
+	add		r3, r3, r13				@get the starting upper buffer pointer
+	add		r5, r5, r13				@get the starting lower buffer pointer
+	rsb		r13, r2, #8				@\
+	add		r13, r13, #2			@|
+	mov		r14, r11, lsr r13		@|update the texture pointer for the next row
+	sub		r11, r11, r14, lsl r13	@|
+	add		r0, r0, r14, lsl r1		@|
+	sub		r4, r4, r14, lsl r1		@/
+DrawOnePixel:
+	ldrb	r13, [r0, r7, lsr #16]	@load the upper pixel from the texture bitmap
+	strb	r13, [r3], #1			@store the upper pixel in the buffer, post increment
+	ldrb	r13, [r4, r7, lsr #16]	@load the lower pixel from the texture bitmap
+	strb	r13, [r5], #1			@store the lower pixel in the buffer, post increment
+	subs	r7, r7, r8				@subtract the horizontal scale to reach the next pixel
+	bpl		DrawOnePixel			@continue until we run out of horizontal pixels in the texture
+	add		r3, r3, #0x80			@\
+	bic		r3, r3, #0x7f			@|update the buffer pointers
+	sub		r5, r5, #0x80			@|
+	bic		r5, r5, #0x7f			@/
+	sub		r14, r5, r3				@\
+	cmp		r14, #-80				@|repeat if the lower buffer address is greater than the upper buffer address
+	bgt		DrawOneLine				@/
+
 	ldr		r13, R13Temp
 	pop		{r4-r12, r14}
 	bx		lr
@@ -88,36 +89,40 @@ DrawOnePixelDown:
 @r6: trig table 1
 @r7: scratch
 @r8: scratch
+@r9: current angle
+@r10: last angle
 
 @angle is in top byte, xpos is in bottom byte
 
 SetupPosTableCylinder:
-	push	{r4-r9}					@store the existing registers
+	push	{r4-r10}				@store the existing registers
 	ldr		r4, =pos_table_1
 	mov		r3, #0x10000			@starting y pos is 1
 	mov		r5, r1, lsl #1
 	adr		r8, InverseTable
 	ldrh	r5, [r8, r5]			@load the inverse of radius into the y update value
 	ldr		r6, =trig_table_group_1
-	orr		r8, r2, #0xff000000		@first pixel has texture value of pi/2			
-	str		r8, [r4], #4			@first pixel is always at same x value as center x	
+	mov		r10, #0xff000000		@first pixel has texture value of pi/2	
+	str		r2, [r4], #4			@first pixel is always at same x value as center x	
 	subs	r3, r3, r5				@add the update value to the ypos
 setupPixel:
 	mov		r8, r3, lsr #8
 	ldr		r8, [r6, r8, lsl #2]	@load the sqrt(1-Y^2) and the arcsin(Y)
-	and		r9, r8, #0xff
-	and		r8, r8, #0xff00
+	and		r9, r8, #0xff			@isolate the angle
+	rsb		r9, r9, r10, lsr #24	@find the difference between this angle and the last
+	sub		r10, r10, r9, lsl #24	@store the new angle in r10
+	and		r8, r8, #0xff00			@isolate the x pos
 	mul		r7, r8, r1				@multiply by radius
 	mul		r8, r7, r0				@multiply by cos(pitch)
 	add		r8, r2, r8, lsr #24		@store the x pos in the bottom byte
-	orr		r8, r8, r9, lsl #24		@store the angle at the upper byte
+	orr		r8, r8, r9, lsl #24		@store the delta angle at the upper byte
 	str		r8, [r4], #4			@store the x value at the corrosponding y position in the table
 	subs	r3, r3, r5				@add the update value to the ypos
 	bhi		setupPixel
 	mul		r8, r1, r0				@one special case for the center pixel
 	add		r8, r2, r8, asr #8
 	str		r8, [r4]				
-	pop		{r4-r9}
+	pop		{r4-r10}
 	bx		lr
 	
 	
