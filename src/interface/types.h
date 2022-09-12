@@ -4,14 +4,19 @@
 #include "../core/types.h"
 
 typedef struct StageItem{
+	Object *icons;
+	Object *caret;
+	Object *gauge;
 	u16 tile_id;
 	s16 consumable_amount;
 } StageItem;
 
 typedef struct Stage {
+	Object *number;
+	Object *separator;
 	StageItem *items;
-	u16 height;
-	bool in_queue;
+	u16 height; // pre computed value to save cycles, in px
+	u16 size;
 } Stage;
 
 #endif
