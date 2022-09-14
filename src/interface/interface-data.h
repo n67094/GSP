@@ -3,6 +3,8 @@
 
 // PALETTE ID
 #define OBJ_PALETTE_0 0
+#define OBJ_PALETTE_1 1
+#define OBJ_PALETTE_2 2
 
 // UI GENERICS
 // ===========

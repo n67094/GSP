@@ -5,6 +5,7 @@
 
 #define TILE_FONT_ALPHA 97
 #define TILE_FONT_DIGITS 129
+#define TILE_FONT_SPECIAL 139
 
 static const LabelFont default_font = {
 	.glyphs = (LabelGlyph[]){
@@ -44,9 +45,9 @@ static const LabelFont default_font = {
 		{.ascii_code  = '7', .height = 5, .width = 6, .tile_id = TILE_FONT_DIGITS + 7},
 		{.ascii_code  = '8', .height = 5, .width = 6, .tile_id = TILE_FONT_DIGITS + 8},
 		{.ascii_code  = '9', .height = 5, .width = 6, .tile_id = TILE_FONT_DIGITS + 9},
-		{.ascii_code  = ':', .height = 5, .width = 6, .tile_id = TILE_FONT_DIGITS + 10},
-		{.ascii_code  = '.', .height = 5, .width = 6, .tile_id = TILE_FONT_DIGITS + 11},
-		{.ascii_code  = ' ', .height = 5, .width = 6, .tile_id = TILE_FONT_DIGITS + 12},
+		{.ascii_code  = ':', .height = 5, .width = 6, .tile_id = TILE_FONT_SPECIAL},
+		{.ascii_code  = '.', .height = 5, .width = 6, .tile_id = TILE_FONT_SPECIAL + 1},
+		{.ascii_code  = ' ', .height = 5, .width = 6, .tile_id = TILE_FONT_SPECIAL + 2},
 	},
 	.start_alpha_id = 0,
 	.start_digit_id = 26,

@@ -4,7 +4,7 @@
 #include "../core/types.h"
 
 typedef struct StageItem{
-	Object *icons;
+	Object *icon;
 	Object *caret;
 	Object *gauge;
 	u16 tile_id;

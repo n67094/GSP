@@ -5,7 +5,7 @@
 
 #include "interface-data.h"
 
-#define STAGES_SIZE 5
+#define STAGES_SIZE 4
 
 extern u32 stage_previous;
 extern u32 stage_current;
@@ -15,7 +15,7 @@ extern u32 stage_visible_start;
 extern u32 stage_visible_end;
 extern bool stage_visible_consumable;
 
-static const Stage *stages = (Stage[]){
+static Stage *stages = (Stage[]){
 	// PARACHUTE
 	{
 		.items = (StageItem[]) {

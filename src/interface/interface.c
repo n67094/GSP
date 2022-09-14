@@ -10,9 +10,11 @@
 
 #include "../global.h"
 #include "../types.h"
+
 #include "../core/memory.h"
 #include "../core/object.h"
 #include "../core/tile.h"
+
 #include "axes.h"
 #include "metrics.h"
 #include "stage.h"
@@ -32,7 +34,7 @@ void InterfaceInit(void)
 
   AxesInit();
   MetricsInit();
-  StageInit();
+  StageInit(object_buffer, OAM_STAGE);
 }
 
 void InterfaceUpdate(s32 roll, s32 pitch, s32 yaw, s32 altitude, s32 speed, s32 throttle) 

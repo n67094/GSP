@@ -6,10 +6,14 @@
 
 #include "../global.h"
 #include "../types.h"
+
 #include "../core/memory.h"
 #include "../core/object.h"
 #include "../core/tile.h"
 #include "../core/label.h"
+#include "../core/font.h"
+
+#include "../debug/log.h"
 
 #include "interface-data.h"
 #include "stage.h"
@@ -39,72 +43,74 @@ int StageInit(Object *oam_buffer, u32 oam_start){
   );
 
   // construct the whole stages position doesn't matter yet, hide sprites
-  int i = STAGES_SIZE;
+  int i = STAGES_SIZE - 1;
   int object_count = 0;
   while(i > 0) {
-    StageItem *items;
 
+    // TODO HIDE sprites
     int j = 0;
-    while( j < stages[i].size) {
+    while(j < stages[i].size) {
       // the icons
-      items[j].icons = &oam_buffer[oam_start + object_count];
+      stages[i].items[j].icon = &oam_buffer[oam_start + object_count];
       ObjectSetAttr(
-        items[j].icons,
+        stages[i].items[j].icon,
         OBJ_SHAPE_SQUARE,
         OBJ_SIZE_16X16,
-        OBJ_PALETTE_NUMBER(OBJ_PALETTE_0) | OBJ_TILE_NUMBER(items[j].tile_id)
+        OBJ_PALETTE_NUMBER(OBJ_PALETTE_0) | OBJ_TILE_NUMBER(stages[i].items[j].tile_id)
       );
-      ObjectSetPos(items[j].icons, 0, 0);
+      ObjectSetPos(stages[i].items[j].icon, 0, 0);
       ++object_count;
 
       if(stages[i].items[j].consumable_amount > -1) {
         // the gauge
-        items[j].icons = &oam_buffer[oam_start + object_count];
+        stages[i].items[j].gauge = &oam_buffer[oam_start + object_count];
         ObjectSetAttr(
-          items[j].icons,
-          OBJ_SHAPE_SQUARE,
-          OBJ_SIZE_16X16,
+          stages[i].items[j].gauge,
+          OBJ_SHAPE_WIDE,
+          OBJ_SIZE_8X16,
           OBJ_PALETTE_NUMBER(OBJ_PALETTE_0) | OBJ_TILE_NUMBER(TILE_GAUGE)
         );
-        ObjectSetPos(items[j].icons, 0, 0);
+        ObjectSetPos(stages[i].items[j].gauge, 0, 0);
 
         ++object_count;
 
         // the caret
-        items[j].icons = &oam_buffer[oam_start + object_count];
+        stages[i].items[j].caret = &oam_buffer[oam_start + object_count];
         ObjectSetAttr(
-          items[j].icons,
+          stages[i].items[j].caret,
           OBJ_SHAPE_SQUARE,
-          OBJ_SIZE_16X16,
-          OBJ_PALETTE_NUMBER(OBJ_PALETTE_0) | OBJ_TILE_NUMBER(TILE_CARET)
+          OBJ_SIZE_8X8,
+          OBJ_PALETTE_NUMBER(OBJ_PALETTE_2) | OBJ_TILE_NUMBER(TILE_CARET)
         );
-        ObjectSetPos(items[j].icons, 0, 0);
+        ObjectSetPos(stages[i].items[j].caret, 0, 0);
         ++object_count;
       }
+
+      ++j;
     }
 
     // the number
-    items[j].icons = &oam_buffer[oam_start + object_count];
+    stages[i].number = &oam_buffer[oam_start + object_count];
     ObjectSetAttr(
-      items[j].icons,
+      stages[i].number,
       OBJ_SHAPE_SQUARE,
-      OBJ_SIZE_16X16,
-      OBJ_PALETTE_NUMBER(OBJ_PALETTE_0) | OBJ_TILE_NUMBER()// TODO)
+      OBJ_SIZE_8X8,
+      OBJ_PALETTE_NUMBER(OBJ_PALETTE_0) | OBJ_TILE_NUMBER(TILE_FONT_DIGITS + STAGES_SIZE + 1 - i)
     );
-    ObjectSetPos(items[j].icons, 0, 0);
+    ObjectSetPos(stages[i].number, 0, 0);
     ++object_count;
-
 
     // the separator
-    items[j].icons = &oam_buffer[oam_start + object_count];
+    stages[i].separator = &oam_buffer[oam_start + object_count];
     ObjectSetAttr(
-      items[j].icons,
-      OBJ_SHAPE_SQUARE,
-      OBJ_SIZE_16X16,
+      stages[i].separator,
+      OBJ_SHAPE_WIDE,
+      OBJ_SIZE_8X32,
       OBJ_PALETTE_NUMBER(OBJ_PALETTE_0) | OBJ_TILE_NUMBER(TILE_SEPARATOR)
     );
-    ObjectSetPos(items[j].icons, 0, 0);
+    ObjectSetPos(stages[i].separator, 0, 0);
     ++object_count;
+
     --i;
   }
 
