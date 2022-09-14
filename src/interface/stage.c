@@ -1,6 +1,9 @@
 #include <seven/video/object.h>
 
-#include "../../data/sprites/stage-icons.tiles.h"
+#include "../../data/sprites/stage-parachute.tiles.h"
+#include "../../data/sprites/stage-engine.tiles.h"
+#include "../../data/sprites/stage-decoupler-h.tiles.h"
+#include "../../data/sprites/stage-decoupler-v.tiles.h"
 #include "../../data/sprites/stage-separator.tiles.h"
 #include "../../data/sprites/stage-gauge.tiles.h"
 
@@ -28,8 +31,23 @@ bool stage_visible_consumable = false;
 
 int StageInit(Object *oam_buffer, u32 oam_start){
   MemCpy32(
-    &TILE4_CHARBLOCKS[4][TILE_ICONS],
-    stage_icons_tiles, stage_icons_tiles_size
+    &TILE4_CHARBLOCKS[4][TILE_PARACHUTE],
+    stage_parachute_tiles, stage_parachute_tiles_size
+  );
+
+  MemCpy32(
+    &TILE4_CHARBLOCKS[4][TILE_DECOUPLER_V],
+    stage_decoupler_v_tiles, stage_decoupler_v_tiles_size
+  );
+
+  MemCpy32(
+    &TILE4_CHARBLOCKS[4][TILE_DECOUPLER_H],
+    stage_decoupler_h_tiles, stage_decoupler_h_tiles_size
+  );
+
+  MemCpy32(
+    &TILE4_CHARBLOCKS[4][TILE_ENGINE],
+    stage_engine_tiles, stage_engine_tiles_size
   );
 
   MemCpy32(
@@ -59,6 +77,7 @@ int StageInit(Object *oam_buffer, u32 oam_start){
         OBJ_PALETTE_NUMBER(OBJ_PALETTE_0) | OBJ_TILE_NUMBER(stages[i].items[j].tile_id)
       );
       ObjectSetPos(stages[i].items[j].icon, 0, 0);
+      ObjectHide(stages[i].items[j].icon);
       ++object_count;
 
       if(stages[i].items[j].consumable_amount > -1) {
@@ -71,7 +90,7 @@ int StageInit(Object *oam_buffer, u32 oam_start){
           OBJ_PALETTE_NUMBER(OBJ_PALETTE_0) | OBJ_TILE_NUMBER(TILE_GAUGE)
         );
         ObjectSetPos(stages[i].items[j].gauge, 0, 0);
-
+        ObjectHide(stages[i].items[j].gauge);
         ++object_count;
 
         // the caret
@@ -80,9 +99,10 @@ int StageInit(Object *oam_buffer, u32 oam_start){
           stages[i].items[j].caret,
           OBJ_SHAPE_SQUARE,
           OBJ_SIZE_8X8,
-          OBJ_PALETTE_NUMBER(OBJ_PALETTE_2) | OBJ_TILE_NUMBER(TILE_CARET)
+          OBJ_PALETTE_NUMBER(OBJ_PALETTE_0) | OBJ_TILE_NUMBER(TILE_STAGE_CARET)
         );
         ObjectSetPos(stages[i].items[j].caret, 0, 0);
+        ObjectHide(stages[i].items[j].caret);
         ++object_count;
       }
 
@@ -98,6 +118,7 @@ int StageInit(Object *oam_buffer, u32 oam_start){
       OBJ_PALETTE_NUMBER(OBJ_PALETTE_0) | OBJ_TILE_NUMBER(TILE_FONT_DIGITS + STAGES_SIZE + 1 - i)
     );
     ObjectSetPos(stages[i].number, 0, 0);
+    ObjectHide(stages[i].number);
     ++object_count;
 
     // the separator
@@ -109,6 +130,7 @@ int StageInit(Object *oam_buffer, u32 oam_start){
       OBJ_PALETTE_NUMBER(OBJ_PALETTE_0) | OBJ_TILE_NUMBER(TILE_SEPARATOR)
     );
     ObjectSetPos(stages[i].separator, 0, 0);
+    ObjectHide(stages[i].separator);
     ++object_count;
 
     --i;

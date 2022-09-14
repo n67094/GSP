@@ -3,13 +3,12 @@
 
 // PALETTE ID
 #define OBJ_PALETTE_0 0
-#define OBJ_PALETTE_1 1
-#define OBJ_PALETTE_2 2
 
 // UI GENERICS
 // ===========
 // TILE ID
 #define TILE_CARET 0
+#define TILE_STAGE_CARET 0
 
 // AXES
 // ====
@@ -59,7 +58,6 @@
 // OAM ID
 #define OAM_STAGE 19
 // TILE ID
-#define TILE_ICONS 141
 #define TILE_PARACHUTE 141
 #define TILE_DECOUPLER_V 145
 #define TILE_DECOUPLER_H 149

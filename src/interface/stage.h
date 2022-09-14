@@ -31,7 +31,7 @@ static Stage *stages = (Stage[]){
 	{
 		.items = (StageItem[]) {
 			{
-				.tile_id = TILE_DECOUPLER_H,
+				.tile_id = TILE_DECOUPLER_V,
 				.consumable_amount = -1
 			}
 		},
