@@ -6,7 +6,7 @@
 extern const uint8_t stage_separator_tiles[];
 extern const uint8_t stage_separator_tiles_end[];
 #if __cplusplus >= 201103L
-static constexpr size_t stage_separator_tiles_size=128;
+static constexpr size_t stage_separator_tiles_size=96;
 #else
-static const size_t stage_separator_tiles_size=128;
+static const size_t stage_separator_tiles_size=96;
 #endif
