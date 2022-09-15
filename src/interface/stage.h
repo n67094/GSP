@@ -7,13 +7,15 @@
 
 #define STAGES_SIZE 4
 
-extern u32 stage_previous;
-extern u32 stage_current;
+#define STAGE_MAX_HEIGHT 100
+#define STAGE_SEPARATOR_HEIGHT 8
+#define STAGE_ICON_HEIGHT 16
 
-// on screen stages index
-extern u32 stage_visible_start;
-extern u32 stage_visible_end;
-extern bool stage_visible_consumable;
+extern int stage_previous;
+extern int stage_current;
+
+extern int stage_star;
+extern int stage_end;
 
 static Stage *stages = (Stage[]){
 	// PARACHUTE
@@ -25,7 +27,7 @@ static Stage *stages = (Stage[]){
 			}
 		},
 		.size = 1,
-		.height = 0,
+		.height = 24,
 	},
 	// DECOUPLER
 	{
@@ -36,7 +38,7 @@ static Stage *stages = (Stage[]){
 			}
 		},
 		.size = 1,
-		.height = 0,
+		.height = 24,
 	},
 	// ENGINE + DECOUPLER
 	{
@@ -51,7 +53,7 @@ static Stage *stages = (Stage[]){
 			}
 		},
 		.size = 2,
-		.height = 0,
+		.height = 40,
 	},
 	// ENGINE
 	{
@@ -70,7 +72,7 @@ static Stage *stages = (Stage[]){
 			}
 		},
 		.size = 3,
-		.height = 0,
+		.height = 56
 	}
 };
 

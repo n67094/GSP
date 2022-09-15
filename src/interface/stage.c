@@ -22,12 +22,28 @@
 #include "stage.h"
 #include "types.h"
 
-u32 stage_previous = STAGES_SIZE;
-u32 stage_current = STAGES_SIZE;
+int stage_previous = STAGES_SIZE;
+int stage_current = STAGES_SIZE;
 
-u32 stage_visible_start = 0;
-u32 stage_visible_end = 0;
-bool stage_visible_consumable = false;
+int stage_start = -1;
+int stage_end = -1;
+
+static void StageHide(int start,int end) {
+  int i;
+  for(i = start; i < end; ++i) {
+      ObjectHide(stages[i].number);
+      ObjectHide(stages[i].separator);
+
+    int j = 0;
+    for(j = 0; j < stages[i].size; ++j) {
+      ObjectHide(stages[i].items[j].icon);
+      if(stages[i].items[j].consumable_amount > -1) {
+        ObjectHide(stages[i].items[j].gauge);
+        ObjectHide(stages[i].items[j].caret);
+      }
+    }
+  }
+}
 
 int StageInit(Object *oam_buffer, u32 oam_start){
   MemCpy32(
@@ -63,7 +79,7 @@ int StageInit(Object *oam_buffer, u32 oam_start){
   // construct the whole stages position doesn't matter yet, hide sprites
   int i = STAGES_SIZE - 1;
   int object_count = 0;
-  while(i > 0) {
+  while(i >= 0) {
 
     // TODO HIDE sprites
     int j = 0;
@@ -115,7 +131,7 @@ int StageInit(Object *oam_buffer, u32 oam_start){
       stages[i].number,
       OBJ_SHAPE_SQUARE,
       OBJ_SIZE_8X8,
-      OBJ_PALETTE_NUMBER(OBJ_PALETTE_0) | OBJ_TILE_NUMBER(TILE_FONT_DIGITS + STAGES_SIZE + 1 - i)
+      OBJ_PALETTE_NUMBER(OBJ_PALETTE_0) | OBJ_TILE_NUMBER(TILE_FONT_DIGITS + i + 1)
     );
     ObjectSetPos(stages[i].number, 0, 0);
     ObjectHide(stages[i].number);
@@ -136,23 +152,90 @@ int StageInit(Object *oam_buffer, u32 oam_start){
     --i;
   }
 
-  return 0;
+  stage_previous = -1;
+  stage_current = STAGES_SIZE - 1;
+
+  return object_count;
 }
 
 void StageUpdate() {
   if(stage_current != stage_previous) {
-  // Here update stages visible on screen - position on show/hide
-  // from latest in the array to first
+    // Here update stages visible on screen - position on show/hide
+    // from latest in the array to first
 
-  // compute size state
+    // mask before redraw
+    if(stage_previous > -1) { // if not init state
+      StageHide(0, 4);
+    }
 
-  // draw state
+    // compute what to draw
+    int height = 0;
+    int i = stage_current;
+    while(i >= 0 && height < STAGE_MAX_HEIGHT) {
+      height += stages[i].height;
+
+      if(height < STAGE_MAX_HEIGHT) {
+        --i;
+      }
+    }
+
+    // draw
+    stage_start = i + 1;
+    stage_end = stage_current;
+
+    LOG_DEBUG("start %d end %d", stage_start, stage_end);
+
+    int y = 0;
+    while (stage_start < stage_end + 1) {
+      // number
+      ObjectSetPos(
+        stages[stage_start].number,
+        POS_STAGE_X, 
+        POS_STAGE_Y + y
+      );
+      ObjectUnhide(stages[stage_start].number, OBJ_MODE_REGULAR);
+
+      // separator
+      ObjectSetPos(
+        stages[stage_start].separator,
+        POS_STAGE_X + POS_SEPARATOR_MARGIN_X, 
+        POS_STAGE_Y + y
+      );
+      ObjectUnhide(stages[stage_start].separator, OBJ_MODE_REGULAR);
+
+      y += STAGE_SEPARATOR_HEIGHT;
+
+      int i;
+      for(i = 0; i < stages[stage_start].size; ++i) {
+        ObjectSetPos(
+          stages[stage_start].items[i].icon,
+          POS_STAGE_X, 
+          POS_STAGE_Y + y
+        );
+        ObjectUnhide(stages[stage_start].items[i].icon, OBJ_MODE_REGULAR);
+
+        if(
+          stages[stage_start].items->consumable_amount > -1 && 
+          stage_start == stage_current
+        ) {
+          ObjectSetPos(
+            stages[stage_start].items[i].gauge,
+            POS_STAGE_X + POS_GAUGE_MARGIN_X, 
+            POS_STAGE_Y + y + POS_GAUGE_MARGIN_Y
+          );
+          ObjectUnhide(stages[stage_start].items[i].gauge, OBJ_MODE_REGULAR);
+        }
+        y += STAGE_ICON_HEIGHT;
+      }
+      ++stage_start;
+    }
+    stage_previous = stage_current;
   }
 
-  if(stage_visible_consumable) {
+  // if(stage_visible_consumable) {
   // here update carret for visible consumable items
   // loop trougth disaple stage to find consumable
-  }
+  // }
 }
 
 void StageNext() {

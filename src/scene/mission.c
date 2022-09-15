@@ -7,6 +7,7 @@
 #include "../core/label.h"
 #include "../entity/earth.h"
 #include "../interface/interface.h"
+#include "../interface/stage.h"
 #include "../renderer/sphere.h"
 #include "../types.h"
 #include "../global.h"
@@ -29,6 +30,10 @@ static void MissionUpdate()
 {
   if (~(REG_KEYINPUT)&KEY_UP) {
     earth.pitch++;
+  }
+
+  if(inputKeysReleased(KEY_A)) {
+    StageNext();
   }
 
   if (~(REG_KEYINPUT)&KEY_DOWN) {
