@@ -6,7 +6,7 @@
 extern const uint8_t interface_1_palette[];
 extern const uint8_t interface_1_palette_end[];
 #if __cplusplus >= 201103L
-static constexpr size_t interface_1_palette_size=32;
+static constexpr size_t interface_1_palette_size=14;
 #else
-static const size_t interface_1_palette_size=32;
+static const size_t interface_1_palette_size=14;
 #endif

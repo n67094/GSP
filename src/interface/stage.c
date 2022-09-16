@@ -250,6 +250,10 @@ void StageUpdate() {
       ObjectUnhide(stages[stage_start].number, OBJ_MODE_REGULAR);
 
       // separator
+			if(stage_start == stage_current) {
+				stages[stage_start].separator->attr2 = BF_SET(stages[stage_start].separator->attr2, OBJ_PALETTE_NUMBER, INTERFACE_PALETTE_1);
+			}
+
       ObjectSetPos(
         stages[stage_start].separator,
         POS_STAGE_X + POS_SEPARATOR_MARGIN_X, 

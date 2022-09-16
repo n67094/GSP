@@ -3,8 +3,7 @@
 	.balign 4
 	.global interface_1_palette
 interface_1_palette:
-	.byte   0,  0,  0,  0, 75, 41,255,127,224,  3,224,126, 31,124,  0,  0
-	.byte   0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0
+	.byte  31,124,  0,  0,255,127, 31,  0, 64,127, 75, 41,224,  3
 
 	.global interface_1_palette_end
 interface_1_palette_end:
