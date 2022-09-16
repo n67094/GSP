@@ -10,7 +10,7 @@
 #define STAGE_MAX_HEIGHT 100
 #define STAGE_SEPARATOR_HEIGHT 8
 #define STAGE_ICON_HEIGHT 16
-#define STAGE_MAX_CONSUMABLE 10
+#define STAGE_MAX_CONSUMABLE 9
 
 extern int stage_previous;
 extern int stage_current;

@@ -56,7 +56,7 @@ Stage *stages = (Stage[]){
 		.items = (StageItem[]) {
 			{
 				.tile_id = TILE_ENGINE,
-				.consumable_amount = 10
+				.consumable_amount = 9
 			},
 			{
 				.tile_id = TILE_DECOUPLER_H,
@@ -71,15 +71,15 @@ Stage *stages = (Stage[]){
 		.items = (StageItem[]) {
 			{
 				.tile_id = TILE_ENGINE,
-				.consumable_amount = 10
+				.consumable_amount = 9
 			},
 			{
 				.tile_id = TILE_ENGINE,
-				.consumable_amount = 10
+				.consumable_amount = 9
 			},
 			{
 				.tile_id = TILE_ENGINE,
-				.consumable_amount = 10
+				.consumable_amount = 9
 			}
 		},
 		.size = 3,
@@ -197,7 +197,7 @@ int StageInit(Object *oam_buffer, u32 oam_start){
           stages[i].items[j].caret,
           OBJ_SHAPE_SQUARE,
           OBJ_SIZE_8X8,
-          OBJ_PALETTE_NUMBER(INTERFACE_PALETTE_0) | OBJ_TILE_NUMBER(TILE_STAGE_CARET)
+          OBJ_PALETTE_NUMBER(INTERFACE_PALETTE_1) | OBJ_TILE_NUMBER(TILE_STAGE_CARET)
         );
         ObjectSetPos(stages[i].items[j].caret, 0, 0);
         ObjectHide(stages[i].items[j].caret);
