@@ -2,7 +2,8 @@
 #define INTERFACE_DATA
 
 // PALETTE ID
-#define OBJ_PALETTE_0 0
+#define INTERFACE_PALETTE_0 0
+#define INTERFACE_PALETTE_1 1
 
 // UI GENERICS
 // ===========

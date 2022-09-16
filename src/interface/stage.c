@@ -145,7 +145,7 @@ int StageInit(Object *oam_buffer, u32 oam_start){
       stages[i].number,
       OBJ_SHAPE_SQUARE,
       OBJ_SIZE_8X8,
-      OBJ_PALETTE_NUMBER(OBJ_PALETTE_0) | OBJ_TILE_NUMBER(TILE_FONT_DIGITS + i + 1)
+      OBJ_PALETTE_NUMBER(INTERFACE_PALETTE_0) | OBJ_TILE_NUMBER(TILE_FONT_DIGITS + i + 1)
     );
     ObjectSetPos(stages[i].number, 0, 0);
     ObjectHide(stages[i].number);
@@ -157,7 +157,7 @@ int StageInit(Object *oam_buffer, u32 oam_start){
       stages[i].separator,
       OBJ_SHAPE_WIDE,
       OBJ_SIZE_8X32,
-      OBJ_PALETTE_NUMBER(OBJ_PALETTE_0) | OBJ_TILE_NUMBER(TILE_SEPARATOR)
+      OBJ_PALETTE_NUMBER(INTERFACE_PALETTE_0) | OBJ_TILE_NUMBER(TILE_SEPARATOR)
     );
     ObjectSetPos(stages[i].separator, 0, 0);
     ObjectHide(stages[i].separator);
@@ -172,7 +172,7 @@ int StageInit(Object *oam_buffer, u32 oam_start){
         stages[i].items[j].icon,
         OBJ_SHAPE_SQUARE,
         OBJ_SIZE_16X16,
-        OBJ_PALETTE_NUMBER(OBJ_PALETTE_0) | OBJ_TILE_NUMBER(stages[i].items[j].tile_id)
+        OBJ_PALETTE_NUMBER(INTERFACE_PALETTE_0) | OBJ_TILE_NUMBER(stages[i].items[j].tile_id)
       );
       ObjectSetPos(stages[i].items[j].icon, 0, 0);
       ObjectHide(stages[i].items[j].icon);
@@ -185,7 +185,7 @@ int StageInit(Object *oam_buffer, u32 oam_start){
           stages[i].items[j].gauge,
           OBJ_SHAPE_WIDE,
           OBJ_SIZE_8X16,
-          OBJ_PALETTE_NUMBER(OBJ_PALETTE_0) | OBJ_TILE_NUMBER(TILE_GAUGE)
+          OBJ_PALETTE_NUMBER(INTERFACE_PALETTE_0) | OBJ_TILE_NUMBER(TILE_GAUGE)
         );
         ObjectSetPos(stages[i].items[j].gauge, 0, 0);
         ObjectHide(stages[i].items[j].gauge);
@@ -197,7 +197,7 @@ int StageInit(Object *oam_buffer, u32 oam_start){
           stages[i].items[j].caret,
           OBJ_SHAPE_SQUARE,
           OBJ_SIZE_8X8,
-          OBJ_PALETTE_NUMBER(OBJ_PALETTE_0) | OBJ_TILE_NUMBER(TILE_STAGE_CARET)
+          OBJ_PALETTE_NUMBER(INTERFACE_PALETTE_0) | OBJ_TILE_NUMBER(TILE_STAGE_CARET)
         );
         ObjectSetPos(stages[i].items[j].caret, 0, 0);
         ObjectHide(stages[i].items[j].caret);
