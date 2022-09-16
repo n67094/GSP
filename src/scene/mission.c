@@ -4,11 +4,17 @@
 #include <seven/hw/memory.h>
 #include <seven/hw/video.h>
 
+#include "../debug/log.h"
+
 #include "../core/label.h"
+
 #include "../entity/earth.h"
+
 #include "../interface/interface.h"
+
 #include "../interface/stage.h"
 #include "../renderer/sphere.h"
+
 #include "../types.h"
 #include "../global.h"
 
@@ -30,6 +36,14 @@ static void MissionUpdate()
 {
   if (~(REG_KEYINPUT)&KEY_UP) {
     earth.pitch++;
+  }
+
+  if(inputKeysReleased(KEY_LEFT)) {
+    int i;
+    Stage *stage = &stages[stage_current];
+    for(i = 0; i < stage->size && stage->items[i].consumable_amount > 0; ++i) {
+      stage->items[i].consumable_amount -= 1;
+    }
   }
 
   if(inputKeysReleased(KEY_A)) {
@@ -56,7 +70,6 @@ static void MissionUpdate()
 
 static void MissionDraw() {
   InterfaceDraw();
-
 }
 
 static void MissionVBlank() {}

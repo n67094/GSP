@@ -69,6 +69,8 @@
 #define POS_STAGE_Y 16
 #define POS_GAUGE_MARGIN_X 16
 #define POS_GAUGE_MARGIN_Y 7
+#define POS_CARET_MARGIN_X 27
+#define POS_CARET_MARGIN_Y 8
 #define POS_SEPARATOR_MARGIN_X 8
 
 #endif

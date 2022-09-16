@@ -8,7 +8,7 @@ typedef struct StageItem{
 	Object *caret;
 	Object *gauge;
 	u16 tile_id;
-	s16 consumable_amount;
+	int consumable_amount;
 } StageItem;
 
 typedef struct Stage {
