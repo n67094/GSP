@@ -16,8 +16,6 @@
 #include "../core/label.h"
 #include "../core/font.h"
 
-#include "../debug/log.h"
-
 #include "interface-data.h"
 #include "stage.h"
 #include "types.h"
@@ -221,7 +219,7 @@ void StageUpdate() {
 
     // mask before redraw
     if(stage_previous > -1) { // if not init state
-      StageHide(0, 4);
+      StageHide(stage_start, stage_end + 1);
     }
 
     // compute what to draw
@@ -239,60 +237,59 @@ void StageUpdate() {
     stage_start = i + 1;
     stage_end = stage_current;
 
-    int y = 0;
-    while (stage_start < stage_end + 1) {
+    int offset_y = 0;
+    for(i = stage_start; i < stage_end + 1; ++i) {
       // number
       ObjectSetPos(
-        stages[stage_start].number,
+        stages[i].number,
         POS_STAGE_X, 
-        POS_STAGE_Y + y
+        POS_STAGE_Y + offset_y
       );
-      ObjectUnhide(stages[stage_start].number, OBJ_MODE_REGULAR);
+      ObjectUnhide(stages[i].number, OBJ_MODE_REGULAR);
 
       // separator
-			if(stage_start == stage_current) {
-				stages[stage_start].separator->attr2 = BF_SET(stages[stage_start].separator->attr2, OBJ_PALETTE_NUMBER, INTERFACE_PALETTE_1);
+			if(i == stage_current) {
+				stages[i].separator->attr2 = BF_SET(stages[i].separator->attr2, OBJ_PALETTE_NUMBER, INTERFACE_PALETTE_1);
 			}
 
       ObjectSetPos(
-        stages[stage_start].separator,
+        stages[i].separator,
         POS_STAGE_X + POS_SEPARATOR_MARGIN_X, 
-        POS_STAGE_Y + y
+        POS_STAGE_Y + offset_y
       );
-      ObjectUnhide(stages[stage_start].separator, OBJ_MODE_REGULAR);
+      ObjectUnhide(stages[i].separator, OBJ_MODE_REGULAR);
 
-      y += STAGE_SEPARATOR_HEIGHT;
+      offset_y += STAGE_SEPARATOR_HEIGHT;
 
-      int i;
-      for(i = 0; i < stages[stage_start].size; ++i) {
+      int j;
+      for(j = 0; j < stages[i].size; ++j) {
         ObjectSetPos(
-          stages[stage_start].items[i].icon,
+          stages[i].items[j].icon,
           POS_STAGE_X, 
-          POS_STAGE_Y + y
+          POS_STAGE_Y + offset_y
         );
-        ObjectUnhide(stages[stage_start].items[i].icon, OBJ_MODE_REGULAR);
+        ObjectUnhide(stages[i].items[j].icon, OBJ_MODE_REGULAR);
 
         if(
-          stages[stage_start].items->consumable_amount > -1 &&
-          stage_start == stage_current
+          stages[i].items[j].consumable_amount > -1 &&
+          i == stage_current
         ) {
           ObjectSetPos(
-            stages[stage_start].items[i].gauge,
+            stages[i].items[j].gauge,
             POS_STAGE_X + POS_GAUGE_MARGIN_X, 
-            POS_STAGE_Y + y + POS_GAUGE_MARGIN_Y
+            POS_STAGE_Y + offset_y + POS_GAUGE_MARGIN_Y
           );
-          ObjectUnhide(stages[stage_start].items[i].gauge, OBJ_MODE_REGULAR);
+          ObjectUnhide(stages[i].items[j].gauge, OBJ_MODE_REGULAR);
 
           ObjectSetPos(
-            stages[stage_start].items[i].caret,
+            stages[i].items[j].caret,
             POS_STAGE_X + POS_CARET_MARGIN_X, 
-            POS_STAGE_Y + y + POS_CARET_MARGIN_Y
+            POS_STAGE_Y + offset_y + POS_CARET_MARGIN_Y
           );
-          ObjectUnhide(stages[stage_start].items[i].caret, OBJ_MODE_REGULAR);
+          ObjectUnhide(stages[i].items[j].caret, OBJ_MODE_REGULAR);
         }
-        y += STAGE_ICON_HEIGHT;
+        offset_y += STAGE_ICON_HEIGHT;
       }
-      ++stage_start;
     }
     stage_previous = stage_current;
   }
