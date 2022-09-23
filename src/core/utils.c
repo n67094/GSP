@@ -21,8 +21,6 @@ u32 UtilsBCD(u32 value) {
 
   u32 result = 0;
 
-  LOG_DEBUG("oki -1");
-
   int i;
   for(i = 20; i >= 0; --i) { // 20 is the number of bit occupied by 999999
     if((result & BCD_1ST) >= 5)
@@ -40,8 +38,6 @@ u32 UtilsBCD(u32 value) {
 
     result = (result << 1) | ((value >> i) & 1);
   }
-
-  LOG_DEBUG("oki -2");
 
   return result;
 }

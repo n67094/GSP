@@ -2,12 +2,14 @@
 #define INTERFACE_DATA
 
 // PALETTE ID
-#define OBJ_PALETTE_0 0
+#define INTERFACE_PALETTE_0 0
+#define INTERFACE_PALETTE_1 1
 
 // UI GENERICS
 // ===========
 // TILE ID
 #define TILE_CARET 0
+#define TILE_STAGE_CARET 0
 
 // AXES
 // ====
@@ -16,10 +18,8 @@
 #define OAM_ROLL_CARET 1
 #define OAM_PITCH_CARET 2
 #define OAM_YAW_CARET 3
-
 // TILE ID
 #define TILE_AXES 1
-
 // SPRITES POS
 #define POS_AXES_X 0
 #define POS_AXES_Y 128
@@ -53,5 +53,25 @@
 #define POS_METRICS_2_Y 128
 #define POS_THROTTLE_CARET_X 185
 #define POS_THROTTLE_CARET_Y 150
+
+// STAGES
+// ======
+// OAM ID
+#define OAM_STAGE 19
+// TILE ID
+#define TILE_PARACHUTE 141
+#define TILE_DECOUPLER_V 145
+#define TILE_DECOUPLER_H 149
+#define TILE_ENGINE 153
+#define TILE_SEPARATOR 157
+#define TILE_GAUGE 161
+// SPRITES POS
+#define POS_STAGE_X 3
+#define POS_STAGE_Y 16
+#define POS_GAUGE_MARGIN_X 16
+#define POS_GAUGE_MARGIN_Y 7
+#define POS_CARET_MARGIN_X 27
+#define POS_CARET_MARGIN_Y 8
+#define POS_SEPARATOR_MARGIN_X 8
 
 #endif

@@ -37,21 +37,21 @@ void MetricsInit()
   ObjectSetAttr(metrics_1,
     OBJ_SHAPE_WIDE,
     OBJ_SIZE_64X32,
-    OBJ_PALETTE_NUMBER(OBJ_PALETTE_0) | OBJ_TILE_NUMBER(TILE_METRICS_1)
+    OBJ_PALETTE_NUMBER(INTERFACE_PALETTE_0) | OBJ_TILE_NUMBER(TILE_METRICS_1)
   );
   ObjectSetPos(metrics_1, POS_METRICS_1_X, POS_METRICS_2_Y);
 
   ObjectSetAttr(metrics_2,
     OBJ_SHAPE_WIDE,
     OBJ_SIZE_64X32,
-    OBJ_PALETTE_NUMBER(OBJ_PALETTE_0) | OBJ_TILE_NUMBER(TILE_METRICS_2)
+    OBJ_PALETTE_NUMBER(INTERFACE_PALETTE_0) | OBJ_TILE_NUMBER(TILE_METRICS_2)
   );
   ObjectSetPos(metrics_2, POS_METRICS_2_X, POS_METRICS_2_Y);
 
   ObjectSetAttr(throttle_caret,
     OBJ_SHAPE_SQUARE,
     OBJ_SIZE_8X8,
-    OBJ_PALETTE_NUMBER(OBJ_PALETTE_0) | OBJ_TILE_NUMBER(TILE_THROTTLE_CARET));
+    OBJ_PALETTE_NUMBER(INTERFACE_PALETTE_0) | OBJ_TILE_NUMBER(TILE_THROTTLE_CARET));
   ObjectSetPos(throttle_caret, POS_THROTTLE_CARET_X, POS_THROTTLE_CARET_Y);
 }
 
@@ -62,11 +62,11 @@ void MetricsUpdate(u16 altitue, u16 speed, u16 throttle) {
   int altitue_bcd = UtilsBCD(altitue);
   UtilsBCDtoA(altitue_bcd, altitue_str);
 
-  LabelPrint(altitue_str, POS_ALTITUE_X, POS_ALTITUE_Y, OAM_ALTITUE, object_buffer, 1);
+  LabelPrint(altitue_str, POS_ALTITUE_X, POS_ALTITUE_Y, OAM_ALTITUE, object_buffer, 2);
 
   char speed_str[7];
   int speed_bcd = UtilsBCD(speed);
   UtilsBCDtoA(speed_bcd, speed_str);
 
-  LabelPrint(speed_str, POS_SPEED_X, POS_SPEED_Y, OAM_SPEED, object_buffer, 1);
+  LabelPrint(speed_str, POS_SPEED_X, POS_SPEED_Y, OAM_SPEED, object_buffer, 2);
 }
