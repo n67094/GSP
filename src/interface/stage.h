@@ -25,8 +25,8 @@ extern Stage *stages;
  */
 int StageInit(Object *oam_buffer, u32 oam_start);
 
-void StageUpdate();
+void StageUpdate(void);
 
-void StageNext();
+void StageNext(void);
 
 #endif
