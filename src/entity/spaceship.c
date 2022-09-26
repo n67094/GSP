@@ -30,52 +30,45 @@ void SpaceshipInit(){
 }
 
 void SpaceshipDraw(s32 pitch, s32 spin){
-	#define texture_width 6 //these will be defined in the part data, but for testing purposes, I have them here
-	#define texture_height 7 
 	
 	static u32 univ_scale = 0x100; //this scale is calculated based on the dimensions of the ship,
 	//so that the entire ship will always fit inside the bg, no matter the orientation.
-	static u32 part_radius = 32; //this will be set in the part data, but it is a variable here for testing purposes
-	static u32 part_height = 64; //this will be set in the part data, but it is a variable here for testing purposes
 	
-	u32 horiz_len = (TrigGetCos(pitch) * univ_scale * part_height) >> 16; //this is the number of pixels the side texture will be.
-	//the assembly function will combine this with the texture width to figure out the scale.
-	s32 xPos = 64 - ((TrigGetCos(pitch) * horiz_len) / 512); 
+	u32 xPos = 64; 
 	u32 yPos = 64;
+  
+	if (~(REG_KEYINPUT)&KEY_L) {
+		univ_scale--;
+		if (univ_scale < 1){
+			univ_scale = 1;
+		}
+	}
 
-	u32 radius = (part_radius * univ_scale) >> 8;
+	if (~(REG_KEYINPUT)&KEY_R) {
+		univ_scale++;
+		if (univ_scale > 0x170){
+			univ_scale = 0x170;
+		}
+	}
 	
 	spin = spin & 0x3ff; //get the spin into a range of 0-2pi
 	spin += 0x100;
 	
-	//normally, the radius will only be set by the part data, this key controlls is for testing only
-	if (~(REG_KEYINPUT)&KEY_L) {
-		part_radius++;
-		if (part_radius > 63){
-			part_radius = 63;
-		}
-	}
-	if (~(REG_KEYINPUT)&KEY_R) {
-		part_radius--;
-		if (part_radius < 1){
-			part_radius = 1;
-		}
-	}
-	if (~(REG_KEYINPUT)&KEY_A) {
-		part_height++;
-		if (part_height > 63){
-			part_height = 63;
-		}
-	}
-	if (~(REG_KEYINPUT)&KEY_B) {
-		part_height--;
-		if (part_height < 1){
-			part_height = 1;
-		}
-	}
-
-	SetupPosTableCylinder(TrigGetSin(pitch), radius, xPos);
+	extern SegmentData Capsule_wall; 				//This will eventually be referenced indirectly by the data for the ship.
+	SegmentData *current_segment = &Capsule_wall;	//But for testing, I'm just putting it here.
 	
-	DrawCylinderWall(TestWallTextureBitmap + ((spin * (1 << texture_height) / 1024) * (1 << texture_width)), texture_width, texture_height,
-					spaceship_buffer + (yPos * 128) - (radius * 128), horiz_len, radius);
+	u32 radius_1 = (current_segment->radius_1 * univ_scale) >> 8;
+	u32 radius_2 = (current_segment->radius_2 * univ_scale) >> 8;
+	s32 height = (current_segment->height * univ_scale) >> 8;
+	u32 gfx_width = current_segment->gfx_width;
+	u32 gfx_height = current_segment->gfx_height;
+	cu8 *gfxPtr = current_segment->gfx_data + (spin >> (10 - gfx_height) << gfx_width);
+
+	/*SetupPosTableCylinder(TrigGetSin(pitch), radius_1, xPos);
+	u32 horiz_len = (TrigGetCos(pitch) * height) >> 16;
+	DrawCylinderWall(gfxPtr, texture_width, texture_height, spaceship_buffer + (yPos * 128) - (radius_1 * 128), horiz_len, radius_1);
+	*/
+	SetupPosTableCone(pitch, radius_1, radius_2, xPos, height);
+	DrawConeWall(gfxPtr, spaceship_buffer + (yPos << 7), gfx_width, gfx_height);
+	
 }

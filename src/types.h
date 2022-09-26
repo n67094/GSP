@@ -44,19 +44,19 @@ typedef struct SegmentData{
 	//bit 5: reserved
 	//bit 6: reserved
 	//bit 7: reserved
-	cu8 radius_1; //the in-game radius of one side of this segment.
+	cu8 radius_1; //the in-game radius of one side of this segment. (Top side, if cone)
 	cu8 radius_2; //the in-game radius of the other side of this segment. Only used for cones.
 	cu8 height; //the in-game height of this segment. Not used for base segments
 	cu8 gfx_width; //the width of the texture in pixels.
-	cu8 gfx_height; //the height of the texture in pixels.
+	cs8 gfx_height; //the height of the texture in pixels. Negative means smaller radius is on top (cones only)
 	cu8 *gfx_data; //pointer to the start of this segments texture.
 } SegmentData;
 
 //This is the data for one part. A rocket is built up from many of these pre-defined parts
 typedef struct PartData{
-	cu8 num_Segments; //the number of segments needed to draw this part.
-	const SegmentData *segments_ptr; //a pointer to an array of NumSegments SegmentData structs.
+	cu8 num_segments; //the number of segments needed to draw this part.
 	cu8 length; //The length of this part from end to end, including all segments.
+	const SegmentData *segments_ptr; //a pointer to an array of NumSegments SegmentData structs.
 	//if this were to be developed into a full game, other const details about the part could go here, like mass, cost, etc.
 } PartData;
 
