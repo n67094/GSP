@@ -1,26 +1,25 @@
 #ifndef INTERFACE_FACECAM_H
 #define INTERFACE_FACECAM_H
 
-#define GERBIL_NAME_1 ""
-#define GERBIL_NAME_2 ""
-#define GERBIL_NAME_3 ""
+#include "types.h"
 
-typedef enum FacecamState {
- FACECAM_STATE_NORMAL,
- FACECAM_STATE_HAPPY,
- FACECAM_STATE_SICK,
-} FacecamState;
+#define FACECAM_NAME_1 ""
+#define FACECAM_NAME_2 ""
+#define FACECAM_NAME_2_NAME_3 ""
 
-extern FacecamState facecam_state;
+#define FACECAM_1_ID 1
+#define FACECAM_2_ID 2
+#define FACECAM_3_ID 3
+#define FACECAM_SIZE 3
 
-void FacecamInit(void);
+int FacecamInit(Object *oam_buffer, u32 oam_start);
 
 void FacecamUpdate(void);
 
-void FacecamSetNormal(void);
+void FacecamSetNormal(int id);
 
-void FacecamSetHappy(void);
+void FacecamSetHappy(int id);
 
-void FacecamSetSick(void);
+void FacecamSetSick(int id);
 
 #endif
