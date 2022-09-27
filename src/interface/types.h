@@ -28,9 +28,8 @@ typedef enum FacecamState {
 typedef struct Facecam {
 	Object *top;
 	Object *bottom;
-	FacecamState top_state;
-	FacecamState bottom_state;
+	u16 top_tile;
+	u16 bottom_tile;
 } Facecam;
-
 
 #endif

@@ -45,6 +45,11 @@ void InterfaceInit(void)
   MetricsInit();
   FacecamInit(object_buffer, OAM_FACECAM);
   StageInit(object_buffer, OAM_STAGE);
+
+  // TO REMOVE just an example how to set facecam faces
+  FacecamSetNormal(FACECAM_1_ID);
+  FacecamSetHappy(FACECAM_2_ID);
+  FacecamSetSick(FACECAM_3_ID);
 }
 
 void InterfaceUpdate(s32 roll, s32 pitch, s32 yaw, s32 altitude, s32 speed, s32 throttle)

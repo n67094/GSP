@@ -21,9 +21,9 @@
 bool facecam_changed = false;
 
 Facecam facecams[3] = {
-  { .top_state = FACECAM_STATE_NORMAL , .bottom_state = FACECAM_STATE_NORMAL},
-  { .top_state = FACECAM_STATE_NORMAL , .bottom_state = FACECAM_STATE_NORMAL},
-  { .top_state = FACECAM_STATE_NORMAL , .bottom_state = FACECAM_STATE_NORMAL},
+  { .top_tile = TILE_FACECAM_NORMAL_TOP , .bottom_tile = TILE_FACECAM_NORMAL_BOTTOM},
+  { .top_tile = TILE_FACECAM_NORMAL_TOP , .bottom_tile = TILE_FACECAM_NORMAL_BOTTOM},
+  { .top_tile = TILE_FACECAM_NORMAL_TOP , .bottom_tile = TILE_FACECAM_NORMAL_BOTTOM},
 };
 
 int FacecamInit(Object *oam_buffer, u32 oam_start) {
@@ -200,6 +200,12 @@ int FacecamInit(Object *oam_buffer, u32 oam_start) {
 void FacecamUpdate(void) {
   if(facecam_changed) {
     facecam_changed = false;
+
+    int i;
+    for(i = 0; i < FACECAM_SIZE; ++i) {
+      facecams[i].top->attr2 = BF_SET(facecams[i].top->attr2, OBJ_TILE_NUMBER, facecams[i].top_tile);
+      facecams[i].bottom->attr2 = BF_SET(facecams[i].bottom->attr2, OBJ_TILE_NUMBER, facecams[i].bottom_tile);
+    }
   }
 }
 
@@ -207,22 +213,22 @@ void FacecamSetNormal(int id) {
   if(id < 0 || id > FACECAM_SIZE) return;
 
   facecam_changed = true;
-  facecams[id].top_state = FACECAM_STATE_NORMAL;
-  facecams[id].bottom_state = FACECAM_STATE_NORMAL;
+  facecams[id].top_tile = TILE_FACECAM_NORMAL_TOP;
+  facecams[id].bottom_tile = TILE_FACECAM_NORMAL_BOTTOM;
 }
 
 void FacecamSetHappy(int id) {
   if(id < 0 || id > FACECAM_SIZE) return;
 
   facecam_changed = true;
-  facecams[id].top_state = FACECAM_STATE_NORMAL;
-  facecams[id].bottom_state = FACECAM_STATE_HAPPY;
+  facecams[id].top_tile = TILE_FACECAM_NORMAL_TOP;
+  facecams[id].bottom_tile = TILE_FACECAM_HAPPY_BOTTOM;
 }
 
 void FacecamSetSick(int id) {
   if(id < 0 || id > FACECAM_SIZE) return;
 
   facecam_changed = true;
-  facecams[id].top_state = FACECAM_STATE_SICK;
-  facecams[id].bottom_state = FACECAM_STATE_SICK;
+  facecams[id].top_tile = TILE_FACECAM_SICK_TOP;
+  facecams[id].bottom_tile = TILE_FACECAM_SICK_BOTTOM;
 }
