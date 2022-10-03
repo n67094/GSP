@@ -8,7 +8,7 @@
 @r0: pitch, then sin(pitch)
 @r1: radius_1
 @r2: radius_2
-@r3: center xPos offset from center
+@r3: xPos offset from center
 @r4: current big yPos
 @r5: pointer to position table
 @r6: big yPos Update Value
@@ -48,8 +48,8 @@ SetupPosTableCone:
 	ldrh	r6, [r11, r12]			@/
 	mul		r14, r6, r2				@multiply small radius by inverse of big radius to get the small update value
 	mov		r3, #0					@set the initial x pos offset to 0
-	mov		r9, #-1					@reset the small y value
-	mov		r10, #-1				@reset the small x value
+	mov		r9, #-0x8001			@reset the small y value
+	mov		r10, #-0x8001			@reset the small x value
 	subs	r4, r4, r6				@subtract the update value to the ypos
 setupPixelCone:
 	mov		r11, r4, lsr #8
@@ -62,25 +62,26 @@ setupPixelCone:
 	rsbs	r13, r3, r11, asr #24	@subtract the new xpos from the last xpos
 	beq		noXposBigUpdate
 	bmi		negativeBigXUpdate
-positiveBigXUpdate:
 	orr		r12, r12, #1			@set the update into the pos table (positive x)
+positiveBigXUpdate:
 	adds	r10, r10, r14			@increase the small x pos
 	orrpl	r12, r12, #8			@set the small xpos update
 	subpl	r10, r10, #0x10000		@reset the small xpos counter
 	subs	r13, r13, #1			@check if reached the end of big x pos updates
 	strneh	r12, [r5], #2			@store the pixel data if there is more
-	andne	r12, r12, #0xff00		@clear the pixel data to prepare for the next 
+	bicne	r12, r12, #0x3c			@clear the pixel data to prepare for the next 
 	bne		positiveBigXUpdate
 	b		BigXUpdateDone
 negativeBigXUpdate:
 	orr		r12, r12, #3			@set the update into the pos table (negative x)
+negativeBigXRepeat:
 	adds	r10, r10, r14			@increase the small x pos
-	orrpl	r12, r12, #0x18			@set the small xpos negative update
-	subpl	r10, r10, #0x10000		@reset the small xpos counter
+	orrpl	r12, r12, #0x18			@set the small xpos negative update if needed
+	subpl	r10, r10, #0x10000		@reset the small xpos counter if needed
 	adds	r13, r13, #1			@check if reached the end of big pos updates
 	strneh	r12, [r5], #2			@store the pixel data if there is more
-	andne	r12, r12, #0xff00		@clear the pixel data to prepare for the next 
-	bne		negativeBigXUpdate	
+	bicne	r12, r12, #0x3c			@clear the pixel data to prepare for the next 
+	bne		negativeBigXRepeat	
 BigXUpdateDone:
 	mov		r3, r11, asr #24		@update the last xpos with the new value
 noXposBigUpdate:
@@ -233,6 +234,113 @@ BresenhamEnd:
 	submis	r9, r9, #1				@decrement big y if bit 2 is set
 	bpl		ConeNewLine				@if we are done, exit the loop, otherwise, reset for new line
 DrawConeEnd:
+	msr		cpsr_c, #0x1f
+	ldr		r13, R13Temp
+	pop		{r4-r12, r14}
+	bx		lr
+	
+.section .iwram,"ax", %progbits
+    .align  2
+    .code   32
+	.global DrawConeWallBack
+	.type DrawConeWallBack STT_FUNC
+	
+@This is a nearly ideitical copy of the DrawConeWall funciton, with just a few lines of code changed.
+@If we run short of IWRAM, self-modifying code can be used to reuse the above section.
+	
+	DrawConeWallBack:
+	push	{r4-r12, r14}			@store the existing registers
+	str		r13, R13Temp			@store the stack pointer
+	ldr		r10, =InverseTable
+	msr		cpsr_c, #0x11			@switch to fiq mode, registers 8-14 now reference the fiq registers
+	mov		r12, r1					@move the buffer center pointer to the right register
+	mov		r13, r0					@move the texture center pointer to the right register
+	ldr		r14, =pos_table
+	ldr		r4, [r14], #4			@load the initial x and y coordinates into r4
+	and		r8, r4, #0xff			@get the initial x pos big from the pos table
+	and		r6, r4, #0xff00			@isolate the y_0 big offset
+	mov		r9, r6, lsr #8			@place the big y_0 offset in r9
+	and		r6, r4, #0xff0000		@isolate the x_0 small
+	mov		r10, r6, lsr #16		@place it into the correct register
+	mov		r11, r4, lsr #24		@place the y_0 small offset in r11
+@									@below this point is a section copy-pasted from the normal loop.
+	ldrh	r4, [r14], #2			@load the next pos table entry, post increment
+	movs	r5, r4, lsl #27			@check bits 5 and 4. 
+	addmi	r10, r10, #2			@increase small x by 2 if bit 4 is set ||DIFFERENT||
+	subcs	r11, r11, #1			@decrement small y if bit 5 is set
+	movs	r5, r5, lsl #2			@check bits 3 and 2
+	subcs	r10, r10, #1			@decrement small x if bit 3 is set ||DIFFERENT||
+	submis	r9, r9, #1				@decrement big y if bit 2 is set
+	bmi		DrawConeBackEnd			@if we are done already, branch to the end of the function
+ConeNewLineBack:
+	movs	r5, r5, lsl #2			@check bits 1 and 0
+	submi	r8, r8, #1				@decrement big x if bit 0 is set ||DIFFERENT||
+	addcs	r8, r8, #2				@increase big x by 2 if bit 1 is set ||DIFFERENT||
+	rsb		r4, r4, #0x20000		@||NEW||
+	rsb		r5, r3, #18				@\convert the angle to texture vertical offset
+	mov		r4, r4, lsr r5			@/
+	sub		r6, r13, r4, lsl r2		@multiply by texture width and subtract from texture middle to get texture top
+	add		r7, r13, r4, lsl r2		@multiply by texture width and add to texture middle to get texture bottom
+	sub		r0, r12, r9, lsl #7		@subtract the big y from the middle buffer pointer to get the upper pointer
+	add		r0, r0, r8				@add the big x to finish the upper pointer
+	add		r1, r12, r9, lsl #7		@add the big y from the middle buffer pointer to get the lower pointer
+	add		r1, r1, r8				@add the big x to finish the lower pointer
+	sub		r5, r9, r11				@calculate delta y, should always be positive
+	subs	r4, r10, r8				@calculate the delta x
+	msr		cpsr_c, #0x1F			@switch to system mode
+	rsbmi	r4, r4, #0				@make sure the delta x is positive
+	movmi	r9, #-1					@\set the buffer update value accordingly
+	movpl	r9, #1					@/
+	mov		r13, #0x10000			@\set the counter to the texture width, lsl 16
+	mov		r11, r13, lsl r2		@/
+	cmp		r4, r5					@compare delta x to delta y
+	bmi		YGreaterBack
+XGreaterBack:
+	rsb		r8, r4, r5, lsl #1		@error value starts out as 2*dy - dx
+	sub		r8, r8, r5, lsl #1		@undo the first error update
+	mov		r13, r4, lsl #1			@\load the inverse of dx
+	ldrh	r13, [r10, r13]			@/
+	mov		r12, r13, lsl r2		@multiply by the texture width
+PlotXPixelBack:
+	ldrb	r13, [r6, r11, lsr #16]	@load the upper pixel from the texture
+	strb	r13, [r0], r9			@store the color into the upper buffer, update x value
+	ldrb	r14, [r7, r11, lsr #16]	@load the lower pixel from the texture
+	strb	r14, [r1], r9			@store the color into the lower buffer, update x value
+	adds	r8, r8, r5, lsl #1		@update the error value
+	strplb	r13, [r0], #128			@store the corner, and update the upper buffer value if y is changed
+	strplb	r14, [r1], #-128		@store the corner, and update the lower buffer value if y is changed
+	subpl	r8, r8, r4, lsl #1		@update the error value is y is changed
+	subs	r11, r11, r12			@update the counter
+	bpl		PlotXPixelBack			@repeat if not done
+	b		BresenhamEndBack
+YGreaterBack:
+	rsb		r8, r5, r4, lsl #1		@error value starts out as 2*dx - dy
+	sub		r8, r8, r4, lsl #1		@undo the first error update
+	mov		r13, r5, lsl #1			@\load the inverse of dy
+	ldrh	r13, [r10, r13]			@/
+	mov		r12, r13, lsl r2		@multiply by the texture width
+PlotYPixelBack:
+	ldrb	r13, [r6, r11, lsr #16]	@load the upper pixel from the texture
+	strb	r13, [r0], #128			@store the color into the upper buffer, update x value
+	ldrb	r14, [r7, r11, lsr #16]	@load the lower pixel from the texture
+	strb	r14, [r1], #-128		@store the color into the lower buffer, update x value
+	adds	r8, r8, r4, lsl #1		@update the error value
+	strplb	r13, [r0], r9			@store the corner, and update the upper buffer value if y is changed
+	strplb	r14, [r1], r9			@store the corner, and update the lower buffer value if y is changed
+	subpl	r8, r8, r5, lsl #1		@update the error value is y is changed
+	subs	r11, r11, r12			@update the counter
+	bpl		PlotYPixelBack			@repeat if not done
+BresenhamEndBack:
+	msr		cpsr_c, #0x11			@switch to fiq mode, registers 8-14 now reference the fiq registers
+	ldrh	r4, [r14], #2			@load the next pos table entry, post increment
+	movs	r5, r4, lsl #27			@check bits 5 and 4. 
+	addmi	r10, r10, #2			@increase small x by 2 if bit 4 is set ||DIFFERENT||
+	subcs	r11, r11, #1			@decrement small y if bit 5 is set
+	movs	r5, r5, lsl #2			@check bits 3 and 2
+	subcs	r10, r10, #1			@decrement small x if bit 3 is set ||DIFFERENT||
+	submis	r9, r9, #1				@decrement big y if bit 2 is set
+	bpl		ConeNewLineBack			@if we are done, exit the loop, otherwise, reset for new line
+DrawConeBackEnd:
 	msr		cpsr_c, #0x1f
 	ldr		r13, R13Temp
 	pop		{r4-r12, r14}

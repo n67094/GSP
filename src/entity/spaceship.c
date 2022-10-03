@@ -19,12 +19,19 @@ static void SpaceshipInitTileMap() {
   for (u32 i = 0; i < 128; ++i) {
     tilemap_ptr[i] = (((i << 1) + 1) << 8) + (i << 1);
   }
+  
+	
 }
 
 void SpaceshipInit(){
 	SpaceshipInitTileMap();
 	
 	//These palette entries are temporary. The unified sphere/spaceship palette will be copied instead once it is ready
+	extern cu8 Capsule_TexturePal[512];
+	for(u32 i = 0; i < 16; i++) {
+		((u16 *)0x05000000)[i] = ((u16 *)Capsule_TexturePal)[i];
+	}
+	
 	*(u16 *)0x05000140 = 0x3ff; //Setting the color Yellow to palette entry 0xa0
 	*(u16 *)0x05000142 = 0x1f; //Setting the color Red to palette entry 0xa1
 }
@@ -50,15 +57,17 @@ void SpaceshipDraw(s32 pitch, s32 spin){
 			univ_scale = 0x170;
 		}
 	}
+	vu8 debug = 1;
 	
 	spin = spin & 0x3ff; //get the spin into a range of 0-2pi
-	spin += 0x100;
+	spin += 0x200;
 	
 	extern SegmentData Capsule_wall; 				//This will eventually be referenced indirectly by the data for the ship.
 	SegmentData *current_segment = &Capsule_wall;	//But for testing, I'm just putting it here.
 	
 	u32 radius_1 = (current_segment->radius_1 * univ_scale) >> 8;
 	u32 radius_2 = (current_segment->radius_2 * univ_scale) >> 8;
+	//while(debug);
 	s32 height = (current_segment->height * univ_scale) >> 8;
 	u32 gfx_width = current_segment->gfx_width;
 	u32 gfx_height = current_segment->gfx_height;
@@ -69,6 +78,7 @@ void SpaceshipDraw(s32 pitch, s32 spin){
 	DrawCylinderWall(gfxPtr, texture_width, texture_height, spaceship_buffer + (yPos * 128) - (radius_1 * 128), horiz_len, radius_1);
 	*/
 	SetupPosTableCone(pitch, radius_1, radius_2, xPos, height);
+	DrawConeWallBack(gfxPtr, spaceship_buffer + (yPos << 7), gfx_width, gfx_height);
 	DrawConeWall(gfxPtr, spaceship_buffer + (yPos << 7), gfx_width, gfx_height);
 	
 }

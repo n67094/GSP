@@ -14,6 +14,8 @@
 #include "../core/memory.h"
 #include "../core/object.h"
 #include "../core/tile.h"
+#include "../core/sound.h"
+#include "../entity/soundlist.h"
 #include "scene.h"
 
 #include "../debug/log.h"
@@ -64,6 +66,9 @@ static void TitleOpen() {
     OBJ_PALETTE_NUMBER(TITLE_OBJ_PALETTE_0) | OBJ_TILE_NUMBER(TILE_TITLE_START_2)
   );
   ObjectSetPos(start2, POS_TITLE_START_2_X, POS_TITLE_START_2_Y);
+  
+  SoundInit();
+  SoundPlay(&Title_song);
 }
 
 static void TitleUpdate()
@@ -92,9 +97,16 @@ static void TitleVBlank() {
   } else {
     ++title_frame_counter;
   }
+  
+  u32 Sound_Duration = CheckSoundProgress(&Title_song);
+  if(Sound_Duration){
+	SoundRepeat(&Title_song, Sound_Duration);
+  }
 }
 
-static void TitleClose() {}
+static void TitleClose() {
+	SoundStop(&Title_song);
+}
 
 Scene title_scene = {
     .Open = TitleOpen, .Update = TitleUpdate, .Draw = TitleDraw, .VBlank = TitleVBlank, .Close = TitleClose};
