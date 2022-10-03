@@ -19,4 +19,17 @@ typedef struct Stage {
 	u16 size;
 } Stage;
 
+typedef enum FacecamState {
+	FACECAM_STATE_NORMAL,
+	FACECAM_STATE_HAPPY,
+	FACECAM_STATE_SICK,
+} FacecamState;
+
+typedef struct Facecam {
+	Object *top;
+	Object *bottom;
+	u16 top_tile;
+	u16 bottom_tile;
+} Facecam;
+
 #endif
