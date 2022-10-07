@@ -9,20 +9,16 @@
 #include "../core/label.h"
 
 #include "../entity/earth.h"
+#include "../entity/spaceship.h"
 
 #include "../interface/interface.h"
-
 #include "../interface/stage.h"
-#include "../renderer/sphere.h"
-<<<<<<< HEAD
-#include "../entity/spaceship.h"
-=======
 
->>>>>>> main
+#include "../renderer/sphere.h"
+
 #include "../types.h"
 #include "../global.h"
 
-#include "../global.h"
 #include "scene.h"
 
 SphereData earth;
