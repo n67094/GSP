@@ -5,7 +5,7 @@
 //All linear inputs and outputs are in units of 1/256.
 
 s32 TrigGetSin(s32 theta){
-	u32 negative;
+	u32 negative = 0;
 	s32 value;
 	theta = theta & 0x3ff; //shift any Theta into a range of 0-1023 (1 complete sin wave)
 	if(theta > 0x200){ //if theta is in the negative portion of the sin wave
@@ -13,7 +13,7 @@ s32 TrigGetSin(s32 theta){
 		theta -= 0x200;
 	}
 	if(theta > 0x100){ //if theta is in the second or fourth quarter of the sin wave.
-		theta = 200 - theta;
+		theta = 0x200 - theta;
 	}
 	if(theta < 0x100){
 		value = trig_table_group_2[theta] & 0xff;
@@ -35,7 +35,7 @@ s32 TrigGetCos(s32 theta){
 
 s32 TrigGetArcSin(s32 length){ //length must be between -256 (-1) and 256 (1)
 	s32 theta;
-	u32 negative;
+	u32 negative = 0;
 	if (length < 0){
 		negative = 1;
 		length = -length;
@@ -86,8 +86,8 @@ s32 TrigGetInvPythSqrt(s32 length){ //length must be between -0xff and 0xff. 0x1
 	return value;
 }
 
-s32 GetCsc(s32 theta){ //length should not be a multiple of pi (512). csc(pi) is undefined, but this function returns 0xffff
-	u32 negative;
+s32 TrigGetCsc(s32 theta){ //length should not be a multiple of pi (512). csc(pi) is undefined, but this function returns 0xffff
+	u32 negative = 0;
 	s32 value;
 	theta = theta & 0x3ff; //shift any Theta into a range of 0-1023 (1 complete csc wave)
 	if(theta > 0x200){ //if theta is in the negative portion of the csc wave
@@ -95,7 +95,7 @@ s32 GetCsc(s32 theta){ //length should not be a multiple of pi (512). csc(pi) is
 		theta -= 0x200;
 	}
 	if(theta > 0x100){ //if theta is in the second or fourth quarter of the csc wave.
-		theta = 200 - theta;
+		theta = 0x200 - theta;
 	}
 	if(theta < 0x100){
 		value = (trig_table_group_2[theta] & 0xffff0000) >> 16;
@@ -109,20 +109,20 @@ s32 GetCsc(s32 theta){ //length should not be a multiple of pi (512). csc(pi) is
 	return value;
 }
 
-s32 GetSec(s32 theta){ //length should not be a multiple of pi (512) - pi/2. csc(pi/2) is undefined, but this function returns 0xffff
+s32 TrigGetSec(s32 theta){ //length should not be a multiple of pi (512) - pi/2. csc(pi/2) is undefined, but this function returns 0xffff
 	s32 value;
-	value = GetCsc(theta + 0x100);
+	value = TrigGetCsc(theta - 0x100);
 	return value;
 }
 
-s32 GetTanValue(s32 theta){ //theta should not be a multiple of pi (256) - pi/2. Answer is undefined, but this function returns 0xffff
+s32 TrigGetTan(s32 theta){ //theta should not be a multiple of pi (256) - pi/2. Answer is undefined, but this function returns 0xffff
 	s32 value;
-	value = (GetSec(theta) * TrigGetSin(theta)) >> 8;
+	value = (TrigGetSec(theta) * TrigGetSin(theta)) >> 8;
 	return value;
 }
 
-s32 GetCot(s32 theta){ //theta should not be a multiple of pi (256). Answer is undefined, but this function returns 0xffff
+s32 TrigGetCot(s32 theta){ //theta should not be a multiple of pi (256). Answer is undefined, but this function returns 0xffff
 	s32 value;
-	value = (GetCsc(theta) * TrigGetCos(theta)) >> 8;
+	value = (TrigGetCsc(theta) * TrigGetCos(theta)) >> 8;
 	return value;
 }
