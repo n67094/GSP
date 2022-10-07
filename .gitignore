@@ -4,7 +4,4 @@ compile_commands.json
 .cache
 tags
 /**/.DS_Store
-<<<<<<< HEAD
 bin2s.exe
-=======
->>>>>>> main

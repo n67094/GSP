@@ -1,5 +1,5 @@
-#ifndef RENDERER_SPACESHIP_H
-#define RENDERER_SPACESHIP_H
+#ifndef ENTITIY_SPACESHIP_H
+#define ENTITIY_SPACESHIP_H
 
 #include "../types.h"
 
