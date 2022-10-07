@@ -17,6 +17,6 @@ void TransferBuffer(vu8 *BufferPtr, vu16 *VramPtr);
 void SpaceshipInit();
 void SpaceshipDraw(s32 pitch, s32 spin);
 
-extern cu8 TestWallTextureBitmap[];
+extern cu8 wall_tiles[];
 
 #endif
