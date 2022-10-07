@@ -2,7 +2,6 @@
 #include "../types.h"
 #include <seven/hw/dma.h>
 #include <seven/hw/timer.h>
-#include "../entity/soundlist.h"
 
 void SoundInit(){
 	REG_DMA1DST = (u32 *)0x40000A0;
@@ -19,14 +18,11 @@ void SoundInit(){
 	REG_TM2CNT = (TIMER_FREQ_64KHZ);
 	REG_TM3CNT = (TIMER_FREQ_64KHZ);
 	
-	
 	*(vu16 *)0x4000084 = 0x80;	//DMA channel master enable
 	*(vu16 *)0x4000082 = 0x730C; //enable both DMA channels at max volume on both left and right.
-
-	
 }
 
-u32 CheckSoundProgress(SoundData *CurrentSound){ //returns how much over we are if we've reached the end
+u32 CheckSoundProgress(cs8 * data,  u32 channel, u32 size){ //returns how much over we are if we've reached the end
 	static u16 timer2LastVal = 0;
 	u16 timer2CurrentVal;
 	static u16 timer3LastVal = 0;
@@ -36,8 +32,8 @@ u32 CheckSoundProgress(SoundData *CurrentSound){ //returns how much over we are 
 	u32 soundLength;
 	static u32 testCounter = 0;
 	
-	if (CurrentSound->channel == 0){
-		soundLength = CurrentSound->length;
+	if (channel == 0){
+		soundLength = size;
 		timer2CurrentVal = timerGetValue(2);
 		channel0Duration += ((timer2CurrentVal - timer2LastVal) & 0xffff) >> 1;
 		timer2LastVal = timer2CurrentVal;
@@ -48,7 +44,7 @@ u32 CheckSoundProgress(SoundData *CurrentSound){ //returns how much over we are 
 		}
 	}
 	else {
-		soundLength = CurrentSound->length;
+		soundLength = size;
 		timer3CurrentVal = timerGetValue(3);
 		channel1Duration += ((timer3CurrentVal - timer3LastVal) & 0xffff) >> 1;
 		timer3LastVal = timer3CurrentVal;
@@ -60,9 +56,9 @@ u32 CheckSoundProgress(SoundData *CurrentSound){ //returns how much over we are 
 	return 0;
 }
 
-void SoundPlay(SoundData *CurrentSound){
-	if (CurrentSound->channel == 0){
-		REG_DMA1SRC = CurrentSound->sound;
+void SoundPlay(cs8 *sound, u32 channel){
+	if (channel == 0){
+		REG_DMA1SRC = sound;
 		dmaDisable(1);
 		dmaEnable(1);
 		REG_TM2VAL = 0; //used to measure DMA sound 0 duration
@@ -70,7 +66,7 @@ void SoundPlay(SoundData *CurrentSound){
 		timerEnable(2); //timer ticks twice per sample
 	}
 	else{
-		REG_DMA2SRC = CurrentSound->sound;
+		REG_DMA2SRC = sound;
 		dmaDisable(2);
 		dmaEnable(2);
 		REG_TM3VAL = 0; //used to measure DMA sound 1 duration
@@ -79,9 +75,9 @@ void SoundPlay(SoundData *CurrentSound){
 	}
 }
 
-void SoundRepeat(SoundData *CurrentSound, u32 soundDuration){
-	if (CurrentSound->channel == 0){
-		REG_DMA1SRC = CurrentSound->sound + soundDuration;
+void SoundRepeat(cs8 *sound, u32 channel, u32 duration){
+	if (channel == 0){
+		REG_DMA1SRC = sound + duration;
 		dmaDisable(1);
 		dmaEnable(1);
 		REG_TM2VAL = 0; //used to measure DMA sound 0 duration
@@ -90,7 +86,7 @@ void SoundRepeat(SoundData *CurrentSound, u32 soundDuration){
 	}
 	else{
 		u16 playedLength = timerGetValue(3) >> 1;
-		REG_DMA1SRC = CurrentSound->sound + soundDuration;
+		REG_DMA1SRC = sound + duration;
 		dmaDisable(2);
 		dmaEnable(2);
 		REG_TM3VAL = 0; //used to measure DMA sound 1 duration
@@ -99,8 +95,8 @@ void SoundRepeat(SoundData *CurrentSound, u32 soundDuration){
 	}
 }
 
-void SoundStop(SoundData *CurrentSound){
-	if(CurrentSound->channel == 0){
+void SoundStop(u32 channel){
+	if(channel == 0){
 		dmaDisable(1);
 	}
 	else{

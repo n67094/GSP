@@ -72,13 +72,10 @@ static void MissionUpdate()
   }
 
   // Due to the time it take to compute it cannot be move in draw
-  //EarthDraw(&earth);
-   	TransferBuffer(spaceship_buffer, GFX_BASE_ADDR(2)); 
-	ClearBuffer(spaceship_buffer);
-	SpaceshipDraw(spaceship.pitch, spaceship.spin);
- 
-	
-	
+  // EarthDraw(&earth);
+  TransferBuffer(spaceship_buffer, GFX_BASE_ADDR(2));
+  ClearBuffer(spaceship_buffer);
+  SpaceshipDraw(spaceship.pitch, spaceship.spin);
 }
 
 static void MissionDraw() {

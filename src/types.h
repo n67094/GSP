@@ -79,9 +79,4 @@ typedef struct ShipData{
 	u32 length; //The longest dimension of the ship in in-game units, used to make sure the entire ship can fit into the background layer.
 } ShipData;
 
-typedef struct SoundData{
-	cs8 *sound; //the raw data for the sound effect/song
-	cu32 length; //the length of the song in bytes
-	cu32 channel; //0 for song channel (FIFO 0) 1 for sound effect channel (FIFO 1).
-}SoundData;
 #endif

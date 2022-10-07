@@ -1,7 +1,7 @@
 #ifndef RENDERER_SPACESHIP_H
 #define RENDERER_SPACESHIP_H
 
-#include <seven/base/types.h>
+#include "../types.h"
 
 void DrawCylinderWall(cu8 *GfxPtr, u32 GfxWidth, u32 GfxHeight, vu8 *BufferPtr, u32 horiz_len, u32 Radius);
 void DrawConeWall(cu8 *GfxCenterPtr, vu8 *BufferCenterPtr, u32 GfxWidth, u32 GfxHeight);
