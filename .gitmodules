@@ -1,3 +1,4 @@
 [submodule "externals/libseven"]
 	path = externals/libseven
 	url = git@github.com:n67094/libseven.git
+	dirty = true
