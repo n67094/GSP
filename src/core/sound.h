@@ -1,3 +1,6 @@
+#ifndef CORE_SOUND_H
+#define CORE_SOUND_H
+
 #include "../types.h"
 
 void SoundInit();
@@ -5,3 +8,5 @@ u32 CheckSoundProgress(SoundData *); //returns the duration played if sound has 
 void SoundPlay(SoundData *);
 void SoundRepeat(SoundData *, u32);
 void SoundStop(SoundData *);
+
+#endif
