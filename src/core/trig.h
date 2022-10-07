@@ -1,7 +1,7 @@
 #ifndef CORE_TRIG_H
 #define CORE_TRIG_H
 
-#include "../types.h"
+#include "types.h"
 
 //All inputs and outputs are in 24.8 signed format (24 whole number bits, 8 fractional bits)
 

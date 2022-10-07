@@ -4,11 +4,23 @@
 #include <seven/hw/memory.h>
 #include <seven/hw/video.h>
 
+#include "../debug/log.h"
+
+#include "../core/label.h"
+
 #include "../entity/earth.h"
+
 #include "../interface/interface.h"
+
+#include "../interface/stage.h"
 #include "../renderer/sphere.h"
+<<<<<<< HEAD
 #include "../entity/spaceship.h"
+=======
+
+>>>>>>> main
 #include "../types.h"
+#include "../global.h"
 
 #include "../global.h"
 #include "scene.h"
@@ -36,6 +48,18 @@ static void MissionUpdate()
 {
   if (~(REG_KEYINPUT)&KEY_UP) {
     earth.pitch++;
+  }
+
+  if(inputKeysReleased(KEY_LEFT)) {
+    int i;
+    Stage *stage = &stages[stage_current];
+    for(i = 0; i < stage->size && stage->items[i].consumable_amount > 0; ++i) {
+      stage->items[i].consumable_amount -= 1;
+    }
+  }
+
+  if(inputKeysReleased(KEY_A)) {
+    StageNext();
   }
 
   if (~(REG_KEYINPUT)&KEY_DOWN) {
@@ -76,6 +100,8 @@ static void MissionUpdate()
   TransferBuffer(spaceship_buffer, GFX_BASE_ADDR(2));
   ClearBuffer(spaceship_buffer);
   SpaceshipDraw(spaceship.pitch, spaceship.spin);
+
+  InterfaceUpdate(7, 8, 3, 1234, 2345, 5);
 }
 
 static void MissionDraw() {

@@ -3,7 +3,7 @@
 
 #include <seven/base/addresses.h>
 
-#include "../types.h"
+#include "types.h"
 
 #define VRAM_BG_SIZE 0x10000
 #define VRAM_OBJ_SIZE 0x08000
