@@ -1,94 +1,144 @@
 .SUFFIXES:
 
-PROJECT := GSP
-
-LIBSEVEN := ./externals/libseven
+# Path to gba-minrt
 MINRT := ./externals/libseven/gba-minrt
 
-LIBDIRS := $(LIBSEVEN)
+# Path to libseven
+LIBSEVEN := ./externals/libseven
+
+# Name of your ROM
+PROJECT := GSP
+
+# Source files
+SOURCES := $(MINRT)/src/crt0.s $(shell find ./src ./data -type f -name '*.c' -o -name '*.s' ! -path '*/.*')
+
+# Include directories
+INCLUDES := $(MINRT)/src
+
+# Library directories, with /include and /lib
+LIBDIRS := $(MINRT) $(LIBSEVEN)
+
+# Libraries to link
 LIBS := seven
 
+# All build output goes here
 BUILDDIR := build
-
-# Data folder can containes sources which was note generate from bin2s
-SOURCES := rt/crt0.s $(shell find ./src ./data -type f -name '*.c' -o -name '*.s' ! -path '*/.*')
-INCLUDES :=
 
 # Used to convert bin files to .s and .h with bin2s
 BIN2S := ./tools/bin2s/bin2s
 DATA := $(shell find ./data -type f -name '*.*' ! -name '*.c' ! -name '*.h' ! -name '*.s' ! -path '*/.*')
-BINARIES = $(DATA:%=/data/%)
+BINARIES = :$(DATA:%=/data/%)
 
-# Target specific
-TARGET := release # can be release or debug
+# C compiler flags
+TARGET := release
 
 FLAGS := -O2 -std=c99 -ffunction-sections -fdata-sections
 FLAGS.release :=
 FLAGS.debug := -g3 -gdwarf-4 -DNDEBUG
 
 CFLAGS := $(FLAGS.$(TARGET)) $(FLAGS)
-LDFLAGS := -mthumb -nostartfiles -specs=nano.specs -specs=nosys.specs -Wl,-Trom.ld -L$(MINRT)/rt
 
-vpath rt/% $(MINRT)
+CFLAGS := -g3 -gdwarf-4 -O2 -std=c99 -ffunction-sections -fdata-sections
 
-CC = arm-none-eabi-gcc
-OBJCOPY = arm-none-eabi-objcopy
+# Linker flags
+LDFLAGS := -mthumb -nostartfiles \
+		   -specs=nano.specs -specs=nosys.specs \
+		   -Wl,-Trom.ld
 
-ELFFILE = $(BUILDDIR)/$(PROJECT).elf
-ROMFILE = $(BUILDDIR)/$(PROJECT).gba
-MAPFILE = $(BUILDDIR)/$(PROJECT).map
+# Toolchain prefix
+#
+# Only change this if you want to use a different compiler
+TOOLCHAIN	:= arm-none-eabi
 
-LIBSEVEN_LIB = $(LIBSEVEN)/lib/libseven.a
+# Uncomment this if you want to use C++
+#
+# USE_CXX := yes
 
-OBJECTS = $(SOURCES:%=$(BUILDDIR)/obj/%.o)
-DEPENDS = $(SOURCES:%=$(BUILDDIR)/dep/%.d)
-OBJDIRS = $(dir $(BUILDDIR) $(OBJECTS) $(DEPENDS))
+# Uncomment this if you want to use Link Time Optimization
+#
+# USE_LTO := yes
+
+#
+# Internal
+#
+
+CC := $(TOOLCHAIN)-gcc
+CXX := $(TOOLCHAIN)-g++
+OBJCOPY := $(TOOLCHAIN)-objcopy
+LD := $(if $(USE_CXX),$(CXX),$(CC))
+
+ELFFILE	:= $(BUILDDIR)/$(PROJECT).elf
+ROMFILE	:= $(BUILDDIR)/$(PROJECT).gba
+MAPFILE	:= $(BUILDDIR)/$(PROJECT).map
+
+default: $(ROMFILE)
 
 CFLAGS += \
-	  -mcpu=arm7tdmi \
-	  -mabi=aapcs \
-	  -mthumb \
-	  $(LIBDIRS:%=-I%/include) \
-	  $(INCLUDES:%=-I%) \
+	-mcpu=arm7tdmi \
+	-mabi=aapcs \
+	-mthumb \
+	$(LIBDIRS:%=-I%/include) \
+	$(INCLUDES:%=-I%) \
+	$(if $(USE_LTO),-flto,-fno-lto) \
 
 LDFLAGS += \
-	  -Wl,--gc-sections \
-	  -Wl,-Map,$(MAPFILE) \
-	  $(LIBDIRS:%=-L%/lib) \
-	  $(LIBS:%=-l%) \
+	-Wl,--gc-sections \
+	-Wl,-Map,$(MAPFILE) \
+	$(LIBDIRS:%=-L%/lib) \
+	$(LIBS:%=-l%) \
+	$(if $(USE_LTO),-flto,-fno-lto) \
+
+OBJECTS :=
+DEPENDS :=
+
+SPACE := $(subst ,, )
+
+eq = $(and $(findstring x$(1),x$(2)),$(findstring x$(2),x$(1)))
+
+pathmap = $(2)$(subst $(SPACE),/,$(foreach component,$(subst /, ,$(1)),$(if $(call eq,$(component),..),__,$(component))))$(3)
+
+obj = $(call pathmap,$(1),$(BUILDDIR)/obj/,.o)
+dep = $(call pathmap,$(1),$(BUILDDIR)/dep/,.d)
+
+define compile =
+$(call obj,$(1)): $(1)
+	@echo "compile $$<"
+	@$$(CC) -c -o $$@ $$(CFLAGS) -MMD -MP -MF $(call dep,$(1)) $$<
+
+OBJECTS += $(call obj,$(1))
+DEPENDS += $(call dep,$(1))
+endef
+
+$(foreach source,$(SOURCES),$(eval $(call compile,$(source))))
+
+DIRS := $(dir $(BUILDDIR) $(OBJECTS) $(DEPENDS))
 
 $(ROMFILE): $(ELFFILE)
-$(ELFFILE): $(OBJECTS) $(LIBSEVEN_LIB)
-$(OBJECTS): | builddirs $(BINARIES)
-
-%.gba:
-	@echo "$@"
-	@$(OBJCOPY) -O binary $< $@
+$(ELFFILE): $(OBJECTS)
+$(OBJECTS): | dirs
 
 %.elf:
-	@echo "$@"
-	@$(CC) -o $@ $^ $(LDFLAGS)
+	@echo "link    $@"
+	$(LD) -o $@ $^ $(LDFLAGS)
 
-$(BUILDDIR)/obj/%.o: %
-	@echo "$<"
-	@$(CC) -c -o $@ $(CFLAGS) -MMD -MP -MF $(BUILDDIR)/dep/$<.d $<
+%.gba:
+	@echo "objcopy $@"
+	$(OBJCOPY) -O binary $< $@
 
-$(LIBSEVEN_LIB):
-	@$(MAKE) -C $(LIBSEVEN)
+dirs:
+	mkdir -p $(DIRS)
 
-builddirs:
-	@mkdir -p $(OBJDIRS)
-
-/data/%: %
-	$(BIN2S) -a 4 -H $<.h $< > $<.s
+clean:
+	@echo "clean   $(BUILDDIR)"
+	@rm -rf $(BUILDDIR)
 
 bin2o:
 	@$(foreach file, $(DATA), bin2s -a 4 -H $(file))
 
-clean:
-	@echo "clean"
-	@rm -rf $(BUILDDIR)
+run: $(ELFFILE)
+	@mgba-qt $(ELFFILE)
 
-.PHONY: libseven builddirs clean
+.PHONY: default dirs clean run
 
 -include $(DEPENDS)
+
