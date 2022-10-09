@@ -5,6 +5,6 @@
 
 extern Object object_buffer[128];
 
-extern ShipData ship_data;
+extern volatile u8 spaceship_buffer[0x4000];
 
 #endif

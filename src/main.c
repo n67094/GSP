@@ -43,6 +43,7 @@ int main(void)
   // SceneManagerGoTo(mission_scene);
 
   while (true) {
+	gba_can_draw = false;
     inputPoll();
 
     Update();
