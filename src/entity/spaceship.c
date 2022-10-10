@@ -1,21 +1,15 @@
 #include <seven/hw/video.h>
 #include <seven/hw/input.h>
 
-#include "../../data/bitmaps/capsule.tiles.h"
-#include "../../data/bitmaps/wall.tiles.h"
-
 #include "../core/memory.h"
 #include "../core/trig.h"
-
-#include "../entity/earth.h"
-
-#include "../renderer/sphere.h"
 
 #include "../types.h"
 #include "../global.h"
 
-#include "spaceship-data.h"
+#include "parts-data.h"
 #include "spaceship.h"
+#include "spaceship-data.h"
 
 static void SpaceshipInitTileMap() {
   vu16 *tilemap_ptr = (u16 *)MAP_BASE_ADDR(8);
@@ -29,6 +23,7 @@ void SpaceshipInit(){
 	SpaceshipInitTileMap();
 	
 	//These palette entries are temporary. The unified sphere/spaceship palette will be copied instead once it is ready
+	extern u8 capsule_palette[512];
 	for(u32 i = 0; i < 16; i++) {
 		((u16 *)0x05000000)[i] = ((u16 *)capsule_palette)[i];
 	}
@@ -38,8 +33,12 @@ void SpaceshipInit(){
 }
 
 void SpaceshipDraw(s32 pitch, s32 spin){
+	ColumnData *current_column;
+	const PartData *current_part;
+	const SegmentData *current_segment;
+	vu8 *bufferPtr;
 	
-	static u32 univ_scale = 0x100; //this scale is calculated based on the dimensions of the ship,
+	static u32 univ_scale = 0x10; //this scale is calculated based on the dimensions of the ship,
 	//so that the entire ship will always fit inside the bg, no matter the orientation.
 	
 	u32 pos_x = 64;
@@ -58,28 +57,45 @@ void SpaceshipDraw(s32 pitch, s32 spin){
 			univ_scale = 0x170;
 		}
 	}
-	vu8 debug = 1;
 	
-	spin = spin & 0x3ff; //get the spin into a range of 0-2pi
-	spin += 0x200;
+	spin = spin & 0x3ff; 
+	spin += 0x200; //get the spin into a range of pi-3pi
 	
-	// why not on the header ?
-	// extern SegmentData capsule_wall; 				//This will eventually be referenced indirectly by the data for the ship.
-	const SegmentData *current_segment = &capsule_wall;	//But for testing, I'm just putting it here.
+	current_column = &center_column;
 	
-	u32 radius_1 = (current_segment->radius_1 * univ_scale) >> 8;
-	u32 radius_2 = (current_segment->radius_2 * univ_scale) >> 8;
-	//while(debug);
-	s32 height = (current_segment->height * univ_scale) >> 8;
-	u32 gfx_width = current_segment->gfx_width;
-	u32 gfx_height = current_segment->gfx_height;
-	cu8 *gfxPtr = current_segment->gfx_data + (spin >> (10 - gfx_height) << gfx_width);
-
-	/*SetupPosTableCylinder(TrigGetSin(pitch), radius_1, xPos);
-	u32 horiz_len = (TrigGetCos(pitch) * height) >> 16;
-	DrawCylinderWall(gfxPtr, texture_width, texture_height, spaceship_buffer + (yPos * 128) - (radius_1 * 128), horiz_len, radius_1);
-	*/
-	SetupPosTableCone(pitch, radius_1, radius_2, pos_x, height);
-	DrawConeWallBack(gfxPtr, spaceship_buffer + (pos_y << 7), gfx_width, gfx_height);
-	DrawConeWall(gfxPtr, spaceship_buffer + (pos_y << 7), gfx_width, gfx_height);
+	for(u32 i = 0; i < current_column->num_parts; i++){
+		current_part = current_column->parts_ptr[i];
+		
+		for(u32 j = 0; j < current_part->num_segments; j++){
+			current_segment = &current_part->segments_ptr[j];
+			
+			u32 type = current_segment->type;
+			u32 radius_1 = (current_segment->radius_1 * univ_scale) >> 8;
+			u32 radius_2 = (current_segment->radius_2 * univ_scale) >> 8;
+			s32 height = (current_segment->height * univ_scale) >> 8;
+			u32 gfx_width = current_segment->gfx_width;
+			u32 gfx_height = current_segment->gfx_height;
+			cu8 *gfxPtr = current_segment->gfx_data + (spin >> (10 - gfx_height) << gfx_width);
+			
+			if (type & 0x1){ //if this segment is a base
+			//skip for now
+			}
+			
+			else if (type & 0x2){ //if this segment is a cone wall
+				SetupPosTableCone(pitch, radius_1, radius_2, pos_x, height);
+				bufferPtr = spaceship_buffer + (pos_y << 7);
+				if((pitch ^ height) >= 0){//if pitch and height have the same signs, also render the backside
+					DrawConeWallBack(gfxPtr, bufferPtr, gfx_width, gfx_height);
+				}
+				DrawConeWall(gfxPtr, bufferPtr, gfx_width, gfx_height);
+			}
+			
+			else{ //if this segment is a cylinder wall
+				SetupPosTableCylinder(TrigGetSin(pitch), radius_1, pos_x);
+				u32 horiz_len = (TrigGetCos(pitch) * height) >> 8;
+				bufferPtr = spaceship_buffer + (pos_y << 7) - (radius_1 * 128);
+				DrawCylinderWall(gfxPtr, gfx_width, gfx_height, bufferPtr, horiz_len, radius_1);
+			}
+		}
+	}
 }

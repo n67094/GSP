@@ -1,6 +1,19 @@
 .section .iwram,"ax", %progbits
     .align  2
     .code   32
+	.global DrawBase
+	.type DrawBase STT_FUNC
+	
+DrawBase:
+
+
+
+
+
+
+.section .iwram,"ax", %progbits
+    .align  2
+    .code   32
 	.global SetupPosTableCone
 	.type SetupPosTableCone STT_FUNC
 	

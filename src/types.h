@@ -39,8 +39,8 @@ typedef struct PartData{
 
 //This is the data for one column of parts. A column is made up of many parts attached end-to-end.
 typedef struct ColumnData{
-	u8 bum_parts; //the number of parts that make up this column.
-	PartData *Parts_ptr; //a pointer to an array of NumParts PartData structs.
+	u8 num_parts; //the number of parts that make up this column.
+	const PartData **parts_ptr; //a pointer to an array of NumParts PartData struct pointers. First part is on top
 	u32 length; //The total length of this column in in-game units, from tip to tail.
 	s32 x_pos; //The X position of this column relative to the center column in in-game units, X is towards the camera when Spin and Pitch = 0.
 	s32 z_pos; //The Z position of this column relative to the center column in in-game units, Z is towars the top of the screen when Spin and Pitch = 0.
