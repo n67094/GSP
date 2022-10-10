@@ -23,8 +23,8 @@ void VBlank(u16 irqs)
   SceneVBlank();
 
   if (gba_can_draw == true) {
-    Draw();
     gba_can_draw = false;
+    Draw();
   }
 }
 
@@ -40,10 +40,8 @@ int main(void)
   irqCallbackSet(IRQ_VBLANK, VBlank, 0);
 
   SceneGoTo(title_scene);
-  // SceneManagerGoTo(mission_scene);
 
   while (true) {
-	gba_can_draw = false;
     inputPoll();
 
     Update();
