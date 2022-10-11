@@ -38,7 +38,7 @@ void SpaceshipDraw(s32 pitch, s32 spin){
 	const SegmentData *current_segment;
 	vu8 *bufferPtr;
 	
-	static u32 univ_scale = 0x10; //this scale is calculated based on the dimensions of the ship,
+	static u32 univ_scale = 0x55; //this scale is calculated based on the dimensions of the ship,
 	//so that the entire ship will always fit inside the bg, no matter the orientation.
 	
 	u32 pos_x = 64;

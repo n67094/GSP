@@ -14,18 +14,18 @@ typedef struct SegmentData{
 	cu8 type; //encodes various data about the segment so that the algorithm knows how to draw it.
 	//bit 0: 0 = wall, 1 = base.
 	//bit 1 if wall: 0 = cylinder, 1 = cone.
-	//bit 1 if base: 0 = always draw, 1 = do not draw if segment is mated with another part.
-	//bit 2: 0 = segment texture has no transparant pixels, 1 = segment texture has some transparant pixels.
-	//bit 3: 0 = static dimensions, 1 = variable dimensions. For example, Engine exhaust will have variable height.
-	//bit 4: reserved
-	//bit 5: reserved
-	//bit 6: reserved
-	//bit 7: reserved
-	cu8 radius_1; //the in-game radius of one side of this segment. (Top side, if cone)
+	//bit 1 if base: 0 = do not draw if segment is mated with another part, 1 = always draw 
+	//bit 2: 0 = static dimensions, 1 = variable height
+	//bit 3: unused
+	//bit 4: unused
+	//bit 5: unused
+	//bit 6: unused
+	//bit 7: unused
+	cu8 radius_1; //the in-game radius of one side of this segment. (larger side, if cone)
 	cu8 radius_2; //the in-game radius of the other side of this segment. Only used for cones.
-	cs8 height; //the in-game height of this segment. Not used for base segments
-	cu8 gfx_width; //the width of the texture in pixels.
-	cs8 gfx_height; //the height of the texture in pixels. Negative means smaller radius is on top (cones only)
+	cs8 height; //the in-game height of this segment. Not used for base segments. Negative means smaller radius is on top (cones only)
+	cu8 gfx_width; //the width of the texture in 2^n pixels.
+	cs8 gfx_height; //the height of the texture in 2^n pixels.
 	cu8 *gfx_data; //pointer to the start of this segments texture.
 } SegmentData;
 
@@ -44,7 +44,7 @@ typedef struct ColumnData{
 	u32 length; //The total length of this column in in-game units, from tip to tail.
 	s32 x_pos; //The X position of this column relative to the center column in in-game units, X is towards the camera when Spin and Pitch = 0.
 	s32 z_pos; //The Z position of this column relative to the center column in in-game units, Z is towars the top of the screen when Spin and Pitch = 0.
-	s32 y_pos; //The Y position of the top of this column relative to the top of the center column in in-game units.
+	s32 y_pos; //The Y position of the top of this column relative to the center of the spaceship
 } ColumnData;
 
 //This is the data for the ship as a whole. The ship is made up of one central column, with potentially more columns attached radially.
