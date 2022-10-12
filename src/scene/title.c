@@ -11,15 +11,17 @@
 
 #include "../global.h"
 #include "../types.h"
+
+#include "../debug/log.h"
+
 #include "../core/input.h"
 #include "../core/memory.h"
 #include "../core/object.h"
 #include "../core/tile.h"
 #include "../core/sound.h"
+
 #include "scene.h"
 
-#include "../debug/log.h"
-#include "seven/video/object.h"
 
 #define TITLE_INTERFACE_PALETTE_0 0
 
@@ -44,7 +46,8 @@ static void TitleOpen() {
   REG_DISPCNT = VIDEO_MODE_BITMAP_INDEXED | VIDEO_BG2_ENABLE | VIDEO_OBJ_ENABLE | VIDEO_OBJ_MAPPING_1D;
 
   MemCpy32(BG_PALETTE, title_palette, title_palette_size);
-  MemCpy32(MODE4_FRAME, title_tiles, title_tiles_size);
+
+  MemCpy32(MODE4_FRAME_0, title_tiles, title_tiles_size);
 
   MemCpy32(OBJ_PALETTE, title_obj_palette, title_obj_palette_size);
   MemCpy32(&OBJ4_CHARBLOCKS[1][TILE_TITLE_START_1 - 512], start_1_tiles, start_1_tiles_size);
@@ -73,8 +76,8 @@ static void TitleOpen() {
 
 static void TitleUpdate()
 {
-  if (~(REG_KEYINPUT)&KEY_START) {
-    SceneGoTo(mission_scene);
+  if (inputKeysPressed(KEY_START)) {
+    SceneGoTo(help_scene);
   }
 }
 
@@ -105,7 +108,7 @@ static void TitleVBlank() {
 }
 
 static void TitleClose() {
-  SoundStop(TITLE_SOUND_CHANNEL);
+  // SoundStop(TITLE_SOUND_CHANNEL);
 }
 
 Scene title_scene = {
