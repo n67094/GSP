@@ -3,7 +3,9 @@
 #include <seven/video/prelude.h>
 #include <seven/hw/video.h>
 
-#include "../../data/bitmaps/title.h"
+#include "../../data/bitmaps/title.palette.h"
+#include "../../data/bitmaps/title.tiles.h"
+
 #include "../../data/bitmaps/title-obj.palette.h"
 #include "../../data/bitmaps/start-1.tiles.h"
 #include "../../data/bitmaps/start-2.tiles.h"
@@ -49,9 +51,9 @@ static void TitleOpen() {
 
   MemCpy32(MODE4_FRAME_0, title_tiles, title_tiles_size);
 
-  MemCpy32(OBJ_PALETTE, title_obj_palette, title_obj_palette_size);
-  MemCpy32(&OBJ4_CHARBLOCKS[1][TILE_TITLE_START_1 - 512], start_1_tiles, start_1_tiles_size);
-  MemCpy32(&OBJ4_CHARBLOCKS[1][TILE_TITLE_START_2 - 512], start_2_tiles, start_2_tiles_size);
+ // MemCpy32(OBJ_PALETTE, title_obj_palette, title_obj_palette_size);
+ // MemCpy32(&OBJ4_CHARBLOCKS[1][TILE_TITLE_START_1 - 512], start_1_tiles, start_1_tiles_size);
+  // MemCpy32(&OBJ4_CHARBLOCKS[1][TILE_TITLE_START_2 - 512], start_2_tiles, start_2_tiles_size);
 
   Object *start1 = &object_buffer[OAM_TITLE_START_1];
   Object *start2 = &object_buffer[OAM_TITLE_START_2];

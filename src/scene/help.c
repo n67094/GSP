@@ -4,8 +4,6 @@
 #include <seven/video/prelude.h>
 #include <seven/hw/video.h>
 
-#include "../../data/bitmaps/title.h"
-#include "../../data/bitmaps/title.h"
 #include "../../data/sounds/title-sound.h"
 
 #include "../types.h"
@@ -25,10 +23,10 @@
 static void HelpOpen() {
   REG_DISPCNT = VIDEO_MODE_BITMAP_INDEXED | VIDEO_BG2_ENABLE;
 
-  MemCpy32(BG_PALETTE, title_palette, title_palette_size);
+ // MemCpy32(BG_PALETTE, title_palette, title_palette_size);
 
-  MemCpy32(MODE4_FRAME_0, title_tiles, title_tiles_size);
-  MemCpy32(MODE4_FRAME_1, title_tiles, title_tiles_size);
+ // MemCpy32(MODE4_FRAME_0, title_tiles, title_tiles_size);
+ // MemCpy32(MODE4_FRAME_1, title_tiles, title_tiles_size);
 }
 
 static void HelpUpdate()
