@@ -3,12 +3,11 @@
 #include <seven/video/prelude.h>
 #include <seven/hw/video.h>
 
-#include "../../data/bitmaps/title.palette.h"
 #include "../../data/bitmaps/title.tiles.h"
 
-#include "../../data/bitmaps/title-obj.palette.h"
-#include "../../data/bitmaps/start-1.tiles.h"
-#include "../../data/bitmaps/start-2.tiles.h"
+#include "../../data/sprites/title-object.palette.h"
+#include "../../data/sprites/start-1.tiles.h"
+#include "../../data/sprites/start-2.tiles.h"
 #include "../../data/sounds/title-sound.h"
 
 #include "../global.h"
@@ -24,17 +23,16 @@
 
 #include "scene.h"
 
-
 #define TITLE_INTERFACE_PALETTE_0 0
 
 #define OAM_TITLE_START_1 0
 #define TILE_TITLE_START_1 512
-#define POS_TITLE_START_1_X 64
+#define POS_TITLE_START_1_X 54
 #define POS_TITLE_START_1_Y 128
 
 #define OAM_TITLE_START_2 1
 #define TILE_TITLE_START_2 544
-#define POS_TITLE_START_2_X 128
+#define POS_TITLE_START_2_X 122
 #define POS_TITLE_START_2_Y 128
 
 #define DELAY_TITLE_START 30 //Frame so 0.5 sec
@@ -51,9 +49,9 @@ static void TitleOpen() {
 
   MemCpy32(MODE4_FRAME_0, title_tiles, title_tiles_size);
 
- // MemCpy32(OBJ_PALETTE, title_obj_palette, title_obj_palette_size);
- // MemCpy32(&OBJ4_CHARBLOCKS[1][TILE_TITLE_START_1 - 512], start_1_tiles, start_1_tiles_size);
-  // MemCpy32(&OBJ4_CHARBLOCKS[1][TILE_TITLE_START_2 - 512], start_2_tiles, start_2_tiles_size);
+  MemCpy32(OBJ_PALETTE, title_object_palette, title_object_palette_size);
+  MemCpy32(&OBJ4_CHARBLOCKS[1][TILE_TITLE_START_1 - 512], start_1_tiles, start_1_tiles_size);
+  MemCpy32(&OBJ4_CHARBLOCKS[1][TILE_TITLE_START_2 - 512], start_2_tiles, start_2_tiles_size);
 
   Object *start1 = &object_buffer[OAM_TITLE_START_1];
   Object *start2 = &object_buffer[OAM_TITLE_START_2];
@@ -80,6 +78,7 @@ static void TitleUpdate()
 {
   if (inputKeysPressed(KEY_START)) {
     SceneGoTo(help_scene);
+    //SceneGoTo(mission_scene);
   }
 }
 

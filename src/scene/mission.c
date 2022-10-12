@@ -31,7 +31,7 @@ static void MissionOpen()
   REG_BG3CNT = BG_TILE_8BPP | BG_PRIORITY(0) | BG_GFX_BASE(2) | BG_MAP_BASE(8);
 
   //EarthInit();
-  SpaceshipInit();
+  // SpaceshipInit();
   SpaceshipInit();
 
   InterfaceInit();

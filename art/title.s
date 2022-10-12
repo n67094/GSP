@@ -8,7 +8,7 @@
 @	+ bitmap not compressed
 @	Total size: 512 + 38400 = 38912
 @
-@	Time-stamp: 2022-10-12, 18:39:28
+@	Time-stamp: 2022-10-12, 18:44:35
 @	Exported by Cearn's GBA Image Transmogrifier, v0.8.16
 @	( http://www.coranac.com/projects/#grit )
 @
@@ -16,9 +16,9 @@
 
 	.section .rodata
 	.align	2
-	.global title_tiles		@ 38400 unsigned chars
-	.hidden title_tiles
-title_tiles:
+	.global titleBitmap		@ 38400 unsigned chars
+	.hidden titleBitmap
+titleBitmap:
 	.word 0x01010101,0x01010101,0x01010101,0x01010101,0x01010101,0x01010101,0x01010101,0x01010101
 	.word 0x01010101,0x01010101,0x01010101,0x01010101,0x01010101,0x01010101,0x01010101,0x01010101
 	.word 0x01010101,0x01010101,0x01010101,0x01010101,0x01010101,0x01010101,0x01010101,0x01010101
@@ -1371,9 +1371,9 @@ title_tiles:
 
 	.section .rodata
 	.align	2
-	.global title_palette		@ 512 unsigned chars
-	.hidden title_palette
-title_palette:
+	.global titlePal		@ 512 unsigned chars
+	.hidden titlePal
+titlePal:
 	.hword 0x0000,0x0000,0x30A2,0x6EB3,0x5147,0x7FFF,0x3881,0x54C2
 	.hword 0x5AA4,0x7383,0x6723,0x6B57,0x0438,0x0421,0x0421,0x0421
 	.hword 0x0842,0x0842,0x0842,0x0842,0x0842,0x0842,0x0842,0x0842
