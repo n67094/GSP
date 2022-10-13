@@ -9,5 +9,5 @@ const SegmentData m_engine_exhaust_wall = {
 const SegmentData m_engine_exhaust_segments[] = {m_engine_exhaust_wall};
 
 const PartData m_engine_exhaust = {
-	.num_segments = 1, .length = 24, .segments_ptr = m_engine_exhaust_segments
+	.num_segments = 1, .length = 64, .segments_ptr = m_engine_exhaust_segments
 };

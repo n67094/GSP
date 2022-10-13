@@ -5,5 +5,5 @@ const PartData *center_column_parts[] = {&parachute, &capsule, &m_fuel_tank, &m_
 
 ColumnData center_column = {
 	.num_parts = 5, .parts_ptr = center_column_parts,
-	.length = 192, .x_pos = 0, .z_pos = 0, .y_pos = 96
+	.length = 200, .x_pos = 0, .z_pos = 0, .y_pos = 100
 };
