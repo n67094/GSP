@@ -7,9 +7,6 @@
 #include "debug/assert.h"
 #include "debug/log.h"
 
-#include "core/label.h"
-#include "core/font.h"
-
 #include "scene/scene.h"
 
 bool gba_can_draw = false;
@@ -31,9 +28,6 @@ void VBlank(u16 irqs)
 int main(void)
 {
   LOG_INIT();
-
-  FontInit();
-  LabelInit(&default_font);
 
   irqInitDefault();
   irqEnableFull(IRQ_VBLANK);
