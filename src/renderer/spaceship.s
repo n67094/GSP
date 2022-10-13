@@ -105,7 +105,7 @@ noXposBigUpdate:
 	strh	r12, [r5], #2			@store the x value at the corrosponding y position in the table
 	subs	r4, r4, r6				@subtract the update value to the ypos
 	bpl		setupPixelCone
-	
+	strh	r12, [r5], #2			@one more duplicate entry to handle error accumulation problems
 	ldr		r13, R13Temp
 	pop		{r4-r12, r14}
 	bx		lr
