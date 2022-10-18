@@ -16,8 +16,8 @@ const SegmentData m_fuel_tank_bottom_base = {
 	.gfx_width = 6, .gfx_height = 0, .gfx_data = test_baseBitmap
 };
 
-const SegmentData m_fuel_tank_wall_segments[] = {m_fuel_tank_wall};
+const SegmentData m_fuel_tank_wall_segments[] = {m_fuel_tank_top_base, m_fuel_tank_wall, m_fuel_tank_bottom_base};
 
 const PartData m_fuel_tank = {
-	.num_segments = 1, .length = 64, .segments_ptr = m_fuel_tank_wall_segments
+	.num_segments = 3, .length = 64, .segments_ptr = m_fuel_tank_wall_segments
 };

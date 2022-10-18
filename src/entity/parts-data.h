@@ -24,5 +24,15 @@ extern const PartData m_engine;
 extern const SegmentData m_engine_exhaust_segments[];
 extern const PartData m_engine_exhaust;
 
+extern const SegmentData s_nosecone_segments[];
+extern const PartData s_nosecone;
 
+extern const SegmentData s_fuel_tank_segments[];
+extern const PartData s_fuel_tank;
+
+extern const SegmentData s_engine_segments[];
+extern const PartData s_engine;
+
+extern const SegmentData s_engine_exhaust_segments[];
+extern const PartData s_engine_exhaust;
 #endif

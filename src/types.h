@@ -42,15 +42,15 @@ typedef struct ColumnData{
 	u8 num_parts; //the number of parts that make up this column.
 	const PartData **parts_ptr; //a pointer to an array of NumParts PartData struct pointers. First part is on top
 	u32 length; //The total length of this column in in-game units, from tip to tail.
-	s32 x_pos; //The X position of this column relative to the center column in in-game units, X is towards the camera when Spin and Pitch = 0.
-	s32 z_pos; //The Z position of this column relative to the center column in in-game units, Z is towars the top of the screen when Spin and Pitch = 0.
+	u32 radius; //The distance of the center axis of this column to the center axis of the spaceship
+	u32 angle; //The angular position of this column around the center axis of the spaceship.
 	s32 y_pos; //The Y position of the top of this column relative to the center of the spaceship
 } ColumnData;
 
 //This is the data for the ship as a whole. The ship is made up of one central column, with potentially more columns attached radially.
 typedef struct ShipData{
 	u32 num_columns; //the number of columns that make up this ship.
-	ColumnData *columns_ptr; //a pointer to an array of NumColumns ColumnData structs.
+	ColumnData **columns_ptr; //a pointer to an array of NumColumns ColumnData structs.
 	s32 pitch; //the pitch of the ship, reletive to the camera, where 256 is pointing the front of the ship at the camera. Must be between -256 and 256.
 	s32 spin; //the spin of the ship, (or roll), reletive to the camera. 
 	u32 length; //The longest dimension of the ship in in-game units, used to make sure the entire ship can fit into the background layer.

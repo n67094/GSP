@@ -16,8 +16,8 @@ void ClearBuffer(vu8 *BufferPtr);
 void TransferBuffer(vu8 *BufferPtr, vu16 *VramPtr);
 
 void SpaceshipInit();
-void SpaceshipDraw(s32 pitch, s32 spin);
+void SpaceshipDraw(ShipData *);
 
-extern cu8 wall_tiles[];
+void SortColumns(ColumnData *[], ShipData *);
 
 #endif
