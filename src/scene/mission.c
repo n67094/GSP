@@ -25,10 +25,17 @@
 
 #include "scene.h"
 
+#define ANGLE_ACC 0x10
+
 SphereData earth;
+
+RotationMatrix spaceship_rotation;
+
 ShipData spaceship = {
-	.num_columns = 4, .columns_ptr = ship_columns, .pitch = 0, .spin = 0, .length = 200
+	.num_columns = 4, .columns_ptr = ship_columns, .length = 200, .rotation_matrix = &spaceship_rotation,
 };
+struct BgAffineDstData Bg3AffineTemp;
+struct BgAffineDstData *Bg3AffineReg = (struct BgAffineDstData *)0x4000030;
 
 static void MissionOpen()
 {
@@ -51,9 +58,6 @@ static void MissionOpen()
 
 static void MissionUpdate()
 {
-  if (~(REG_KEYINPUT)&KEY_UP) {
-    earth.pitch++;
-  }
 
   if(inputKeysReleased(KEY_LEFT)) {
     int i;
@@ -66,52 +70,50 @@ static void MissionUpdate()
   if(inputKeysReleased(KEY_A)) {
     StageNext();
   }
-
-  if (~(REG_KEYINPUT)&KEY_DOWN) {
-    earth.pitch--;
-  }
-
+  
   if (~(REG_KEYINPUT)&KEY_LEFT) {
-    earth.spin--;
+    spaceship.yaw_vel += ANGLE_ACC;
   }
 
   if (~(REG_KEYINPUT)&KEY_RIGHT) {
-    earth.spin++;
-  }
-  
-    if (~(REG_KEYINPUT)&KEY_LEFT) {
-    spaceship.pitch--;
-	if (spaceship.pitch < -255){
-		spaceship.pitch = -255;
-	}
-  }
-
-  if (~(REG_KEYINPUT)&KEY_RIGHT) {
-    spaceship.pitch++;
-	if (spaceship.pitch > 255){
-		spaceship.pitch = 255;
-	}
+    spaceship.yaw_vel -= ANGLE_ACC;
   }
   
   if (~(REG_KEYINPUT)&KEY_DOWN) {
-    spaceship.spin-=4;
+    spaceship.pitch_vel += ANGLE_ACC;
   }
 
   if (~(REG_KEYINPUT)&KEY_UP) {
-    spaceship.spin+=4;
+    spaceship.pitch_vel -= ANGLE_ACC;
+  }
+  
+  if (~(REG_KEYINPUT)&KEY_R) {
+    spaceship.roll_vel += ANGLE_ACC;
+  }
+
+  if (~(REG_KEYINPUT)&KEY_L) {
+    spaceship.roll_vel -= ANGLE_ACC;
   }
 
   // Turning this off for now until modified vblank routine is created.
   // EarthDraw(&earth);
-  TransferBuffer(spaceship_buffer, GFX_BASE_ADDR(2));
+
 
   InterfaceUpdate(7, 8, 3, 1234, 2345, 5);
+  
+  InterfaceDraw();
+  ClearBuffer(spaceship_buffer);
+  SpaceshipDraw(&spaceship, &Bg3AffineTemp);
 }
 
 static void MissionDraw() {
-  InterfaceDraw();
-  ClearBuffer(spaceship_buffer);
-  SpaceshipDraw(&spaceship);
+  TransferBuffer(spaceship_buffer, GFX_BASE_ADDR(2));
+  Bg3AffineReg->h_diff_x = Bg3AffineTemp.h_diff_x;
+  Bg3AffineReg->v_diff_x = Bg3AffineTemp.v_diff_x;
+  Bg3AffineReg->h_diff_y = Bg3AffineTemp.h_diff_y;
+  Bg3AffineReg->v_diff_y = Bg3AffineTemp.v_diff_y;
+  Bg3AffineReg->start_x = Bg3AffineTemp.start_x;
+  Bg3AffineReg->start_y = Bg3AffineTemp.start_y;
 }
 
 static void MissionVBlank() {}

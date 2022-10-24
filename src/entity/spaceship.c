@@ -1,5 +1,6 @@
 #include <seven/hw/video.h>
 #include <seven/hw/input.h>
+#include <seven/svc/affine.h>
 
 #include "../core/memory.h"
 #include "../core/trig.h"
@@ -32,24 +33,95 @@ void SpaceshipInit(){
 	*(u16 *)0x05000142 = 0x1f; //Setting the color Red to palette entry 0xa1
 }
 
-void SpaceshipDraw(ShipData *Spaceship){
+void SpaceshipDraw(ShipData *Spaceship, struct BgAffineDstData *Bg3AffineTemp){
 	ColumnData *current_column;
 	const PartData *current_part;
 	const SegmentData *current_segment;
 	ColumnData *sorted_columns[Spaceship->num_columns];
 	vu8 *bufferPtr;
-	s32 spin = Spaceship->spin;
-	s32 pitch = Spaceship->pitch;
+	s32 spin; //spin of the rocket
+	s32 pitch; //pitch of the rocket
+	s32 rotate; //the rotation of the background
 	u32 pos_x;
 	u32 pos_y = 64;
+	u32 update_matrix;
+	s32 delta_roll;
+	s32 delta_pitch;
+	s32 delta_yaw;
+	
 	
 	static s32 univ_scale = 0x9e; //this scale is calculated based on the dimensions of the ship,
 	//so that the entire ship will always fit inside the bg, no matter the orientation.
 	
+	update_matrix = 1;
+	
+	Spaceship->roll_pos += Spaceship->roll_vel;
+	Spaceship->pitch_pos += Spaceship->pitch_vel;
+	Spaceship->yaw_pos += Spaceship->yaw_vel;
+	
+	if(Spaceship->roll_pos >> 8){
+		delta_roll = Spaceship->roll_pos >> 8;
+		Spaceship->roll_pos -= (delta_roll << 8);
+		update_matrix = 1;
+	}
+	if(Spaceship->pitch_pos >> 8){
+		delta_pitch = Spaceship->pitch_pos >> 8;
+		Spaceship->pitch_pos -= (delta_pitch << 8);
+	}
+	if(Spaceship->yaw_pos >> 8){
+		delta_yaw = Spaceship->yaw_pos >> 8;
+		Spaceship->yaw_pos -= (delta_yaw << 8);
+	}
+	
+	if (~(REG_KEYINPUT)&KEY_LEFT) {
+		Spaceship->alpha += 5;
+	}
+
+	if (~(REG_KEYINPUT)&KEY_RIGHT) {
+		Spaceship->alpha -= 5;
+	}
+  
+	if (~(REG_KEYINPUT)&KEY_DOWN) {
+		Spaceship->beta += 5;		
+	}
+
+	if (~(REG_KEYINPUT)&KEY_UP) {
+		Spaceship->beta -= 5;
+	}
+  
+	if (~(REG_KEYINPUT)&KEY_R) {
+		Spaceship->gamma += 5;
+	}
+
+	if (~(REG_KEYINPUT)&KEY_L) {
+		Spaceship->gamma -= 5;
+	}
+	
+	Spaceship->beta &= 0x3ff; //clamp into range of 0 to 2pi
+	Spaceship->alpha &= 0x3ff; //clamp into range of 0 to 2pi
+	Spaceship->gamma &=0x3ff; //clamp into range of 0 to 2pi
+	
+	CreateMatrix(Spaceship->rotation_matrix, Spaceship->alpha, Spaceship->beta, Spaceship->gamma);
+	
+	rotate = GetRotate(Spaceship->rotation_matrix);
+	spin = GetSpin(Spaceship->rotation_matrix);
+	pitch = GetPitch(Spaceship->rotation_matrix);
+	
+	/*if (pitch > 0x300){
+		pitch -= 0x400;
+	}
+	else if(pitch > 0x100){
+		pitch = 0x200 - pitch;
+		spin += 0x200;
+		rotate += 0x200;
+	}	*/
+	
+	PrepareAffine(rotate, Bg3AffineTemp); //calculate the contents of the affine registers
+	
 	spin = spin & 0x3ff; 
 	spin += 0x200; //get the spin into a range of pi-3pi
 	
-	SortColumns(sorted_columns, Spaceship); //sort the columns from back to front.
+	SortColumns(sorted_columns, Spaceship, spin); //sort the columns from back to front.
 	
 	current_column = &side_column_1;
 	for(s32 k = 0; k < Spaceship->num_columns; k++){
@@ -153,17 +225,17 @@ void SpaceshipDraw(ShipData *Spaceship){
 	}
 }
 
-void SortColumns(ColumnData *sorted_columns[], ShipData *Spaceship){
+void SortColumns(ColumnData *sorted_columns[], ShipData *Spaceship, s32 spin){
 	s32 distance_table[Spaceship->num_columns];
 	s32 temp;
 	for(u32 i = 0; i < Spaceship->num_columns; i++){ //calculate the distance of each column
 		sorted_columns[i] = Spaceship->columns_ptr[i];
-		distance_table[i] = TrigGetCos(Spaceship->spin + Spaceship->columns_ptr[i]->angle) * Spaceship->columns_ptr[i]->radius;
+		distance_table[i] = TrigGetCos(spin + Spaceship->columns_ptr[i]->angle) * Spaceship->columns_ptr[i]->radius;
 	}
 	for(u32 i = 0; i < Spaceship->num_columns; i++){//selection sort because I am lazy
 		s32 lowest = i;
 		for(u32 j = i+1; j < Spaceship->num_columns; j++){
-			if (distance_table[j] < distance_table[lowest]){
+			if (distance_table[j] > distance_table[lowest]){
 				lowest = j;
 			}
 		}
@@ -174,4 +246,62 @@ void SortColumns(ColumnData *sorted_columns[], ShipData *Spaceship){
 		sorted_columns[i] = sorted_columns[lowest];
 		sorted_columns[lowest] = (ColumnData *)temp;
 	}
+}
+
+void CreateMatrix(RotationMatrix *RM, s32 alpha, s32 beta, s32 gamma){
+	vu8 debug = 1;
+	//while(debug);
+	s32 cr = TrigGetCos(alpha);
+	s32 sr = TrigGetSin(alpha);
+	s32 cp = TrigGetCos(beta);
+	s32 sp = TrigGetSin(beta);
+	s32 cy = TrigGetCos(gamma);
+	s32 sy = TrigGetSin(gamma);
+	
+
+	//combine the rotations into a new rotation matrix
+	RM->X1 = cp*cr >> 8;
+	RM->X2 = cp*sr >> 8;
+	RM->X3 = -sp;
+	RM->Y1 = (sy*sp*cr >> 8) - cy*sr >> 8;
+	RM->Y2 = (sy*sp*sr >> 8) + cy*cr >> 8;
+	RM->Y3 = sy*cp >> 8;
+	RM->Z1 = (cy*sp*cr >> 8) + sy*sr >> 8; 
+	RM->Z2 = (cy*sp*sr >> 8) - sy*cr >> 8;
+	RM->Z3 = cy*cp >> 8;
+}
+
+void PrepareAffine(s32 rotate, struct BgAffineDstData *Bg3AffineTemp){
+	struct BgAffineSrcData Bg3Affine = {0x4000, 0x4000, 120, 80, 0x100, 0x100, (rotate & 0x3ff) << 6};
+
+	svcBgAffineSet(&Bg3Affine, Bg3AffineTemp, 1);
+}
+
+s32 GetRotate(RotationMatrix *RM){
+	s32 rotate;
+	rotate = TrigGetArcSin(RM->X2 * TrigGetInvPythSqrt(RM->X3) >> 8);
+	if(RM->X1 < 0){
+		rotate = 0x200 - rotate;
+	}
+	return rotate;
+}
+
+s32 GetPitch(RotationMatrix *RM){
+	if((RM->X1 * RM->X1 + RM->X2 * RM->X2) <= 0x400){ //if the ship is really close to pointing directly at or away from the screen
+		s32 temp = TrigGetPythHyp(RM->X1 * RM->X1 + RM->X2 * RM->X2); //use this more precise formula
+		if(RM->X3 > 0){
+			temp = -temp;
+		}	
+		return TrigGetArcCos(temp);
+	}
+	return TrigGetArcSin(-RM->X3); //otherwise, use this general case formula
+}
+
+s32 GetSpin(RotationMatrix *RM){
+	s32 spin;
+	spin = TrigGetArcSin(RM->Y3 * TrigGetInvPythSqrt(RM->X3) >> 8);
+	if(RM->Z3 < 0){
+		spin = 0x200 - spin;
+	}
+	return spin;
 }

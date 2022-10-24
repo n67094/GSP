@@ -2,6 +2,7 @@
 #define ENTITIY_SPACESHIP_H
 
 #include "../types.h"
+#include <seven/svc/affine.h>
 
 void DrawCylinderWall(cu8 *GfxPtr, u32 GfxWidth, u32 GfxHeight, vu8 *BufferPtr, u32 horiz_len, u32 Radius);
 void DrawConeWall(cu8 *GfxCenterPtr, vu8 *BufferCenterPtr, u32 GfxWidth, u32 GfxHeight);
@@ -16,8 +17,13 @@ void ClearBuffer(vu8 *BufferPtr);
 void TransferBuffer(vu8 *BufferPtr, vu16 *VramPtr);
 
 void SpaceshipInit();
-void SpaceshipDraw(ShipData *);
+void SpaceshipDraw(ShipData *, struct BgAffineDstData *);
 
-void SortColumns(ColumnData *[], ShipData *);
+void SortColumns(ColumnData *[], ShipData *, s32);
+void CreateMatrix(RotationMatrix *, s32, s32, s32);
+void PrepareAffine(s32, struct BgAffineDstData *);
+s32 GetRotate(RotationMatrix *);
+s32 GetPitch(RotationMatrix *);
+s32 GetSpin(RotationMatrix *);
 
 #endif
