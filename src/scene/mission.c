@@ -8,6 +8,8 @@
 #include "../debug/log.h"
 
 #include "../core/label.h"
+#include "../core/font.h"
+#include "../core/tile.h"
 
 #include "../entity/earth.h"
 #include "../entity/spaceship.h"
@@ -30,17 +32,21 @@ ShipData spaceship = {
 
 static void MissionOpen()
 {
+  ClearBuffer((vu8 *)MEM_VRAM_OBJ);
+
   REG_DISPCNT = VIDEO_MODE_AFFINE |/* VIDEO_BG2_ENABLE |*/ VIDEO_BG3_ENABLE | VIDEO_OBJ_ENABLE | VIDEO_OBJ_MAPPING_1D;
   REG_BG2CNT = BG_TILE_8BPP | BG_PRIORITY(1);
   REG_BG3CNT = BG_TILE_8BPP | BG_PRIORITY(0) | BG_GFX_BASE(2) | BG_MAP_BASE(8);
+
+  FontInit();
+  LabelInit(&default_font);
 
   //EarthInit();
   SpaceshipInit();
 
   InterfaceInit();
-  
-  REG_WAITCNT = WAIT_ROM_N_2 | WAIT_ROM_S_1 | WAIT_PREFETCH_ENABLE;
 
+  REG_WAITCNT = WAIT_ROM_N_2 | WAIT_ROM_S_1 | WAIT_PREFETCH_ENABLE;
 }
 
 static void MissionUpdate()
