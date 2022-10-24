@@ -8,6 +8,18 @@ typedef struct SphereData {
 	s32 spin;
 } SphereData;
 
+typedef struct RotationMatrix {
+	s32 X1; 
+	s32 X2;
+	s32 X3;
+	s32 Y1;
+	s32 Y2;
+	s32 Y3;
+	s32 Z1;
+	s32 Z2;
+	s32 Z3;
+} RotationMatrix;
+
 //this is the data for one segment, a segment is a piece that uses a single texture. There are two main types of segments, walls, and bases.
 //Walls are the parts that go around cylinders/cones. Bases are the flat part at the end of a cylinder/cone.
 typedef struct SegmentData{
@@ -51,8 +63,16 @@ typedef struct ColumnData{
 typedef struct ShipData{
 	u32 num_columns; //the number of columns that make up this ship.
 	ColumnData **columns_ptr; //a pointer to an array of NumColumns ColumnData structs.
-	s32 pitch; //the pitch of the ship, reletive to the camera, where 256 is pointing the front of the ship at the camera. Must be between -256 and 256.
-	s32 spin; //the spin of the ship, (or roll), reletive to the camera. 
+	RotationMatrix *rotation_matrix; //x is along axis of ship, y is vertical when pitch and spin are 0, z is towards screen when pitch and spin is zero
+	s32 roll_pos; //When value becomes greater than 256, rotation matrix is updated, and this value is reduced by 256
+	s32 pitch_pos; //When value becomes greater than 256, rotation matrix is updated, and this value is reduced by 256
+	s32 yaw_pos; //When value becomes greater than 256, rotation matrix is updated, and this value is reduced by 256
+	s32 roll_vel; //how much the roll_pos changes per frame
+	s32 pitch_vel; //how much the roll_pos changes per frame
+	s32 yaw_vel; //how much the roll_pos changes per frame
+	s32 alpha; //the rotation about the X axis
+	s32 beta; //the rotation about the Y axis
+	s32 gamma; //the rotation about the Z axis
 	u32 length; //The longest dimension of the ship in in-game units, used to make sure the entire ship can fit into the background layer.
 } ShipData;
 
