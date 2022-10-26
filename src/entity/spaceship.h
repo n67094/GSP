@@ -24,6 +24,8 @@ void CreateMatrix(RotationMatrix *, s32, s32, s32);
 void PrepareAffine(s32, struct BgAffineDstData *);
 s32 GetRotate(RotationMatrix *);
 s32 GetPitch(RotationMatrix *);
-s32 GetSpin(RotationMatrix *);
+s32 GetSpin(RotationMatrix *, s32);
+
+extern u16 InverseTable[128];
 
 #endif

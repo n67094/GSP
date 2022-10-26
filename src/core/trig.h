@@ -16,9 +16,11 @@ extern s32 TrigGetCsc(s32) IWRAM_CODE ARM_CODE;
 extern s32 TrigGetTan(s32) IWRAM_CODE ARM_CODE;
 extern s32 TrigGetCot(s32) IWRAM_CODE ARM_CODE;
 extern s32 TrigGetPythHyp(s32) IWRAM_CODE ARM_CODE;
+extern s32 TrigGetInverse(s32) IWRAM_CODE ARM_CODE;
 
 extern u32 trig_table_group_1[256];
 extern u32 trig_table_group_2[256];
 
+extern u16 InverseTable[128];
 
 #endif
