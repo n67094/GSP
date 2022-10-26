@@ -24,10 +24,12 @@ void SpaceshipInit(){
 	SpaceshipInitTileMap();
 	
 	//These palette entries are temporary. The unified sphere/spaceship palette will be copied instead once it is ready
-	extern u8 capsule_palette[512];
+	extern u8 capsulePal[32];
 	for(u32 i = 0; i < 16; i++) {
-		((u16 *)0x05000000)[i] = ((u16 *)capsule_palette)[i];
+	 ((u16 *)0x05000020)[i] = ((u16 *)capsulePal)[i + 16];
 	}
+	
+	// MemCpy16(BG_PALETTE_BANK[1], capsulePal, 32);
 	
 	*(u16 *)0x05000140 = 0x3ff; //Setting the color Yellow to palette entry 0xa0
 	*(u16 *)0x05000142 = 0x1f; //Setting the color Red to palette entry 0xa1

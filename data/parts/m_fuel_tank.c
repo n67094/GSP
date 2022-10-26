@@ -8,7 +8,7 @@ const SegmentData m_fuel_tank_top_base = {
 
 const SegmentData m_fuel_tank_wall = {
 	.type = 0x0, .radius_1 = 32, .radius_2 = 32, .height = 64,
-	.gfx_width = 6, .gfx_height = 7, .gfx_data = wall_tiles
+	.gfx_width = 6, .gfx_height = 7, .gfx_data = m_fuel_tankBitmap
 };
 
 const SegmentData m_fuel_tank_bottom_base = {

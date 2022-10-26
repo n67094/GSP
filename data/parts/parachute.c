@@ -3,7 +3,7 @@
 
 const SegmentData parachute_wall = {
 	.type = 0x2, .radius_1 = 16, .radius_2 = 0, .height = -8,
-	.gfx_width = 6, .gfx_height = 7, .gfx_data = wall_tiles
+	.gfx_width = 4, .gfx_height = 5, .gfx_data = parachuteBitmap
 };
 
 const SegmentData parachute_bottom_base = {
