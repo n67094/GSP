@@ -33,12 +33,13 @@ void SpaceshipInit(){
 	*(u16 *)0x05000142 = 0x1f; //Setting the color Red to palette entry 0xa1
 }
 
-void SpaceshipDraw(ShipData *Spaceship, struct BgAffineDstData *Bg3AffineTemp){
+void SpaceshipDraw(ShipData *Spaceship, struct BgAffineDstData *Bg3AffineTemp, CameraData *Camera){
 	ColumnData *current_column;
 	const PartData *current_part;
 	const SegmentData *current_segment;
 	ColumnData *sorted_columns[Spaceship->num_columns];
 	vu8 *bufferPtr;
+	RotationMatrix result_matrix;
 	s32 spin; //spin of the rocket
 	s32 pitch; //pitch of the rocket
 	s32 rotate; //the rotation of the background
@@ -72,49 +73,42 @@ void SpaceshipDraw(ShipData *Spaceship, struct BgAffineDstData *Bg3AffineTemp){
 		delta_yaw = Spaceship->yaw_pos >> 8;
 		Spaceship->yaw_pos -= (delta_yaw << 8);
 	}
-	
-	if (~(REG_KEYINPUT)&KEY_LEFT) {
-		Spaceship->alpha += 5;
+	if(REG_KEYINPUT&KEY_B){
+		if (~(REG_KEYINPUT)&KEY_LEFT) {
+			Spaceship->alpha += 5;
+		}
+		
+		if (~(REG_KEYINPUT)&KEY_RIGHT) {
+			Spaceship->alpha -= 5;
+		}
+		
+		if (~(REG_KEYINPUT)&KEY_DOWN) {
+			Spaceship->beta += 3;		
+		}
+		
+		if (~(REG_KEYINPUT)&KEY_UP) {
+			Spaceship->beta -= 3;
+		}
+		
+		if (~(REG_KEYINPUT)&KEY_R) {
+			Spaceship->gamma += 5;
+		}
+		
+		if (~(REG_KEYINPUT)&KEY_L) {
+			Spaceship->gamma -= 5;
+		}
 	}
-
-	if (~(REG_KEYINPUT)&KEY_RIGHT) {
-		Spaceship->alpha -= 5;
-	}
-  
-	if (~(REG_KEYINPUT)&KEY_DOWN) {
-		Spaceship->beta += 3;		
-	}
-
-	if (~(REG_KEYINPUT)&KEY_UP) {
-		Spaceship->beta -= 3;
-	}
-  
-	if (~(REG_KEYINPUT)&KEY_R) {
-		Spaceship->gamma += 5;
-	}
-
-	if (~(REG_KEYINPUT)&KEY_L) {
-		Spaceship->gamma -= 5;
-	}
-	
 	Spaceship->beta &= 0x3ff; //clamp into range of 0 to 2pi
 	Spaceship->alpha &= 0x3ff; //clamp into range of 0 to 2pi
 	Spaceship->gamma &=0x3ff; //clamp into range of 0 to 2pi
 	
-	CreateMatrix(Spaceship->rotation_matrix, Spaceship->alpha, Spaceship->beta, Spaceship->gamma);
+	CreateMatrix(Spaceship->rotation_matrix, Spaceship->alpha, Spaceship->beta, Spaceship->gamma); //create the rotation matrix for the spaceship
 	
-	rotate = GetRotate(Spaceship->rotation_matrix);
-	spin = GetSpin(Spaceship->rotation_matrix, rotate);
-	pitch = GetPitch(Spaceship->rotation_matrix);
+	MultiplyCameraMatrix(&result_matrix, Camera->spin, Camera->pitch, Spaceship->rotation_matrix); 
 	
-	/*if (pitch > 0x300){
-		pitch -= 0x400;
-	}
-	else if(pitch > 0x100){
-		pitch = 0x200 - pitch;
-		spin += 0x200;
-		rotate += 0x200;
-	}	*/
+	rotate = GetRotate(&result_matrix);
+	spin = GetSpin(&result_matrix, rotate);
+	pitch = GetPitch(&result_matrix);
 	
 	PrepareAffine(rotate, Bg3AffineTemp); //calculate the contents of the affine registers
 	
@@ -249,8 +243,7 @@ void SortColumns(ColumnData *sorted_columns[], ShipData *Spaceship, s32 spin){
 }
 
 void CreateMatrix(RotationMatrix *RM, s32 alpha, s32 beta, s32 gamma){
-	vu8 debug = 1;
-	//while(debug);
+
 	s32 cr = TrigGetCos(alpha);
 	s32 sr = TrigGetSin(alpha);
 	s32 cp = TrigGetCos(beta);
@@ -269,6 +262,36 @@ void CreateMatrix(RotationMatrix *RM, s32 alpha, s32 beta, s32 gamma){
 	RM->Z1 = (cy*sp*cr >> 8) + sy*sr >> 8; 
 	RM->Z2 = (cy*sp*sr >> 8) - sy*cr >> 8;
 	RM->Z3 = cy*cp >> 8;
+}
+
+void MultiplyCameraMatrix(RotationMatrix *Mdest, s32 spin, s32 pitch, RotationMatrix *M2){
+	RotationMatrix temp_rot;
+	RotationMatrix *temp = &temp_rot;
+	
+	s32 cs = TrigGetCos(spin);
+	s32 cp = TrigGetCos(pitch);
+	s32 ss = TrigGetSin(spin);
+	s32 sp = TrigGetSin(pitch);
+	
+	temp->X1 = cs;
+	temp->X2 = sp * ss >> 8;
+	temp->X3 = cp * ss >> 8;
+	temp->Y1 = 0;
+	temp->Y2 = cp;
+	temp->Y3 = -sp;
+	temp->Z1 = -ss;
+	temp->Z2 = sp * cs >> 8;
+	temp->Z3 = cs * cp >> 8;
+	
+	Mdest->X1 = temp->X1 * M2->X1 + temp->Y1 * M2->X2 + temp->Z1 * M2->X3 >> 8;
+	Mdest->X2 = temp->X2 * M2->X1 + temp->Y2 * M2->X2 + temp->Z2 * M2->X3 >> 8;
+	Mdest->X3 = temp->X3 * M2->X1 + temp->Y3 * M2->X2 + temp->Z3 * M2->X3 >> 8;
+	Mdest->Y1 = temp->X1 * M2->Y1 + temp->Y1 * M2->Y2 + temp->Z1 * M2->Y3 >> 8;
+	Mdest->Y2 = temp->X2 * M2->Y1 + temp->Y2 * M2->Y2 + temp->Z2 * M2->Y3 >> 8;
+	Mdest->Y3 = temp->X3 * M2->Y1 + temp->Y3 * M2->Y2 + temp->Z3 * M2->Y3 >> 8;
+	Mdest->Z1 = temp->X1 * M2->Z1 + temp->Y1 * M2->Z2 + temp->Z1 * M2->Z3 >> 8;
+	Mdest->Z2 = temp->X2 * M2->Z1 + temp->Y2 * M2->Z2 + temp->Z2 * M2->Z3 >> 8;
+	Mdest->Z3 = temp->X3 * M2->Z1 + temp->Y3 * M2->Z2 + temp->Z3 * M2->Z3 >> 8;
 }
 
 void PrepareAffine(s32 rotate, struct BgAffineDstData *Bg3AffineTemp){

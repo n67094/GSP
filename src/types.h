@@ -76,4 +76,10 @@ typedef struct ShipData{
 	u32 length; //The longest dimension of the ship in in-game units, used to make sure the entire ship can fit into the background layer.
 } ShipData;
 
+typedef struct CameraData{
+	RotationMatrix *rotation_matrix;
+	s32 spin;
+	s32 pitch;
+}CameraData;
+
 #endif
