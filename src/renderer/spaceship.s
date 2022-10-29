@@ -1,6 +1,19 @@
 .section .iwram,"ax", %progbits
     .align  2
     .code   32
+	.global DrawBase
+	.type DrawBase STT_FUNC
+	
+DrawBase:
+
+
+
+
+
+
+.section .iwram,"ax", %progbits
+    .align  2
+    .code   32
 	.global SetupPosTableCone
 	.type SetupPosTableCone STT_FUNC
 	
@@ -92,7 +105,9 @@ noXposBigUpdate:
 	strh	r12, [r5], #2			@store the x value at the corrosponding y position in the table
 	subs	r4, r4, r6				@subtract the update value to the ypos
 	bpl		setupPixelCone
-	
+	bic		r12, r12, #0x3f			@sometimes due to rounding errors, one more entry is needed
+	orr		r12, r12, #0x24			@same angle as last entry, both y decrement.
+	strh	r12, [r5], #2			@store the special value
 	ldr		r13, R13Temp
 	pop		{r4-r12, r14}
 	bx		lr

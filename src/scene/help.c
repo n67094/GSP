@@ -48,7 +48,7 @@ static void HelpUpdate()
 		}
 	}
 
-  if(inputKeysPressed(KEY_A)) {
+  if(inputKeysReleased(KEY_A)) {
     SceneGoTo(mission_scene);
   }
 }
