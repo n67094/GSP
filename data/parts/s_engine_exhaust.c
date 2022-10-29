@@ -3,7 +3,7 @@
 
 const SegmentData s_engine_exhaust_wall = {
 	.type = 0x2, .radius_1 = 8, .radius_2 = 0, .height = 32,
-	.gfx_width = 6, .gfx_height = 7, .gfx_data = wall_tiles
+	.gfx_width = 5, .gfx_height = 6, .gfx_data = m_exhaustBitmap
 };
 
 const SegmentData s_engine_exhaust_segments[] = {s_engine_exhaust_wall};

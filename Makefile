@@ -1,5 +1,11 @@
 .SUFFIXES:
 
+# tricks
+define newline
+
+
+endef
+
 # Path to gba-minrt
 MINRT := ./externals/libseven/gba-minrt
 
@@ -26,8 +32,7 @@ BUILDDIR := build
 
 # Used to convert bin files to .s and .h with bin2s
 BIN2S := ./tools/bin2s/bin2s
-DATA := $(shell find ./data -type f -name '*.*' ! -name '*.c' ! -name '*.h' ! -name '*.s' ! -path '*/.*')
-BINARIES = :$(DATA:%=/data/%)
+DATA := $(shell find data -type f -name '*.*' ! -name '*.c' ! -name '*.h' ! -name '*.s' ! -path '*/.*')
 
 # C compiler flags
 TARGET := release
@@ -37,8 +42,6 @@ FLAGS.release :=
 FLAGS.debug := -g3 -gdwarf-4 -DNDEBUG
 
 CFLAGS := $(FLAGS.$(TARGET)) $(FLAGS)
-
-CFLAGS := -g3 -gdwarf-4 -O2 -std=c99 -ffunction-sections -fdata-sections
 
 # Linker flags
 LDFLAGS := -mthumb -nostartfiles \
@@ -115,7 +118,7 @@ DIRS := $(dir $(BUILDDIR) $(OBJECTS) $(DEPENDS))
 
 $(ROMFILE): $(ELFFILE)
 $(ELFFILE): $(OBJECTS)
-$(OBJECTS): | dirs
+$(OBJECTS): | dirs bin
 
 %.elf:
 	@echo "link    $@"
@@ -125,15 +128,16 @@ $(OBJECTS): | dirs
 	@echo "objcopy $@"
 	$(OBJCOPY) -O binary $< $@
 
+bin:
+	$(foreach file, $(DATA), $(BIN2S) -a 4 -H $(file).h $(file) > $(file).s $(newline))
+
 dirs:
+	echo $(DATA)
 	mkdir -p $(DIRS)
 
 clean:
 	@echo "clean   $(BUILDDIR)"
 	@rm -rf $(BUILDDIR)
-
-bin2o:
-	@$(foreach file, $(DATA), bin2s -a 4 -H $(file))
 
 run: $(ELFFILE)
 	@mgba-qt $(ELFFILE)

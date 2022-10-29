@@ -8,7 +8,7 @@ const SegmentData capsule_top_base = {
 
 const SegmentData capsule_wall = {
 	.type = 0x2, .radius_1 = 32, .radius_2 = 16, .height = -32,
-	.gfx_width = 6, .gfx_height = 7, .gfx_data = capsule_tiles
+	.gfx_width = 6, .gfx_height = 7, .gfx_data = capsuleBitmap
 };
 
 const SegmentData capsule_bottom_base = {

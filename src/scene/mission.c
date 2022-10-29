@@ -8,6 +8,8 @@
 #include "../debug/log.h"
 
 #include "../core/label.h"
+#include "../core/font.h"
+#include "../core/tile.h"
 
 #include "../entity/earth.h"
 #include "../entity/spaceship.h"
@@ -48,13 +50,15 @@ static void MissionOpen()
   REG_BG2CNT = BG_TILE_8BPP | BG_PRIORITY(1);
   REG_BG3CNT = BG_TILE_8BPP | BG_PRIORITY(0) | BG_GFX_BASE(2) | BG_MAP_BASE(8);
 
+  ClearBuffer((vu8 *)MEM_VRAM_OBJ);
+
   EarthInit();
+  FontInit();
+  LabelInit(&default_font);
   SpaceshipInit();
-
   InterfaceInit();
-  
-  REG_WAITCNT = WAIT_ROM_N_2 | WAIT_ROM_S_1 | WAIT_PREFETCH_ENABLE;
 
+  REG_WAITCNT = WAIT_ROM_N_2 | WAIT_ROM_S_1 | WAIT_PREFETCH_ENABLE;
 }
 
 static void MissionUpdate()

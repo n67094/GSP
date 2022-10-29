@@ -4,4 +4,4 @@ compile_commands.json
 .cache
 tags
 /**/.DS_Store
-bin2s.exe
+*/bin2s.exe

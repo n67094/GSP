@@ -8,12 +8,12 @@ const SegmentData s_engine_top_base = {
 
 const SegmentData s_engine_wall_1 = {
 	.type = 0x2, .radius_1 = 16, .radius_2 = 0, .height = 8,
-	.gfx_width = 6, .gfx_height = 7, .gfx_data = wall_tiles
+	.gfx_width = 5, .gfx_height = 7, .gfx_data = m_engineBitmap
 };
 
 const SegmentData s_engine_wall_2 = {
 	.type = 0x2, .radius_1 = 8, .radius_2 = 0, .height = -16,
-	.gfx_width = 6, .gfx_height = 7, .gfx_data = wall_tiles
+	.gfx_width = 2, .gfx_height = 5, .gfx_data = m_engine_2Bitmap
 };
 
 const SegmentData s_engine_segments[] = {s_engine_top_base, s_engine_wall_1, s_engine_wall_2};

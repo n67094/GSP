@@ -7,9 +7,6 @@
 #include "debug/assert.h"
 #include "debug/log.h"
 
-#include "core/label.h"
-#include "core/font.h"
-
 #include "scene/scene.h"
 
 bool gba_can_draw = false;
@@ -23,8 +20,8 @@ void VBlank(u16 irqs)
   SceneVBlank();
 
   if (gba_can_draw == true) {
-    Draw();
     gba_can_draw = false;
+    Draw();
   }
 }
 
@@ -32,18 +29,13 @@ int main(void)
 {
   LOG_INIT();
 
-  FontInit();
-  LabelInit(&default_font);
-
   irqInitDefault();
   irqEnableFull(IRQ_VBLANK);
   irqCallbackSet(IRQ_VBLANK, VBlank, 0);
 
   SceneGoTo(title_scene);
-  // SceneManagerGoTo(mission_scene);
 
   while (true) {
-	gba_can_draw = false;
     inputPoll();
 
     Update();

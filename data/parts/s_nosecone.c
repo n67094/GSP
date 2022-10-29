@@ -3,7 +3,7 @@
 
 const SegmentData s_nosecone_wall = {
 	.type = 0x2, .radius_1 = 16, .radius_2 = 0, .height = -16,
-	.gfx_width = 6, .gfx_height = 7, .gfx_data = wall_tiles
+	.gfx_width = 5, .gfx_height = 6, .gfx_data = noseconeBitmap
 };
 
 const SegmentData s_nosecone_bottom_base = {

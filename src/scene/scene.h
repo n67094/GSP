@@ -9,7 +9,7 @@ typedef struct scene {
 	void (*Close)(void);
 } Scene;
 
-extern Scene title_scene, mission_scene;
+extern Scene title_scene, help_scene, mission_scene;
 
 void SceneOpen(void);
 
