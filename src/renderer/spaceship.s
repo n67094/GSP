@@ -538,6 +538,7 @@ Clear512Bytes:
     .align  2
     .code   32
 	.global TransferBuffer
+	.global InverseTable
 	.type TransferBuffer STT_FUNC
 
 @This function transfers a 16kb bitmap buffer to VRAM, while converting it into tiled format.

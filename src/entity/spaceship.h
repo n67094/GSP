@@ -17,13 +17,16 @@ void ClearBuffer(vu8 *BufferPtr);
 void TransferBuffer(vu8 *BufferPtr, vu16 *VramPtr);
 
 void SpaceshipInit();
-void SpaceshipDraw(ShipData *, struct BgAffineDstData *);
+void SpaceshipDraw(ShipData *, struct BgAffineDstData *, CameraData *);
 
 void SortColumns(ColumnData *[], ShipData *, s32);
 void CreateMatrix(RotationMatrix *, s32, s32, s32);
+void MultiplyCameraMatrix(RotationMatrix *, s32, s32, RotationMatrix *);
 void PrepareAffine(s32, struct BgAffineDstData *);
 s32 GetRotate(RotationMatrix *);
 s32 GetPitch(RotationMatrix *);
-s32 GetSpin(RotationMatrix *);
+s32 GetSpin(RotationMatrix *, s32);
+
+extern u16 InverseTable[128];
 
 #endif

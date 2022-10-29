@@ -46,7 +46,6 @@ static void TitleOpen() {
   REG_DISPCNT = VIDEO_MODE_BITMAP_INDEXED | VIDEO_BG2_ENABLE | VIDEO_OBJ_ENABLE | VIDEO_OBJ_MAPPING_1D;
 
   MemCpy32(BG_PALETTE, title_palette, title_palette_size);
-
   MemCpy32(MODE4_FRAME_0, title_tiles, title_tiles_size);
 
   MemCpy32(OBJ_PALETTE, title_object_palette, title_object_palette_size);

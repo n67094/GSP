@@ -8,6 +8,7 @@
 #include "../types.h"
 
 #include "earth.h"
+#include "spaceship.h" //for the clearbuffer function
 
 static void EarthInitTileMap() {
   vu16 *tilemap_ptr = (vu16 *)MEM_VRAM;
@@ -23,7 +24,8 @@ static void EarthInitTileMap() {
 
 void EarthInit() {
   MemCpy16(BG_PALETTE, earth_palette, 512);
-
+  ClearBuffer(GFX_BASE_ADDR(0));
+  ClearBuffer(GFX_BASE_ADDR(1));
   EarthInitTileMap();
 }
 

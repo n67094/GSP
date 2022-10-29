@@ -169,3 +169,16 @@ s32 TrigGetPythHyp(s32 legs){ //only valid for very small hypotenuses, up to 32
 	}
 	return sqrtTable[legs];
 }
+
+s32 TrigGetInverse(s32 num){
+	u32 negative;
+	if(num < 0){
+		negative = 1;
+		num = -num;
+	}
+	num = InverseTable[num];
+	if(negative){
+		num = -num;
+	}
+	return num;
+}	

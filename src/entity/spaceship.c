@@ -35,12 +35,13 @@ void SpaceshipInit(){
 	*(u16 *)0x05000142 = 0x1f; //Setting the color Red to palette entry 0xa1
 }
 
-void SpaceshipDraw(ShipData *Spaceship, struct BgAffineDstData *Bg3AffineTemp){
+void SpaceshipDraw(ShipData *Spaceship, struct BgAffineDstData *Bg3AffineTemp, CameraData *Camera){
 	ColumnData *current_column;
 	const PartData *current_part;
 	const SegmentData *current_segment;
 	ColumnData *sorted_columns[Spaceship->num_columns];
 	vu8 *bufferPtr;
+	RotationMatrix result_matrix;
 	s32 spin; //spin of the rocket
 	s32 pitch; //pitch of the rocket
 	s32 rotate; //the rotation of the background
@@ -74,49 +75,42 @@ void SpaceshipDraw(ShipData *Spaceship, struct BgAffineDstData *Bg3AffineTemp){
 		delta_yaw = Spaceship->yaw_pos >> 8;
 		Spaceship->yaw_pos -= (delta_yaw << 8);
 	}
-	
-	if (~(REG_KEYINPUT)&KEY_LEFT) {
-		Spaceship->alpha += 5;
+	if(REG_KEYINPUT&KEY_B){
+		if (~(REG_KEYINPUT)&KEY_LEFT) {
+			Spaceship->alpha += 5;
+		}
+		
+		if (~(REG_KEYINPUT)&KEY_RIGHT) {
+			Spaceship->alpha -= 5;
+		}
+		
+		if (~(REG_KEYINPUT)&KEY_DOWN) {
+			Spaceship->beta += 3;		
+		}
+		
+		if (~(REG_KEYINPUT)&KEY_UP) {
+			Spaceship->beta -= 3;
+		}
+		
+		if (~(REG_KEYINPUT)&KEY_R) {
+			Spaceship->gamma += 5;
+		}
+		
+		if (~(REG_KEYINPUT)&KEY_L) {
+			Spaceship->gamma -= 5;
+		}
 	}
-
-	if (~(REG_KEYINPUT)&KEY_RIGHT) {
-		Spaceship->alpha -= 5;
-	}
-  
-	if (~(REG_KEYINPUT)&KEY_DOWN) {
-		Spaceship->beta += 5;		
-	}
-
-	if (~(REG_KEYINPUT)&KEY_UP) {
-		Spaceship->beta -= 5;
-	}
-  
-	if (~(REG_KEYINPUT)&KEY_R) {
-		Spaceship->gamma += 5;
-	}
-
-	if (~(REG_KEYINPUT)&KEY_L) {
-		Spaceship->gamma -= 5;
-	}
-	
 	Spaceship->beta &= 0x3ff; //clamp into range of 0 to 2pi
 	Spaceship->alpha &= 0x3ff; //clamp into range of 0 to 2pi
 	Spaceship->gamma &=0x3ff; //clamp into range of 0 to 2pi
 	
-	CreateMatrix(Spaceship->rotation_matrix, Spaceship->alpha, Spaceship->beta, Spaceship->gamma);
+	CreateMatrix(Spaceship->rotation_matrix, Spaceship->alpha, Spaceship->beta, Spaceship->gamma); //create the rotation matrix for the spaceship
 	
-	rotate = GetRotate(Spaceship->rotation_matrix);
-	spin = GetSpin(Spaceship->rotation_matrix);
-	pitch = GetPitch(Spaceship->rotation_matrix);
+	MultiplyCameraMatrix(&result_matrix, Camera->spin, Camera->pitch, Spaceship->rotation_matrix); 
 	
-	/*if (pitch > 0x300){
-		pitch -= 0x400;
-	}
-	else if(pitch > 0x100){
-		pitch = 0x200 - pitch;
-		spin += 0x200;
-		rotate += 0x200;
-	}	*/
+	rotate = GetRotate(&result_matrix);
+	spin = GetSpin(&result_matrix, rotate);
+	pitch = GetPitch(&result_matrix);
 	
 	PrepareAffine(rotate, Bg3AffineTemp); //calculate the contents of the affine registers
 	
@@ -251,8 +245,7 @@ void SortColumns(ColumnData *sorted_columns[], ShipData *Spaceship, s32 spin){
 }
 
 void CreateMatrix(RotationMatrix *RM, s32 alpha, s32 beta, s32 gamma){
-	vu8 debug = 1;
-	//while(debug);
+
 	s32 cr = TrigGetCos(alpha);
 	s32 sr = TrigGetSin(alpha);
 	s32 cp = TrigGetCos(beta);
@@ -273,6 +266,36 @@ void CreateMatrix(RotationMatrix *RM, s32 alpha, s32 beta, s32 gamma){
 	RM->Z3 = cy*cp >> 8;
 }
 
+void MultiplyCameraMatrix(RotationMatrix *Mdest, s32 spin, s32 pitch, RotationMatrix *M2){
+	RotationMatrix temp_rot;
+	RotationMatrix *temp = &temp_rot;
+	
+	s32 cs = TrigGetCos(spin);
+	s32 cp = TrigGetCos(pitch);
+	s32 ss = TrigGetSin(spin);
+	s32 sp = TrigGetSin(pitch);
+	
+	temp->X1 = cs;
+	temp->X2 = sp * ss >> 8;
+	temp->X3 = cp * ss >> 8;
+	temp->Y1 = 0;
+	temp->Y2 = cp;
+	temp->Y3 = -sp;
+	temp->Z1 = -ss;
+	temp->Z2 = sp * cs >> 8;
+	temp->Z3 = cs * cp >> 8;
+	
+	Mdest->X1 = temp->X1 * M2->X1 + temp->Y1 * M2->X2 + temp->Z1 * M2->X3 >> 8;
+	Mdest->X2 = temp->X2 * M2->X1 + temp->Y2 * M2->X2 + temp->Z2 * M2->X3 >> 8;
+	Mdest->X3 = temp->X3 * M2->X1 + temp->Y3 * M2->X2 + temp->Z3 * M2->X3 >> 8;
+	Mdest->Y1 = temp->X1 * M2->Y1 + temp->Y1 * M2->Y2 + temp->Z1 * M2->Y3 >> 8;
+	Mdest->Y2 = temp->X2 * M2->Y1 + temp->Y2 * M2->Y2 + temp->Z2 * M2->Y3 >> 8;
+	Mdest->Y3 = temp->X3 * M2->Y1 + temp->Y3 * M2->Y2 + temp->Z3 * M2->Y3 >> 8;
+	Mdest->Z1 = temp->X1 * M2->Z1 + temp->Y1 * M2->Z2 + temp->Z1 * M2->Z3 >> 8;
+	Mdest->Z2 = temp->X2 * M2->Z1 + temp->Y2 * M2->Z2 + temp->Z2 * M2->Z3 >> 8;
+	Mdest->Z3 = temp->X3 * M2->Z1 + temp->Y3 * M2->Z2 + temp->Z3 * M2->Z3 >> 8;
+}
+
 void PrepareAffine(s32 rotate, struct BgAffineDstData *Bg3AffineTemp){
 	struct BgAffineSrcData Bg3Affine = {0x4000, 0x4000, 120, 80, 0x100, 0x100, (rotate & 0x3ff) << 6};
 
@@ -281,29 +304,100 @@ void PrepareAffine(s32 rotate, struct BgAffineDstData *Bg3AffineTemp){
 
 s32 GetRotate(RotationMatrix *RM){
 	s32 rotate;
-	rotate = TrigGetArcSin(RM->X2 * TrigGetInvPythSqrt(RM->X3) >> 8);
-	if(RM->X1 < 0){
-		rotate = 0x200 - rotate;
+	if((RM->X1 <= 0x20) && (RM->X1 >= -0x20)){
+		if((RM->X1 * RM->X1 + RM->X2 * RM->X2) <= 0x400){ //if the spaceship is pointing towards or away from the camera
+			if(RM->X1 * RM->X1 < RM->X2 * RM->X2){
+				rotate = TrigGetArcCos(TrigGetInverse(TrigGetPythHyp(RM->X1 * RM->X1 + RM->X2 * RM->X2)) * RM->X1 >> 8);
+				if(RM->X2 > 0){
+					rotate = 0x200 - rotate;
+				}
+				else{
+					rotate -= 0x200;
+				}
+			}
+			else{
+				rotate = TrigGetArcSin(TrigGetInverse(TrigGetPythHyp(RM->X1 * RM->X1 + RM->X2 * RM->X2)) * RM->X2 >> 8);
+				if(RM->X1 > 0){
+					rotate = 0x200 - rotate;
+				}
+				rotate -= 0x200;
+			}
+		}
+		else{
+			rotate = TrigGetArcCos(RM->X1 * TrigGetInvPythSqrt(RM->X3) >> 8);
+			if(RM->X2 < 0){
+			rotate = -rotate;
+			}
+		}
 	}
-	return rotate;
+	else{
+		rotate = TrigGetArcSin(RM->X2 * TrigGetInvPythSqrt(RM->X3) >> 8);
+		if(RM->X1 < 0){
+			rotate = 0x200 - rotate;
+		}
+	}
+	return rotate & 0x3ff;
 }
 
 s32 GetPitch(RotationMatrix *RM){
 	if((RM->X1 * RM->X1 + RM->X2 * RM->X2) <= 0x400){ //if the ship is really close to pointing directly at or away from the screen
 		s32 temp = TrigGetPythHyp(RM->X1 * RM->X1 + RM->X2 * RM->X2); //use this more precise formula
 		if(RM->X3 > 0){
-			temp = -temp;
+			return -TrigGetArcCos(temp);
 		}	
 		return TrigGetArcCos(temp);
 	}
 	return TrigGetArcSin(-RM->X3); //otherwise, use this general case formula
 }
 
-s32 GetSpin(RotationMatrix *RM){
+s32 GetSpin(RotationMatrix *RM, s32 rotate){
 	s32 spin;
-	spin = TrigGetArcSin(RM->Y3 * TrigGetInvPythSqrt(RM->X3) >> 8);
-	if(RM->Z3 < 0){
-		spin = 0x200 - spin;
+	s32 phi;
+	if((RM->X1 * RM->X1 + RM->X2 * RM->X2) <= 0x800){//if the ship is really close to pointing directly at or away from the screen
+		if(RM->Y2 * RM->Y2 < RM->Y1 * RM->Y1){
+			phi = TrigGetArcCos(RM->Y2);
+		}
+		else{
+			phi = TrigGetArcSin(RM->Y1);
+			if(RM->Y1 > 0){
+				phi = -phi;
+			}
+			if(RM->Z1 > 0){
+				phi = -phi;
+			}
+			else{
+				phi += 0x200;
+			}
+			if(RM->X3 > 0){
+				phi = 0x200 - phi;
+			}
+		}
+		if(RM->X3 < 0){
+			if (RM->Y1 > 0){
+				phi = -phi;
+			}
+			spin = phi - rotate + 0x200;
+		}
+		else{
+			if(RM->Y1 < 0){
+				phi = -phi;
+			}
+			spin = phi + rotate + 0x200;
+		}
 	}
+	else if((RM->Z3 >= -0x20) && (RM->Z3 <= 0x20)){
+		spin = TrigGetArcCos(RM->Z3 * TrigGetInvPythSqrt(RM->X3) >> 8);
+		if(RM->Y3 > 0){
+			spin = -spin;
+		}
+		spin -= 0x200;
+	}
+	else{
+		spin = TrigGetArcSin(RM->Y3 * TrigGetInvPythSqrt(RM->X3) >> 8);
+		if(RM->Z3 > 0){
+			spin = 0x200 - spin;
+		}
+	}
+
 	return spin;
 }
