@@ -49,7 +49,6 @@ make
 
 **Commande :**
 ```
-make bin //optional if up to date
 make TARGET=debug
 ```
 This will includes to possibility to use log and assert, c.f (src/debug/)
