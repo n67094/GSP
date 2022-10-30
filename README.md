@@ -36,13 +36,20 @@ Binary file can now be put in the /data folder with the extension you want ex: p
 
 **Commande :**
 ```
+make bin //optional if up to date
 make TARGET=release
+```
+or
+```
+make bin //optional if up to date
+make
 ```
 
 ## Debug
 
 **Commande :**
 ```
+make bin //optional if up to date
 make TARGET=debug
 ```
 ## Note

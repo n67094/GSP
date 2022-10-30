@@ -118,25 +118,21 @@ DIRS := $(dir $(BUILDDIR) $(OBJECTS) $(DEPENDS))
 
 $(ROMFILE): $(ELFFILE)
 $(ELFFILE): $(OBJECTS)
-$(OBJECTS): | dirs bin
+$(OBJECTS): | dirs
 
 %.elf:
-	@echo "link    $@"
-	$(LD) -o $@ $^ $(LDFLAGS)
+	@$(LD) -o $@ $^ $(LDFLAGS)
 
 %.gba:
-	@echo "objcopy $@"
-	$(OBJCOPY) -O binary $< $@
+	@$(OBJCOPY) -O binary $< $@
 
 bin:
 	$(foreach file, $(DATA), $(BIN2S) -a 4 -H $(file).h $(file) > $(file).s $(newline))
 
 dirs:
-	echo $(DATA)
-	mkdir -p $(DIRS)
+	@mkdir -p $(DIRS)
 
 clean:
-	@echo "clean   $(BUILDDIR)"
 	@rm -rf $(BUILDDIR)
 
 run: $(ELFFILE)
