@@ -1,6 +1,6 @@
 # GSP
 
-This is a GBA game made during the GBA game jam 2022
+This is a GBA game made for the GBA game jam 2022
 
 # Build
 
@@ -30,7 +30,7 @@ cd tools/bin2s
 make
 ```
 
-Binary file can now be put in the /data folder with the extension you want ex: player.tiles, player.palette
+The tool is build you will be able to run **make bin** to convert bin file to **.h** and **.s** files
 
 ## Release
 
@@ -52,6 +52,8 @@ make
 make bin //optional if up to date
 make TARGET=debug
 ```
+this will includes to possibility to use log and assert, c.f (src/debug/)
+
 ## Note
 
 Durgin the development we noticed that mGBA 0.9.2 had unexpected behavoir, we recommand you to use the version 0.9.3, or the hardware
