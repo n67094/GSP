@@ -52,7 +52,7 @@ make
 make bin //optional if up to date
 make TARGET=debug
 ```
-this will includes to possibility to use log and assert, c.f (src/debug/)
+This will includes to possibility to use log and assert, c.f (src/debug/)
 
 ## Note
 
