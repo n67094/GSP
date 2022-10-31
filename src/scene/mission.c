@@ -5,6 +5,7 @@
 #include <seven/hw/video.h>
 #include <seven/hw/waitstate.h>
 #include <seven/hw/irq.h>
+#include <seven/hw/dma.h>
 
 #include "../debug/log.h"
 
@@ -108,7 +109,7 @@ static void MissionOpen()
   SpaceshipInit();
   InterfaceInit();
 
-  SoundInit();
+  //SoundInit();
   SoundPlay(mission_sound_0, MISSION_SOUND_0_CHANNEL);
 
   REG_WAITCNT = WAIT_ROM_N_2 | WAIT_ROM_S_1 | WAIT_PREFETCH_ENABLE;
@@ -201,11 +202,10 @@ static void MissionUpdate()
   //set the earth's position
   struct BgAffineSrcData Bg2Affine = {0x4000, 0x4000, (camera.spin + 120) << 22 >> 22, camera.pitch + 80, 0x100, 0x100, 0x10};
   svcBgAffineSet(&Bg2Affine, &Bg2AffineTemp, 1);
-  
   irqEnable(IRQ_VBLANK); //enable Vblank earlier than usual, since EarthDraw is designed to be interruptable
   if(earth_in_progress){
 	earth_frames++;
-	EarthResume(); //restore the progress of EarthDraw
+	EarthResume(); //restore the progress of EarthDraw 
   }
   else{
 	earth_in_progress = 1;

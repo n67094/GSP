@@ -244,11 +244,13 @@ earth_in_progress:
 earth_saved_progress: @all the registers 0-12, 14, fiq8-fiq14, spsr so that the sphere can resume where it left off
 	.word	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 	EarthPause:
+	@b		EarthPause
+	push	{r0-r12, r14}
 	adr		r0, earth_saved_progress + 16
 	stmia	r0, {r4-r11}							@save registers 4-11
-	ldr		r5, [r13, #0x24] 						@load r14 from the system stack
+	ldr		r5, [r13, #0x5c] 						@load r14 from the system stack
 	str		r5, earth_saved_progress + (13 * 4)		@save r14
-	ldr		r5, [r13, #0x1c]						@load the psr from the system stack
+	ldr		r5, [r13, #0x54]						@load the psr from the system stack
 	str		r5, earth_saved_progress + (23 * 4)		@save the psr
 	msr		cpsr_c, #0xd1							@switch to fiq mode
 	adr		r4, earth_saved_progress + (15 * 4)		@prepare to save the fiq registers
@@ -262,6 +264,7 @@ earth_saved_progress: @all the registers 0-12, 14, fiq8-fiq14, spsr so that the 
 	adr		r4, pauseexit							@store the exit of the sphere draw function to the interrupt stack
 	str		r4, [r13, #20]							@so that the function ends immediately, and the next frame can start	
 	msr		cpsr_c, #0xdf							@switch back to system mode
+	pop		{r0-r12, r14}
 	bx		lr
 	
 EarthResume:
