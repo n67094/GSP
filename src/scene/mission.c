@@ -197,14 +197,14 @@ static void MissionUpdate()
 		camera.pitch = -0xff;
 	  }
     }
-    if (~(REG_KEYINPUT)&KEY_R){
+    if (~(REG_KEYINPUT)&KEY_L){
 	  camera.zoom += CAMERA_SPEED;
 	  if(camera.zoom > 0x800){
 		camera.zoom = 0x800;
 	  }
     }
   
-    if(~(REG_KEYINPUT)&KEY_L){
+    if(~(REG_KEYINPUT)&KEY_R){
 	  camera.zoom -= CAMERA_SPEED;
 	  if(camera.zoom < 0x60){
 		camera.zoom = 0x60;
