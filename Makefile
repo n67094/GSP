@@ -13,7 +13,7 @@ MINRT := ./externals/libseven/gba-minrt
 LIBSEVEN := ./externals/libseven
 
 # Name of your ROM
-PROJECT := GSP
+PROJECT := GSP_jam
 
 # Source files
 SOURCES := $(MINRT)/src/crt0.s $(shell find ./src ./data -type f -name '*.c' -o -name '*.s' ! -path '*/.*')
