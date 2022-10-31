@@ -6,6 +6,9 @@
 #include <seven/hw/waitstate.h>
 #include <seven/hw/irq.h>
 
+#include "../../data/meta/altitude-meta.h"
+#include "../../data/meta/velocity-meta.h"
+
 #include "../debug/log.h"
 
 #include "../core/label.h"
@@ -55,6 +58,29 @@ struct BgAffineDstData *Bg3AffineReg = (struct BgAffineDstData *)0x4000030;
 struct BgAffineDstData Bg2AffineTemp;
 struct BgAffineDstData *Bg2AffineReg = (struct BgAffineDstData *)0x4000020;
 
+#define MISSION_FRAME_MAX 0x20
+#define MISSION_OVERFLOW_MAX 0xFF
+
+u32 mission_frame_count = 0;
+u32 mission_overflow_count = 0;
+
+u16 altitude = 0;
+u16 velocity = 0;
+
+static void MissionMetaUpdate() {
+	++mission_frame_count;
+
+	if(mission_frame_count == MISSION_FRAME_MAX) {
+	  mission_frame_count = 0;
+
+	  ++mission_overflow_count;
+	  mission_overflow_count &= MISSION_OVERFLOW_MAX; // wrappe
+	}
+
+	altitude = altitude_meta[mission_overflow_count] + ((altitude_meta[mission_overflow_count + 1] - altitude_meta[mission_overflow_count]) * mission_frame_count >> 5);
+	velocity = velocity_meta[mission_overflow_count] + ((velocity_meta[mission_overflow_count + 1] - velocity_meta[mission_overflow_count]) * mission_frame_count >> 5);
+}
+
 static void MissionOpen()
 {
   REG_DISPCNT = VIDEO_MODE_AFFINE | VIDEO_BG2_ENABLE | VIDEO_BG3_ENABLE | VIDEO_OBJ_ENABLE | VIDEO_OBJ_MAPPING_1D;
@@ -70,10 +96,15 @@ static void MissionOpen()
   InterfaceInit();
 
   REG_WAITCNT = WAIT_ROM_N_2 | WAIT_ROM_S_1 | WAIT_PREFETCH_ENABLE;
+
+	altitude = altitude_meta[0];
+	velocity = velocity_meta[0];
 }
 
 static void MissionUpdate()
 {
+	MissionMetaUpdate();
+
 	static s32 throttle;
 	//unfortunately, I did not have time to implement staging...
   /*if(inputKeysReleased(KEY_LEFT)) { 
@@ -150,7 +181,7 @@ static void MissionUpdate()
     }
   }
 
-   InterfaceUpdate(7, 8, 3, earth_frames_taken, 2345, (throttle * 48) >> 8);
+  InterfaceUpdate(7, 8, 3, altitude, velocity, (throttle * 48) >> 8);
   
   InterfaceDraw();
   ClearBuffer(spaceship_buffer);
