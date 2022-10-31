@@ -81,6 +81,7 @@ typedef struct CameraData{
 	RotationMatrix *rotation_matrix;
 	s32 spin;
 	s32 pitch;
+	s32 zoom;
 }CameraData;
 
 #endif

@@ -22,7 +22,7 @@ void SpaceshipDraw(ShipData *, struct BgAffineDstData *, CameraData *, s32);
 void SortColumns(ColumnData *[], ShipData *, s32);
 void CreateMatrix(RotationMatrix *, s32, s32, s32);
 void MultiplyCameraMatrix(RotationMatrix *, s32, s32, RotationMatrix *);
-void PrepareAffine(s32, struct BgAffineDstData *);
+void PrepareAffine(s32, struct BgAffineDstData *, s32);
 s32 GetRotate(RotationMatrix *);
 s32 GetPitch(RotationMatrix *);
 s32 GetSpin(RotationMatrix *, s32);

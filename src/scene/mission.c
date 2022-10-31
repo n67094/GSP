@@ -59,7 +59,7 @@ ShipData spaceship = {
 };
 
 CameraData camera = {
-	.rotation_matrix = &camera_rotation, .spin = 0, .pitch = 0
+	.rotation_matrix = &camera_rotation, .spin = 0, .pitch = 0, .zoom = 0x100
 };
 
 struct BgAffineDstData Bg3AffineTemp;
@@ -164,6 +164,19 @@ static void MissionUpdate()
 	  camera.pitch -= CAMERA_SPEED;
 	  if(camera.pitch < -0xff){
 		camera.pitch = -0xff;
+	  }
+    }
+    if (~(REG_KEYINPUT)&KEY_R){
+	  camera.zoom += CAMERA_SPEED;
+	  if(camera.zoom > 0x800){
+		camera.zoom = 0x800;
+	  }
+    }
+  
+    if(~(REG_KEYINPUT)&KEY_L){
+	  camera.zoom -= CAMERA_SPEED;
+	  if(camera.zoom < 0x60){
+		camera.zoom = 0x60;
 	  }
     }
   }

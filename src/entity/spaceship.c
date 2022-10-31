@@ -115,7 +115,7 @@ void SpaceshipDraw(ShipData *Spaceship, struct BgAffineDstData *Bg3AffineTemp, C
 	spin = GetSpin(&result_matrix, rotate);
 	pitch = GetPitch(&result_matrix);
 	
-	PrepareAffine(rotate, Bg3AffineTemp); //calculate the contents of the affine registers
+	PrepareAffine(rotate, Bg3AffineTemp, Camera->zoom); //calculate the contents of the affine registers
 	
 	spin = spin & 0x3ff; 
 	spin += 0x200; //get the spin into a range of pi-3pi
@@ -339,8 +339,8 @@ void MultiplyCameraMatrix(RotationMatrix *Mdest, s32 spin, s32 pitch, RotationMa
 	Mdest->Z3 = temp->X3 * M2->Z1 + temp->Y3 * M2->Z2 + temp->Z3 * M2->Z3 >> 8;
 }
 
-void PrepareAffine(s32 rotate, struct BgAffineDstData *Bg3AffineTemp){
-	struct BgAffineSrcData Bg3Affine = {0x4000, 0x4000, 120, 80, 0x100, 0x100, (rotate & 0x3ff) << 6};
+void PrepareAffine(s32 rotate, struct BgAffineDstData *Bg3AffineTemp, s32 zoom){
+	struct BgAffineSrcData Bg3Affine = {0x4000, 0x4000, 120, 80, zoom, zoom, (rotate & 0x3ff) << 6};
 
 	svcBgAffineSet(&Bg3Affine, Bg3AffineTemp, 1);
 }
