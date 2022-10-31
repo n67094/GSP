@@ -144,9 +144,16 @@ map_pixel:							@This is where the X position, Y position, and Pitch (P) are pl
 	sub		r3, r3, #1				@If X is a multiple of 4, then we need to swap out the storage register for an empty one.
 	tst		r3, #3
 	bne		map_pixel
+	msr		cpsr_c, #0xdf			@disable interrupts
+	mov		r11, #0x04000000	
+wait4hblank:	
+	ldrh	r12, [r11, #4]			@load the display status
+	tst		r12, #0x2				@check the hblank flag
+	bne		wait4hblank
 	str		r5, [r1], #-4			@store the 4 pixels
 	mov		r2, r2, ror #8
 	str		r2, [r6], #4
+	msr		cpsr_c, #0x1f			@enable interrupts
 	tst		r1, #7					@is this at the boundry of a tile?
 	subne	r1, r1, #56				@if so, move the address to the start of the next tile
 	addne	r6, r6, #56
@@ -212,9 +219,16 @@ map_pixel_bottom:					@This is where the X position, Y position, and Pitch (P) a
 	sub		r3, r3, #1				@If X is a multiple of 4, then we need to swap out the storage register for an empty one.
 	tst		r3, #3
 	bne		map_pixel_bottom
+	msr		cpsr_c, #0xdf			@disable interrupts
+	mov		r11, #0x04000000	
+wait4hblankbottom:	
+	ldrh	r12, [r11, #4]			@load the display status
+	tst		r12, #0x2				@check the hblank flag
+	bne		wait4hblankbottom
 	str		r5, [r1], #-4			@store the 4 pixels
 	mov		r2, r2, ror #8
 	str		r2, [r6], #4
+	msr		cpsr_c, #0x1f			@enable interrupts
 	tst		r1, #7					@is this at the boundry of a tile?
 	subne	r1, r1, #56				@if so, move the address to the start of the next tile
 	addne	r6, r6, #56
