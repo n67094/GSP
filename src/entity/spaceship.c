@@ -244,7 +244,7 @@ void SpaceshipDraw(ShipData *Spaceship, struct BgAffineDstData *Bg3AffineTemp, C
 						}
 						SetupPosTableCone(pitch, radius_1, radius_2, pos_x, height);
 						bufferPtr = spaceship_buffer + (pos_y << 7);
-						if(((pitch ^ height) <= 0) || (type & 8)){//if pitch and height have the same signs, also render the backside
+						if(((pitch ^ height) <= 0) || ((type & 8) && (throttle == 0))){//if pitch and height have the same signs, also render the backside
 							DrawConeWallBack(gfxPtr, bufferPtr, gfx_width, gfx_height);
 						}
 						DrawConeWall(gfxPtr, bufferPtr, gfx_width, gfx_height);
