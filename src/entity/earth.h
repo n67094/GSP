@@ -5,6 +5,6 @@
 
 void EarthInit(void);
 
-void EarthDraw(SphereData *earth);
+void EarthDraw(SphereData *earth, u32);
 
 #endif

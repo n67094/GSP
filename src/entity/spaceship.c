@@ -35,8 +35,9 @@ void SpaceshipInit(){
 	*(u16 *)0x05000142 = 0x1f; //Setting the color Red to palette entry 0xa1
 }
 
-void SpaceshipDraw(ShipData *Spaceship, struct BgAffineDstData *Bg3AffineTemp, CameraData *Camera){
+void SpaceshipDraw(ShipData *Spaceship, struct BgAffineDstData *Bg3AffineTemp, CameraData *Camera, s32 throttle){
 	ColumnData *current_column;
+	static u32 frameCount = 0;
 	const PartData *current_part;
 	const SegmentData *current_segment;
 	ColumnData *sorted_columns[Spaceship->num_columns];
@@ -56,13 +57,15 @@ void SpaceshipDraw(ShipData *Spaceship, struct BgAffineDstData *Bg3AffineTemp, C
 	static s32 univ_scale = 0x9e; //this scale is calculated based on the dimensions of the ship,
 	//so that the entire ship will always fit inside the bg, no matter the orientation.
 	
+	frameCount++;
+	
 	update_matrix = 1;
 	
 	Spaceship->roll_pos += Spaceship->roll_vel;
 	Spaceship->pitch_pos += Spaceship->pitch_vel;
 	Spaceship->yaw_pos += Spaceship->yaw_vel;
 	
-	if(Spaceship->roll_pos >> 8){
+	/*if(Spaceship->roll_pos >> 8){
 		delta_roll = Spaceship->roll_pos >> 8;
 		Spaceship->roll_pos -= (delta_roll << 8);
 		update_matrix = 1;
@@ -99,7 +102,7 @@ void SpaceshipDraw(ShipData *Spaceship, struct BgAffineDstData *Bg3AffineTemp, C
 		if (~(REG_KEYINPUT)&KEY_L) {
 			Spaceship->gamma -= 5;
 		}
-	}
+	}*/
 	Spaceship->beta &= 0x3ff; //clamp into range of 0 to 2pi
 	Spaceship->alpha &= 0x3ff; //clamp into range of 0 to 2pi
 	Spaceship->gamma &=0x3ff; //clamp into range of 0 to 2pi
@@ -134,10 +137,30 @@ void SpaceshipDraw(ShipData *Spaceship, struct BgAffineDstData *Bg3AffineTemp, C
 					u32 type = current_segment->type;
 					u32 radius_1 = (current_segment->radius_1 * univ_scale) >> 8;
 					u32 radius_2 = (current_segment->radius_2 * univ_scale) >> 8;
-					s32 height = (current_segment->height * univ_scale) >> 8;
 					u32 gfx_width = current_segment->gfx_width;
 					u32 gfx_height = current_segment->gfx_height;
-					cu8 *gfxPtr = current_segment->gfx_data + (spin >> (10 - gfx_height) << gfx_width);
+					s32 height;
+					cu8 *gfxPtr;
+					if(type & 0x4){ //if this is an engine exhaust segment
+						if(throttle == 0){
+							if(current_segment->height <= 0){ //if the smaller radius of the cone is towards the top
+								pos_x = initialx_pos + ((total_height * univ_scale * TrigGetCos(pitch)) >> 16);
+								total_height += current_segment->height;
+							}
+							else{ //if the smaller radius of the cone is towards the bottom
+								pos_x = initialx_pos + (((total_height - current_segment->height) * univ_scale * TrigGetCos(pitch)) >> 16);
+								total_height -= current_segment->height;
+							}
+							continue;
+						}
+						height = (current_segment->height * univ_scale * throttle >> 16);
+						u32 modified_spin = ((spin + ((frameCount & 0x7) << 7)) & 0x3ff) + 0x200;
+						gfxPtr = current_segment->gfx_data + (modified_spin >> (10 - gfx_height) << gfx_width);
+					}
+					else{
+						height = (current_segment->height * univ_scale) >> 8;
+						gfxPtr = current_segment->gfx_data + (spin >> (10 - gfx_height) << gfx_width);
+					}
 					
 					if (type & 0x1){ //if this segment is a base
 					//skip for now
@@ -181,10 +204,30 @@ void SpaceshipDraw(ShipData *Spaceship, struct BgAffineDstData *Bg3AffineTemp, C
 					u32 type = current_segment->type;
 					u32 radius_1 = (current_segment->radius_1 * univ_scale) >> 8;
 					u32 radius_2 = (current_segment->radius_2 * univ_scale) >> 8;
-					s32 height = (current_segment->height * univ_scale) >> 8;
 					u32 gfx_width = current_segment->gfx_width;
 					u32 gfx_height = current_segment->gfx_height;
-					cu8 *gfxPtr = current_segment->gfx_data + (spin >> (10 - gfx_height) << gfx_width);
+					s32 height;
+					cu8 *gfxPtr;
+					if(type & 0x4){ //if this is an engine exhaust segment
+						if(throttle == 0){
+							if(current_segment->height <= 0){ //if the smaller radius of the cone is towards the top
+								pos_x = initialx_pos + ((total_height * univ_scale * TrigGetCos(pitch)) >> 16);
+								total_height += current_segment->height;
+							}
+							else{ //if the smaller radius of the cone is towards the bottom
+								pos_x = initialx_pos + (((total_height - current_segment->height) * univ_scale * TrigGetCos(pitch)) >> 16);
+								total_height -= current_segment->height;
+							}
+							continue;
+						}
+						height = (current_segment->height * univ_scale * throttle >> 16);
+						u32 modified_spin = ((spin + ((frameCount & 0x7) << 7)) & 0x3ff) + 0x200;
+						gfxPtr = current_segment->gfx_data + (modified_spin >> (10 - gfx_height) << gfx_width);
+					}
+					else{
+						height = (current_segment->height * univ_scale) >> 8;
+						gfxPtr = current_segment->gfx_data + (spin >> (10 - gfx_height) << gfx_width);
+					}
 					
 					if (type & 0x1){ //if this segment is a base
 					//skip for now
@@ -201,7 +244,7 @@ void SpaceshipDraw(ShipData *Spaceship, struct BgAffineDstData *Bg3AffineTemp, C
 						}
 						SetupPosTableCone(pitch, radius_1, radius_2, pos_x, height);
 						bufferPtr = spaceship_buffer + (pos_y << 7);
-						if((pitch ^ height) <= 0){//if pitch and height have the same signs, also render the backside
+						if(((pitch ^ height) <= 0) || (type & 8)){//if pitch and height have the same signs, also render the backside
 							DrawConeWallBack(gfxPtr, bufferPtr, gfx_width, gfx_height);
 						}
 						DrawConeWall(gfxPtr, bufferPtr, gfx_width, gfx_height);

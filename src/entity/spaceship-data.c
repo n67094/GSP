@@ -12,17 +12,17 @@ const PartData *side_column_parts[] = {&s_nosecone, &s_fuel_tank, &s_engine, &s_
 
 ColumnData side_column_1 = {
 	.num_parts = 4, .parts_ptr = side_column_parts,
-	.length = 104, .radius = 48, .angle = 0, .y_pos = 40
+	.length = 120, .radius = 48, .angle = 0, .y_pos = 40
 };
 
 ColumnData side_column_2 = {
 	.num_parts = 4, .parts_ptr = side_column_parts,
-	.length = 104, .radius = 48, .angle = 341, .y_pos = 40
+	.length = 120, .radius = 48, .angle = 341, .y_pos = 40
 };
 
 ColumnData side_column_3 = {
 	.num_parts = 4, .parts_ptr = side_column_parts,
-	.length = 104, .radius = 48, .angle = 683, .y_pos = 40
+	.length = 120, .radius = 48, .angle = 683, .y_pos = 40
 };
 
 ColumnData *ship_columns[] = {&center_column, &side_column_1, &side_column_2, &side_column_3};

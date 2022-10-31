@@ -2,7 +2,7 @@
 #include "../../src/entity/parts-data.h"
 
 const SegmentData s_engine_exhaust_wall = {
-	.type = 0x2, .radius_1 = 8, .radius_2 = 0, .height = 32,
+	.type = 0x6, .radius_1 = 8, .radius_2 = 0, .height = 48,
 	.gfx_width = 5, .gfx_height = 6, .gfx_data = m_exhaustBitmap
 };
 

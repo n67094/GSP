@@ -9,21 +9,15 @@
 
 #include "scene/scene.h"
 
-bool gba_can_draw = false;
-
 void Update() { SceneUpdate(); }
 
 void Draw() { SceneDraw(); }
 
-void VBlank(u16 irqs)
-{
-  SceneVBlank();
-
-  if (gba_can_draw == true) {
-    gba_can_draw = false;
-    Draw();
-  }
+void VBlank(u16 irqs) { 
+	SceneVBlank();
 }
+
+extern u32 earth_in_progress;
 
 int main(void)
 {
@@ -36,14 +30,15 @@ int main(void)
   SceneGoTo(title_scene);
 
   while (true) {
-    inputPoll();
-
-    Update();
-
-    gba_can_draw = true;
-
-    svcVBlankIntrWait();
-  }
+	if(earth_in_progress == 0){
+      svcVBlankIntrWait(); //wait for Vblank
+	}
+	irqDisable(IRQ_VBLANK); //disable Vertical interrupts
+    inputPoll(); //poll inputs
+    Draw(); //perform all calculations that must be done during Vblank
+    Update(); //perform any calculations that can be done outside of Vblank, but must be done before next Vblank
+	irqEnable(IRQ_VBLANK); //reenable Vertical interrupts, next frame will resume at irqDisable
+  } //repeat
 
   LOG_CLOSE();
 }

@@ -17,7 +17,7 @@ void ClearBuffer(vu8 *BufferPtr);
 void TransferBuffer(vu8 *BufferPtr, vu16 *VramPtr);
 
 void SpaceshipInit();
-void SpaceshipDraw(ShipData *, struct BgAffineDstData *, CameraData *);
+void SpaceshipDraw(ShipData *, struct BgAffineDstData *, CameraData *, s32);
 
 void SortColumns(ColumnData *[], ShipData *, s32);
 void CreateMatrix(RotationMatrix *, s32, s32, s32);

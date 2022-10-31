@@ -4,6 +4,7 @@
 #include <seven/hw/memory.h>
 #include <seven/hw/video.h>
 #include <seven/hw/waitstate.h>
+#include <seven/hw/irq.h>
 
 #include "../debug/log.h"
 
@@ -28,10 +29,17 @@
 #define ANGLE_ACC 0x10
 #define CAMERA_SPEED 10
 
-SphereData earth;
+SphereData earth = {
+	.spin = 0, .pitch = 0, .buffer = 0
+};
 
 RotationMatrix spaceship_rotation;
 RotationMatrix camera_rotation;
+
+extern int earth_in_progress;
+u32 earth_frames;
+u32 earth_frames_taken;
+u32 earth_buffer_select = 0; //the currently displaying buffer for earth
 
 ShipData spaceship = {
 	.num_columns = 4, .columns_ptr = ship_columns, .length = 200, .rotation_matrix = &spaceship_rotation,
@@ -44,10 +52,13 @@ CameraData camera = {
 struct BgAffineDstData Bg3AffineTemp;
 struct BgAffineDstData *Bg3AffineReg = (struct BgAffineDstData *)0x4000030;
 
+struct BgAffineDstData Bg2AffineTemp;
+struct BgAffineDstData *Bg2AffineReg = (struct BgAffineDstData *)0x4000020;
+
 static void MissionOpen()
 {
   REG_DISPCNT = VIDEO_MODE_AFFINE | VIDEO_BG2_ENABLE | VIDEO_BG3_ENABLE | VIDEO_OBJ_ENABLE | VIDEO_OBJ_MAPPING_1D;
-  REG_BG2CNT = BG_TILE_8BPP | BG_PRIORITY(1);
+  REG_BG2CNT = BG_TILE_8BPP | BG_PRIORITY(1) | BG_GFX_BASE(1);
   REG_BG3CNT = BG_TILE_8BPP | BG_PRIORITY(0) | BG_GFX_BASE(2) | BG_MAP_BASE(8);
 
   ClearBuffer((vu8 *)MEM_VRAM_OBJ);
@@ -63,6 +74,7 @@ static void MissionOpen()
 
 static void MissionUpdate()
 {
+	static s32 throttle;
 	//unfortunately, I did not have time to implement staging...
   /*if(inputKeysReleased(KEY_LEFT)) { 
     int i;
@@ -75,24 +87,37 @@ static void MissionUpdate()
   if(inputKeysReleased(KEY_A)) {
     StageNext();
   }*/
-  
-  if(~(REG_KEYINPUT)&KEY_B){ //while B is held, control the camera
-    if (~(REG_KEYINPUT)&KEY_LEFT){
+  if(~(REG_KEYINPUT)&KEY_A){ //while A is held, control the throttle
+	if (~(REG_KEYINPUT)&KEY_DOWN){
+	  throttle -= 5;
+	  if(throttle < 0){
+	    throttle = 0;
+	  }
+	}
+	if (~(REG_KEYINPUT)&KEY_UP){
+	  throttle += 5;
+	  if(throttle > 255){
+	    throttle = 255;
+	  }
+	}
+  }
+  else if(~(REG_KEYINPUT)&KEY_B){ //while B is held, control the camera
+    if (~(REG_KEYINPUT)&KEY_RIGHT){
 	  camera.spin -= CAMERA_SPEED;
     }
   
-    if(~(REG_KEYINPUT)&KEY_RIGHT){
+    if(~(REG_KEYINPUT)&KEY_LEFT){
 	  camera.spin += CAMERA_SPEED;
     }
   
-    if (~(REG_KEYINPUT)&KEY_UP){
+    if (~(REG_KEYINPUT)&KEY_DOWN){
 	  camera.pitch += CAMERA_SPEED;
 	  if(camera.pitch > 0xff){
 		camera.pitch = 0xff;
 	  }
     }
   
-    if(~(REG_KEYINPUT)&KEY_DOWN){
+    if(~(REG_KEYINPUT)&KEY_UP){
 	  camera.pitch -= CAMERA_SPEED;
 	  if(camera.pitch < -0xff){
 		camera.pitch = -0xff;
@@ -125,12 +150,27 @@ static void MissionUpdate()
     }
   }
 
-   InterfaceUpdate(7, 8, 3, 1234, 2345, 5);
+   InterfaceUpdate(7, 8, 3, earth_frames_taken, 2345, (throttle * 48) >> 8);
   
   InterfaceDraw();
   ClearBuffer(spaceship_buffer);
-  SpaceshipDraw(&spaceship, &Bg3AffineTemp, &camera);
-  EarthDraw(&earth);
+  SpaceshipDraw(&spaceship, &Bg3AffineTemp, &camera, throttle);
+  earth.spin++;
+  //set the earth's position
+  struct BgAffineSrcData Bg2Affine = {0x4000, 0x4000, (camera.spin + 120) << 22 >> 22, camera.pitch + 80, 0x100, 0x100, 0x10};
+  svcBgAffineSet(&Bg2Affine, &Bg2AffineTemp, 1);
+  
+  irqEnable(IRQ_VBLANK); //enable Vblank earlier than usual, since EarthDraw is designed to be interruptable
+  if(earth_in_progress){
+	earth_frames++;
+	EarthResume(); //restore the progress of EarthDraw
+  }
+  else{
+	earth_in_progress = 1;
+	earth_frames_taken = earth_frames;
+	earth_frames = 0;
+    EarthDraw(&earth, earth_buffer_select ^ 1); 
+  }
 }
 
 static void MissionDraw() {
@@ -141,9 +181,26 @@ static void MissionDraw() {
   Bg3AffineReg->v_diff_y = Bg3AffineTemp.v_diff_y;
   Bg3AffineReg->start_x = Bg3AffineTemp.start_x;
   Bg3AffineReg->start_y = Bg3AffineTemp.start_y;
+  
+  Bg2AffineReg->h_diff_x = Bg2AffineTemp.h_diff_x;
+  Bg2AffineReg->v_diff_x = Bg2AffineTemp.v_diff_x;
+  Bg2AffineReg->h_diff_y = Bg2AffineTemp.h_diff_y;
+  Bg2AffineReg->v_diff_y = Bg2AffineTemp.v_diff_y;
+  Bg2AffineReg->start_x = Bg2AffineTemp.start_x;
+  Bg2AffineReg->start_y = Bg2AffineTemp.start_y;
+  
+  if(earth_in_progress == 0){
+	earth_buffer_select ^= 1;
+	REG_BG2CNT = BG_TILE_8BPP | BG_PRIORITY(1) | BG_GFX_BASE(earth_buffer_select);
+  }
 }
 
-static void MissionVBlank() {}
+static void MissionVBlank() {
+	if(earth_in_progress){
+		EarthPause(); //save the progress of EarthDraw, then make the interrupt return at the very end of EarthDraw
+		//(as if it had concluded normally) This is an absurdly unsafe function, but the jam is due in a day, and I'm in a rush.
+	}
+}
 
 static void MissionClose() {}
 
