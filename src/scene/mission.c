@@ -5,12 +5,18 @@
 #include <seven/hw/video.h>
 #include <seven/hw/waitstate.h>
 #include <seven/hw/irq.h>
+#include <seven/hw/dma.h>
 
 #include "../../data/meta/altitude-meta.h"
 #include "../../data/meta/velocity-meta.h"
 
 #include "../debug/log.h"
 
+#include "../../data/sounds/mission-sound-0.h"
+#include "../../data/sounds/mission-sound-1.h"
+#include "../../data/sounds/mission-sound-2.h"
+
+#include "../core/sound.h"
 #include "../core/label.h"
 #include "../core/font.h"
 #include "../core/tile.h"
@@ -49,7 +55,7 @@ ShipData spaceship = {
 };
 
 CameraData camera = {
-	.rotation_matrix = &camera_rotation, .spin = 0, .pitch = 0
+	.rotation_matrix = &camera_rotation, .spin = 0, .pitch = 0, .zoom = 0x100
 };
 
 struct BgAffineDstData Bg3AffineTemp;
@@ -57,6 +63,40 @@ struct BgAffineDstData *Bg3AffineReg = (struct BgAffineDstData *)0x4000030;
 
 struct BgAffineDstData Bg2AffineTemp;
 struct BgAffineDstData *Bg2AffineReg = (struct BgAffineDstData *)0x4000020;
+
+cs8 *mission_sound = mission_sound_0;
+int mission_sound_channel = MISSION_SOUND_0_CHANNEL;
+int mission_sound_size = MISSION_SOUND_0_SIZE;
+
+int mission_playlist_index = 0;
+int mission_playlist_size = 3;
+
+static void nextSound() {
+  ++mission_playlist_index;
+  if(mission_playlist_index == mission_playlist_size) {
+    mission_playlist_index = 0;
+  }
+
+  switch (mission_playlist_index) {
+    case 0:
+      mission_sound = mission_sound_0;
+      mission_sound_channel = MISSION_SOUND_0_CHANNEL;
+      mission_sound_size = MISSION_SOUND_0_SIZE;
+      break;
+    case 1:
+      mission_sound = mission_sound_1;
+      mission_sound_channel = MISSION_SOUND_1_CHANNEL;
+      mission_sound_size = MISSION_SOUND_1_SIZE;
+      break;
+    case 2:
+      mission_sound = mission_sound_2;
+      mission_sound_channel = MISSION_SOUND_2_CHANNEL;
+      mission_sound_size = MISSION_SOUND_2_SIZE;
+      break;
+  }
+
+  SoundPlay(mission_sound, mission_sound_channel);
+}
 
 #define MISSION_FRAME_MAX 0x20
 #define MISSION_OVERFLOW_MAX 0xFF
@@ -94,6 +134,9 @@ static void MissionOpen()
   LabelInit(&default_font);
   SpaceshipInit();
   InterfaceInit();
+
+  //SoundInit();
+  //SoundPlay(mission_sound_0, MISSION_SOUND_0_CHANNEL);
 
   REG_WAITCNT = WAIT_ROM_N_2 | WAIT_ROM_S_1 | WAIT_PREFETCH_ENABLE;
 
@@ -154,6 +197,19 @@ static void MissionUpdate()
 		camera.pitch = -0xff;
 	  }
     }
+    if (~(REG_KEYINPUT)&KEY_R){
+	  camera.zoom += CAMERA_SPEED;
+	  if(camera.zoom > 0x800){
+		camera.zoom = 0x800;
+	  }
+    }
+  
+    if(~(REG_KEYINPUT)&KEY_L){
+	  camera.zoom -= CAMERA_SPEED;
+	  if(camera.zoom < 0x60){
+		camera.zoom = 0x60;
+	  }
+    }
   }
   else{ //if B is not held, control the spaceship
     if (~(REG_KEYINPUT)&KEY_LEFT) {
@@ -190,21 +246,26 @@ static void MissionUpdate()
   //set the earth's position
   struct BgAffineSrcData Bg2Affine = {0x4000, 0x4000, (camera.spin + 120) << 22 >> 22, camera.pitch + 80, 0x100, 0x100, 0x10};
   svcBgAffineSet(&Bg2Affine, &Bg2AffineTemp, 1);
-  
   irqEnable(IRQ_VBLANK); //enable Vblank earlier than usual, since EarthDraw is designed to be interruptable
+
   if(earth_in_progress){
-	earth_frames++;
-	EarthResume(); //restore the progress of EarthDraw
+		earth_frames++;
+		EarthResume(); //restore the progress of EarthDraw 
   }
   else{
-	earth_in_progress = 1;
-	earth_frames_taken = earth_frames;
-	earth_frames = 0;
+		earth_in_progress = 1;
+		earth_frames_taken = earth_frames;
+		earth_frames = 0;
     EarthDraw(&earth, earth_buffer_select ^ 1); 
   }
 }
 
 static void MissionDraw() {
+  u32 sound_duration = CheckSoundProgress(mission_sound, mission_sound_channel, mission_sound_size);
+  if(sound_duration){
+    nextSound();
+  }
+
   TransferBuffer(spaceship_buffer, GFX_BASE_ADDR(2));
   Bg3AffineReg->h_diff_x = Bg3AffineTemp.h_diff_x;
   Bg3AffineReg->v_diff_x = Bg3AffineTemp.v_diff_x;
@@ -212,17 +273,17 @@ static void MissionDraw() {
   Bg3AffineReg->v_diff_y = Bg3AffineTemp.v_diff_y;
   Bg3AffineReg->start_x = Bg3AffineTemp.start_x;
   Bg3AffineReg->start_y = Bg3AffineTemp.start_y;
-  
+
   Bg2AffineReg->h_diff_x = Bg2AffineTemp.h_diff_x;
   Bg2AffineReg->v_diff_x = Bg2AffineTemp.v_diff_x;
   Bg2AffineReg->h_diff_y = Bg2AffineTemp.h_diff_y;
   Bg2AffineReg->v_diff_y = Bg2AffineTemp.v_diff_y;
   Bg2AffineReg->start_x = Bg2AffineTemp.start_x;
   Bg2AffineReg->start_y = Bg2AffineTemp.start_y;
-  
+
   if(earth_in_progress == 0){
-	earth_buffer_select ^= 1;
-	REG_BG2CNT = BG_TILE_8BPP | BG_PRIORITY(1) | BG_GFX_BASE(earth_buffer_select);
+	  earth_buffer_select ^= 1;
+	  REG_BG2CNT = BG_TILE_8BPP | BG_PRIORITY(1) | BG_GFX_BASE(earth_buffer_select);
   }
 }
 
