@@ -22,6 +22,8 @@ make
 ```
 ## bin2s
 
+**Note:** this step is only need if you add/modify data
+
 To convert binary file to asm we use bin2s from the DevKipPro tools.
 
 **Commande :**
@@ -36,12 +38,10 @@ The tool is build you will be able to run **make bin** to convert bin file to **
 
 **Commande :**
 ```
-make bin //optional if up to date
 make TARGET=release
 ```
 or
 ```
-make bin //optional if up to date
 make
 ```
 
@@ -49,10 +49,9 @@ make
 
 **Commande :**
 ```
-make bin //optional if up to date
 make TARGET=debug
 ```
-this will includes to possibility to use log and assert, c.f (src/debug/)
+This will includes to possibility to use log and assert, c.f (src/debug/)
 
 ## Note
 

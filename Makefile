@@ -105,7 +105,7 @@ dep = $(call pathmap,$(1),$(BUILDDIR)/dep/,.d)
 
 define compile =
 $(call obj,$(1)): $(1)
-	@echo "compile $$<"
+
 	@$$(CC) -c -o $$@ $$(CFLAGS) -MMD -MP -MF $(call dep,$(1)) $$<
 
 OBJECTS += $(call obj,$(1))
