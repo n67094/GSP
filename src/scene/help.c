@@ -69,9 +69,9 @@ static void HelpDraw()
 }
 
 static void HelpVBlank() {
-  u32 sound_duration = CheckSoundProgress(title_song, TITLE_SOUND_CHANNEL, TITLE_SOUND_SIZE);
+  u32 sound_duration = CheckSoundProgress(title_sound, TITLE_SOUND_CHANNEL, TITLE_SOUND_SIZE);
   if(sound_duration){
-  SoundRepeat(title_song, TITLE_SOUND_CHANNEL, sound_duration);
+  SoundRepeat(title_sound, TITLE_SOUND_CHANNEL, sound_duration);
   }
 }
 

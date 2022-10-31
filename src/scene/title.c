@@ -70,7 +70,7 @@ static void TitleOpen() {
   ObjectSetPos(start2, POS_TITLE_START_2_X, POS_TITLE_START_2_Y);
   
   SoundInit();
-  SoundPlay(title_song, TITLE_SOUND_CHANNEL);
+  SoundPlay(title_sound, TITLE_SOUND_CHANNEL);
 }
 
 static void TitleUpdate()
@@ -101,9 +101,9 @@ static void TitleVBlank() {
     ++title_frame_counter;
   }
 
-  u32 sound_duration = CheckSoundProgress(title_song, TITLE_SOUND_CHANNEL, TITLE_SOUND_SIZE);
+  u32 sound_duration = CheckSoundProgress(title_sound, TITLE_SOUND_CHANNEL, TITLE_SOUND_SIZE);
   if(sound_duration){
-  SoundRepeat(title_song, TITLE_SOUND_CHANNEL, sound_duration);
+  SoundRepeat(title_sound, TITLE_SOUND_CHANNEL, sound_duration);
   }
 }
 

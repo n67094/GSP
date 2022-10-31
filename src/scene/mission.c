@@ -7,6 +7,11 @@
 
 #include "../debug/log.h"
 
+#include "../../data/sounds/mission-sound-0.h"
+#include "../../data/sounds/mission-sound-1.h"
+#include "../../data/sounds/mission-sound-2.h"
+
+#include "../core/sound.h"
 #include "../core/label.h"
 #include "../core/font.h"
 #include "../core/tile.h"
@@ -33,6 +38,13 @@ SphereData earth;
 RotationMatrix spaceship_rotation;
 RotationMatrix camera_rotation;
 
+cs8 *mission_sound = mission_sound_0;
+int mission_sound_channel = MISSION_SOUND_0_CHANNEL;
+int mission_sound_size = MISSION_SOUND_0_SIZE;
+
+int mission_playlist_index = 0;
+int mission_playlist_size = 3;
+
 ShipData spaceship = {
 	.num_columns = 4, .columns_ptr = ship_columns, .length = 200, .rotation_matrix = &spaceship_rotation,
 };
@@ -43,6 +55,33 @@ CameraData camera = {
 
 struct BgAffineDstData Bg3AffineTemp;
 struct BgAffineDstData *Bg3AffineReg = (struct BgAffineDstData *)0x4000030;
+
+static void nextSound() {
+  ++mission_playlist_index;
+  if(mission_playlist_index == mission_playlist_size) {
+    mission_playlist_index = 0;
+  }
+
+  switch (mission_playlist_index) {
+    case 0:
+      mission_sound = mission_sound_0;
+      mission_sound_channel = MISSION_SOUND_0_CHANNEL;
+      mission_sound_size = MISSION_SOUND_0_SIZE;
+      break;
+    case 1:
+      mission_sound = mission_sound_1;
+      mission_sound_channel = MISSION_SOUND_1_CHANNEL;
+      mission_sound_size = MISSION_SOUND_1_SIZE;
+      break;
+    case 2:
+      mission_sound = mission_sound_2;
+      mission_sound_channel = MISSION_SOUND_2_CHANNEL;
+      mission_sound_size = MISSION_SOUND_2_SIZE;
+      break;
+  }
+
+  SoundPlay(mission_sound, mission_sound_channel);
+}
 
 static void MissionOpen()
 {
@@ -57,6 +96,9 @@ static void MissionOpen()
   LabelInit(&default_font);
   SpaceshipInit();
   InterfaceInit();
+
+  SoundInit();
+  SoundPlay(mission_sound_0, MISSION_SOUND_0_CHANNEL);
 
   REG_WAITCNT = WAIT_ROM_N_2 | WAIT_ROM_S_1 | WAIT_PREFETCH_ENABLE;
 }
@@ -125,7 +167,7 @@ static void MissionUpdate()
     }
   }
 
-   InterfaceUpdate(7, 8, 3, 1234, 2345, 5);
+  InterfaceUpdate(7, 8, 3, 1234, 2345, 5);
   
   InterfaceDraw();
   ClearBuffer(spaceship_buffer);
@@ -141,6 +183,11 @@ static void MissionDraw() {
   Bg3AffineReg->v_diff_y = Bg3AffineTemp.v_diff_y;
   Bg3AffineReg->start_x = Bg3AffineTemp.start_x;
   Bg3AffineReg->start_y = Bg3AffineTemp.start_y;
+
+  u32 sound_duration = CheckSoundProgress(mission_sound, mission_sound_channel, mission_sound_size);
+  if(sound_duration){
+    nextSound();
+  }
 }
 
 static void MissionVBlank() {}
