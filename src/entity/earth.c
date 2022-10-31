@@ -3,6 +3,7 @@
 #include "../../data/bitmaps/earth.tiles.h"
 
 #include "../core/memory.h"
+#include "../core/trig.h"
 #include "../entity/earth.h"
 #include "../renderer/sphere.h"
 #include "../types.h"
@@ -29,6 +30,8 @@ void EarthInit() {
   EarthInitTileMap();
 }
 
-void EarthDraw(SphereData *earth) {
-  SphereRender(earth_tiles, (u8 *)MEM_VRAM, earth->pitch, earth->spin, 7, 9);
+void EarthDraw(SphereData *earth, u32 buffer_select) {
+  s32 spin = earth->spin >> 7;
+  earth->pitch = TrigGetSin(spin) >> 4;
+  SphereRender(earth_tiles, (u8 *)GFX_BASE_ADDR(buffer_select), earth->pitch, spin, 7, 9);
 }

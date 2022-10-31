@@ -12,7 +12,7 @@ const SegmentData s_engine_wall_1 = {
 };
 
 const SegmentData s_engine_wall_2 = {
-	.type = 0x2, .radius_1 = 8, .radius_2 = 0, .height = -16,
+	.type = 0xa, .radius_1 = 8, .radius_2 = 0, .height = -16,
 	.gfx_width = 2, .gfx_height = 5, .gfx_data = m_engine_2Bitmap
 };
 

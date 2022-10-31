@@ -6,6 +6,7 @@
 typedef struct SphereData {
 	s32 pitch;
 	s32 spin;
+	u32 buffer;
 } SphereData;
 
 typedef struct RotationMatrix {
@@ -27,8 +28,8 @@ typedef struct SegmentData{
 	//bit 0: 0 = wall, 1 = base.
 	//bit 1 if wall: 0 = cylinder, 1 = cone.
 	//bit 1 if base: 0 = do not draw if segment is mated with another part, 1 = always draw 
-	//bit 2: 0 = static dimensions, 1 = variable height
-	//bit 3: unused
+	//bit 2: 0 = static dimensions, 1 = engine exhaust
+	//bit 3: 1 if engine bell
 	//bit 4: unused
 	//bit 5: unused
 	//bit 6: unused
