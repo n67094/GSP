@@ -7,6 +7,9 @@
 #include <seven/hw/irq.h>
 #include <seven/hw/dma.h>
 
+#include "../../data/meta/altitude-meta.h"
+#include "../../data/meta/velocity-meta.h"
+
 #include "../debug/log.h"
 
 #include "../../data/sounds/mission-sound-0.h"
@@ -42,13 +45,6 @@ SphereData earth = {
 RotationMatrix spaceship_rotation;
 RotationMatrix camera_rotation;
 
-cs8 *mission_sound = mission_sound_0;
-int mission_sound_channel = MISSION_SOUND_0_CHANNEL;
-int mission_sound_size = MISSION_SOUND_0_SIZE;
-
-int mission_playlist_index = 0;
-int mission_playlist_size = 3;
-
 extern int earth_in_progress;
 u32 earth_frames;
 u32 earth_frames_taken;
@@ -67,6 +63,13 @@ struct BgAffineDstData *Bg3AffineReg = (struct BgAffineDstData *)0x4000030;
 
 struct BgAffineDstData Bg2AffineTemp;
 struct BgAffineDstData *Bg2AffineReg = (struct BgAffineDstData *)0x4000020;
+
+cs8 *mission_sound = mission_sound_0;
+int mission_sound_channel = MISSION_SOUND_0_CHANNEL;
+int mission_sound_size = MISSION_SOUND_0_SIZE;
+
+int mission_playlist_index = 0;
+int mission_playlist_size = 3;
 
 static void nextSound() {
   ++mission_playlist_index;
@@ -95,6 +98,29 @@ static void nextSound() {
   SoundPlay(mission_sound, mission_sound_channel);
 }
 
+#define MISSION_FRAME_MAX 0x20
+#define MISSION_OVERFLOW_MAX 0xFF
+
+u32 mission_frame_count = 0;
+u32 mission_overflow_count = 0;
+
+u16 altitude = 0;
+u16 velocity = 0;
+
+static void MissionMetaUpdate() {
+	++mission_frame_count;
+
+	if(mission_frame_count == MISSION_FRAME_MAX) {
+	  mission_frame_count = 0;
+
+	  ++mission_overflow_count;
+	  mission_overflow_count &= MISSION_OVERFLOW_MAX; // wrappe
+	}
+
+	altitude = altitude_meta[mission_overflow_count] + ((altitude_meta[mission_overflow_count + 1] - altitude_meta[mission_overflow_count]) * mission_frame_count >> 5);
+	velocity = velocity_meta[mission_overflow_count] + ((velocity_meta[mission_overflow_count + 1] - velocity_meta[mission_overflow_count]) * mission_frame_count >> 5);
+}
+
 static void MissionOpen()
 {
   REG_DISPCNT = VIDEO_MODE_AFFINE | VIDEO_BG2_ENABLE | VIDEO_BG3_ENABLE | VIDEO_OBJ_ENABLE | VIDEO_OBJ_MAPPING_1D;
@@ -113,10 +139,15 @@ static void MissionOpen()
   //SoundPlay(mission_sound_0, MISSION_SOUND_0_CHANNEL);
 
   REG_WAITCNT = WAIT_ROM_N_2 | WAIT_ROM_S_1 | WAIT_PREFETCH_ENABLE;
+
+	altitude = altitude_meta[0];
+	velocity = velocity_meta[0];
 }
 
 static void MissionUpdate()
 {
+	MissionMetaUpdate();
+
 	static s32 throttle;
 	//unfortunately, I did not have time to implement staging...
   /*if(inputKeysReleased(KEY_LEFT)) { 
@@ -206,7 +237,7 @@ static void MissionUpdate()
     }
   }
 
-  InterfaceUpdate(7, 8, 3, earth_frames_taken, 2345, (throttle * 48) >> 8);
+  InterfaceUpdate(7, 8, 3, altitude, velocity, (throttle * 48) >> 8);
   
   InterfaceDraw();
   ClearBuffer(spaceship_buffer);
@@ -216,14 +247,15 @@ static void MissionUpdate()
   struct BgAffineSrcData Bg2Affine = {0x4000, 0x4000, (camera.spin + 120) << 22 >> 22, camera.pitch + 80, 0x100, 0x100, 0x10};
   svcBgAffineSet(&Bg2Affine, &Bg2AffineTemp, 1);
   irqEnable(IRQ_VBLANK); //enable Vblank earlier than usual, since EarthDraw is designed to be interruptable
+
   if(earth_in_progress){
-	earth_frames++;
-	EarthResume(); //restore the progress of EarthDraw 
+		earth_frames++;
+		EarthResume(); //restore the progress of EarthDraw 
   }
   else{
-	earth_in_progress = 1;
-	earth_frames_taken = earth_frames;
-	earth_frames = 0;
+		earth_in_progress = 1;
+		earth_frames_taken = earth_frames;
+		earth_frames = 0;
     EarthDraw(&earth, earth_buffer_select ^ 1); 
   }
 }
