@@ -109,8 +109,8 @@ static void MissionOpen()
   SpaceshipInit();
   InterfaceInit();
 
-  //SoundInit();
-  //SoundPlay(mission_sound_0, MISSION_SOUND_0_CHANNEL);
+  SoundInit();
+  SoundPlay(mission_sound_0, MISSION_SOUND_0_CHANNEL);
 
   REG_WAITCNT = WAIT_ROM_N_2 | WAIT_ROM_S_1 | WAIT_PREFETCH_ENABLE;
 }
