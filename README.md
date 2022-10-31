@@ -55,4 +55,7 @@ This will includes to possibility to use log and assert, c.f (src/debug/)
 
 ## Note
 
-Durgin the development we noticed that mGBA 0.9.2 had unexpected behavoir, we recommand you to use the version 0.9.3, or the hardware
+**Recommanded mGBA version:** 0.9.3
+
+Durgin the development we noticed that mGBA 0.9.2 and mGBA 0.10.x had unexpected behavoir, we recommand you to use the version 0.9.3, or the hardware
+
