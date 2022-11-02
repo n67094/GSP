@@ -56,6 +56,7 @@ This will includes to possibility to use log and assert, c.f (src/debug/)
 ## Note
 
 **Hardware** is recommanded
+
 **mGBA** v0.9.3 is recommanded (some random glitch can be experienced randomly)
 
 Durgin the development we noticed that mGBA 0.9.2 and mGBA 0.10.x had unexpected behavoir, we recommand you to use the version 0.9.3, or the hardware
